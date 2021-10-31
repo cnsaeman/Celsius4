@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<celsiusv2.1.configuration.plugins>
+<element>
+  <name>PluginJSTOR</name>
+</element>
+<element>
+  <name>PluginStdLaTeX</name>
+</element>
+<element>
+  <name>PluginFileName2</name>
+</element>
+<element>
+  <name>PluginTitleFromBibTeX</name>
+</element>
+<element>
+  <name>PluginJournalSpires</name>
+</element>
+<element>
+  <name>PluginHeader</name>
+</element>
+<element>
+  <name>PluginRepairPDF</name>
+</element>
+<element>
+  <name>PluginCreateBibTeX</name>
+</element>
+<element>
+  <name>PluginLookAtInspire</name>
+</element>
+<element>
+  <name>PluginUpdateCitationCount</name>
+</element>
+<element>
+  <name>PluginLookAtIMDB</name>
+</element>
+<element>
+  <name>PluginTester</name>
+</element>
+<element>
+  <name>PluginFileNameTV</name>
+</element>
+<element>
+  <name>PluginUpdateLinks</name>
+</element>
+<element>
+  <name>PluginCropPDF</name>
+  <parameters>/media/disk/database/media/books</parameters>
+</element>
+<element>
+  <name>PluginAddSource</name>
+</element>
+<element>
+  <name>PluginUpdateInspire</name>
+</element>
+<element>
+  <name>PluginEnumerate</name>
+</element>
+<element>
+  <name>PluginCreateThumb</name>
+</element>
+<element>
+  <name>PluginFileNameMovie</name>
+</element>
+<element>
+  <name>PluginTVShow</name>
+</element>
+<element>
+  <name>PluginLookUpDoi</name>
+</element>
+<element>
+  <name>PluginPDFStamper</name>
+</element>
+<element>
+  <name>PluginNormalizeJournals</name>
+</element>
+<element>
+  <name>PluginFileNameAudio</name>
+</element>
+<element>
+  <name>PluginBibTeX</name>
+</element>
+<element>
+  <name>PluginSimple</name>
+</element>
+<element>
+  <name>PluginListOfPublications</name>
+</element>
+<element>
+  <name>PluginTryToCompleteBibTeX</name>
+</element>
+<element>
+  <name>PluginArXiv</name>
+</element>
+<element>
+  <name>PluginSetIdentifier</name>
+</element>
+<element>
+  <name>PluginGetDOI</name>
+</element>
+<element>
+  <name>PluginWatchCitationCount</name>
+</element>
+<element>
+  <name>PluginPhilSci</name>
+</element>
+<element>
+  <name>PluginAmazonAudio</name>
+</element>
+<element>
+  <name>PluginCreatePlaylist</name>
+</element>
+<element>
+  <name>PluginLookAtAdsAbs</name>
+</element>
+<element>
+  <name>PluginPDFHeader</name>
+</element>
+<element>
+  <name>PluginExtLaTeX</name>
+</element>
+<element>
+  <name>PluginAmazon</name>
+</element>
+<element>
+  <name>PluginFileName</name>
+</element>
+<element>
+  <name>PluginUpdateCompleteRecent</name>
+</element>
+<element>
+  <name>PluginMutopia</name>
+</element>
+<element>
+  <name>PluginGetFromDoi</name>
+</element>
+<element>
+  <name>PluginAdjustType</name>
+</element>
+<element>
+  <name>PluginConvertps2pdf</name>
+</element>
+<element>
+  <name>PluginListOfPublicationsWeb</name>
+</element>
+<element>
+  <name>PluginGetFromInspire</name>
+</element>
+<element>
+  <name>PluginBibTeXPath</name>
+</element>
+<element>
+  <name>PluginAdjustAudioTitle</name>
+</element>
+<element>
+  <name>PluginLookAtIMDBTV</name>
+</element>
+<element>
+  <name>PluginAudioStamper</name>
+</element>
+<element>
+  <name>PluginUpdateComplete</name>
+</element>
+<element>
+  <name>PluginGPX</name>
+</element>
+<element>
+  <name>PluginGetAudioData</name>
+</element>
+<element>
+  <name>PluginHeaderAudio</name>
+</element>
+<element>
+  <name>PluginIMSLP</name>
+</element>
+</celsiusv2.1.configuration.plugins>
