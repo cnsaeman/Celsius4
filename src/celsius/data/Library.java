@@ -113,6 +113,7 @@ public final class Library implements Iterable<Item> {
     
     // Size information
     public int numberOfItems;
+    public int numberOfPeople;
     public int sizeOfItems;
 
     public String LastErrorMessage;
@@ -297,6 +298,7 @@ public final class Library implements Iterable<Item> {
 
             // Read html templates
             htmlTemplates=new HashMap<>();
+            htmlTemplates.put("-1",new CelsiusTemplate(RSC, "<html><body><h2>Currently selected library: #library.name#</h2><hr></body></html>"));
             rs=dbConnection.prepareStatement("SELECT * FROM html_templates;").executeQuery();
             while (rs.next()) {
                 htmlTemplates.put(rs.getString(1), new CelsiusTemplate(RSC,rs.getString(2)));
@@ -665,6 +667,8 @@ public final class Library implements Iterable<Item> {
         try {
             ResultSet rs=this.dbConnection.prepareStatement("SELECT COUNT(*) from items;").executeQuery();
             if (rs.next()) numberOfItems=rs.getInt(1);
+            rs=this.dbConnection.prepareStatement("SELECT COUNT(*) from persons;").executeQuery();
+            if (rs.next()) numberOfPeople=rs.getInt(1);
             rs=this.dbConnection.prepareStatement("SELECT SUM(pages) FROM attachments;").executeQuery();
             if (rs.next()) sizeOfItems=rs.getInt(1);
         } catch (Exception e) {
@@ -1946,6 +1950,14 @@ public final class Library implements Iterable<Item> {
         }
         
         return(person);
+    }
+    
+    public HashMap<String,String> getDataHash() {
+        HashMap<String,String> data=new HashMap();
+        data.put("library.name",name);
+        data.put("library.numberofitems",String.valueOf(numberOfItems));
+        data.put("library.numberofpeople",String.valueOf(numberOfPeople));
+        return(data);
     }
 
 

@@ -420,6 +420,7 @@ public class MainFrame extends javax.swing.JFrame implements
         buttonGroup3 = new javax.swing.ButtonGroup();
         jPMPeopleTable = new javax.swing.JPopupMenu();
         jMIMerge = new javax.swing.JMenuItem();
+        jMIRemoveFromTable = new javax.swing.JMenuItem();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jCBLibraries = new javax.swing.JComboBox();
@@ -507,6 +508,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMPeople = new javax.swing.JMenu();
         jMIMerge1 = new javax.swing.JMenuItem();
+        jMIRemoveFromTable2 = new javax.swing.JMenuItem();
         jMItems = new javax.swing.JMenu();
         jMIView = new javax.swing.JMenuItem();
         jMShow1 = new javax.swing.JMenu();
@@ -852,6 +854,14 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMPeopleTable.add(jMIMerge);
+
+        jMIRemoveFromTable.setText("Remove from current table");
+        jMIRemoveFromTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIRemoveFromTableActionPerformed(evt);
+            }
+        });
+        jPMPeopleTable.add(jMIRemoveFromTable);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Celsius Library System v2.0");
@@ -1435,6 +1445,14 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jMPeople.add(jMIMerge1);
 
+        jMIRemoveFromTable2.setText("Remove from current table");
+        jMIRemoveFromTable2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIRemoveFromTable2ActionPerformed(evt);
+            }
+        });
+        jMPeople.add(jMIRemoveFromTable2);
+
         jMainMenu.add(jMPeople);
 
         jMItems.setText("Items");
@@ -1783,7 +1801,6 @@ public class MainFrame extends javax.swing.JFrame implements
         for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows()) {
             ((Item)tableRow).redoPlainText();
         }
-        guiInfoPanel.updateHTMLview();
         guiInfoPanel.updateGUI();
         updateStatusBar(true);
     }//GEN-LAST:event_jMICreateTxtActionPerformed
@@ -1853,7 +1870,7 @@ public class MainFrame extends javax.swing.JFrame implements
         MLE.setVisible(true);
         if (!MLE.cancel) {
             library.setHTMLTemplate(guiInfoPanel.currentTemplate,MLE.text);
-            guiInfoPanel.updateHTMLview();
+            guiInfoPanel.updateGUI();
         }
     }//GEN-LAST:event_jMIEditDSActionPerformed
 
@@ -2101,11 +2118,7 @@ public class MainFrame extends javax.swing.JFrame implements
     }//GEN-LAST:event_jMIDeleteFileActionPerformed
 
     private void jMIRemoveFromTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRemoveFromTabActionPerformed
-        CelsiusTable celsiusTable = RSC.getCurrentTable();
-        if (celsiusTable!=null) {
-            for (TableRow tableRow : celsiusTable.getSelectedRows())
-                celsiusTable.removeRow(tableRow);
-        }
+        RSC.removeSelectedFromCurrentTable();
         guiInfoPanel.updateGUI();
     }//GEN-LAST:event_jMIRemoveFromTabActionPerformed
 
@@ -2183,7 +2196,7 @@ public class MainFrame extends javax.swing.JFrame implements
         CelsiusTable celsiusTable=RSC.getCurrentTable();
         if (celsiusTable == null) {
             guiPluginPanel.adjustPluginList();
-            guiInfoPanel.updateHTMLview();
+            guiInfoPanel.updateGUI();
         } else {
             switchToLibrary(celsiusTable.library);
             guiPluginPanel.adjustPluginList();
@@ -2564,6 +2577,16 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private void jMIClearLoggingFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIClearLoggingFileActionPerformed
         RSC.resetLogFile();
     }//GEN-LAST:event_jMIClearLoggingFileActionPerformed
+
+    private void jMIRemoveFromTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRemoveFromTableActionPerformed
+        RSC.removeSelectedFromCurrentTable();
+        guiInfoPanel.updateGUI();
+    }//GEN-LAST:event_jMIRemoveFromTableActionPerformed
+
+    private void jMIRemoveFromTable2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRemoveFromTable2ActionPerformed
+        RSC.removeSelectedFromCurrentTable();
+        guiInfoPanel.updateGUI();
+    }//GEN-LAST:event_jMIRemoveFromTable2ActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2655,6 +2678,8 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIReExtract1;
     private javax.swing.JMenuItem jMIRemoveFromTab;
     private javax.swing.JMenuItem jMIRemoveFromTab1;
+    private javax.swing.JMenuItem jMIRemoveFromTable;
+    private javax.swing.JMenuItem jMIRemoveFromTable2;
     private javax.swing.JMenuItem jMIRemoveHalf;
     private javax.swing.JMenuItem jMIRemoveHalf1;
     private javax.swing.JMenuItem jMIRenameCat;
@@ -2826,7 +2851,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                     try {
                         DT.library.registerItem(item, structureNode, 0);
                         guiInfoPanel.updateGUI();
-                        guiInfoPanel.updateHTMLview();
                         updateStatusBar(false);
                     } catch (Exception e) {
                         RSC.outEx(e);
@@ -3320,7 +3344,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             }
         }
         updateStatusBar(true);
-        guiInfoPanel.updateHTMLview();
         guiInfoPanel.updateGUI();        
     }
 

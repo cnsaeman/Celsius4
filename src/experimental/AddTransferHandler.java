@@ -90,7 +90,6 @@ public class AddTransferHandler extends TransferHandler {
                             for (ItemTable DT : MF.RSC.ItemTables) {
                                 DT.refresh();
                             }*/
-                            MF.guiInfoPanel.updateHTMLview();
                             MF.guiInfoPanel.updateGUI();
                             MF.updateStatusBar(true);
                         }

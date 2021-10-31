@@ -698,6 +698,7 @@ public final class Library3 implements Iterable<Item3> {
             sql = "CREATE TABLE IF NOT EXISTS html_templates(\n    mode text UNIQUE,\n";
             sql+= "    template text);";
             stmt = Lib.conn.createStatement();
+            Lib.HTMLtemplates.put("-1", "<html><body><h2>Currently selected library: #library.name#</h2><hr></body></html>");
             RSC.out(sql);
             success=stmt.execute(sql);
             sql = "INSERT INTO html_templates (mode,template) VALUES(?,?)";

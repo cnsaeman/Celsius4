@@ -320,13 +320,6 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         return(ids.toString());
     }
 
-    public void adjustCurrentStats(ArrayList<TableRow> tableRows) {
-        properties.put("currentpages", String.valueOf(library.getPagesForItems(tableRows)));
-        properties.put("currentduration", ToolBox.formatSeconds(0));
-        properties.put("currentitems", String.valueOf(celsiusTableModel.tableRows.size()));
-        properties.put("selecteditems", String.valueOf(jtable.getSelectedRowCount()));
-    }
-
     public void updateStats() {
         if (getObjectType()==CelsiusTable.ITEM_TABLE) {
             properties.put("selecteditems", String.valueOf(jtable.getSelectedRowCount()));
@@ -451,7 +444,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
             jtable.setRowHeight(RSC.guiScale(24));
             if (updateView) {
                 //if (!tableview) TNV.updateView(); //#### test to exclude
-                MF.guiInfoPanel.updateHTMLview();
+                MF.guiInfoPanel.updateGUI();
             }
         }
     }
@@ -495,7 +488,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
                 }
             }
 
-            adjustCurrentStats(getSelectedRows());
+            updateStats();
             MF.guiInfoPanel.updateGUI();
         } else {
             jtable.setComponentPopupMenu(null);
@@ -653,6 +646,10 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         }
     }
 
+    void removeSelectedFromTable() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public class CellRenderer extends DefaultTableCellRenderer {
 
         public CellRenderer() {
@@ -679,5 +676,5 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
             jtable.requestFocus();
         }
     }
-
+    
 }

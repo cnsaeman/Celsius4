@@ -949,6 +949,12 @@ public class Resources {
         }
     }
     
-    
+    public void removeSelectedFromCurrentTable() {
+        CelsiusTable celsiusTable = getCurrentTable();
+        if (celsiusTable!=null) {
+            for (TableRow tableRow : celsiusTable.getSelectedRows())
+                celsiusTable.removeRow(tableRow);
+        }
+    }
     
 }

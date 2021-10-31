@@ -140,7 +140,6 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         
         celsiusTable=null;
         tabMode=-1000;
-        updateHTMLview();
     }
 
     // TODO
@@ -848,7 +847,6 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
             if (currentItem.get("type").equals("Paper")) {
                 currentItem.put("type","Preprint");
             }
-            updateHTMLview();
             updateGUI();
             currentItem.save();
             return;
@@ -866,7 +864,6 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         } else if (currentItem.get("type").equals("Preprint") && (btr.get("journal")!=null)) {
             currentItem.put("type","Paper");
         }
-        updateHTMLview();
         updateGUI();
         currentItem.save();
         if (currentItem.error==6) RSC.showWarning("Error while saving information file.", "Exception:");
@@ -1050,7 +1047,7 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         MLE.setVisible(true);
         if (!MLE.cancel) {
             library.setHTMLTemplate(currentTemplate,MLE.text);
-            updateHTMLview();
+            updateGUI();
         }
 }//GEN-LAST:event_jMIEditDS1jMIEditDSActionPerformed
 
@@ -1131,7 +1128,6 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
             if (!target.equals(targetname))
                 FileTools.deleteIfExists(target);
             updateThumb();
-            updateHTMLview();
             updateGUI();
         } catch (IOException ex) {
             RSC.outEx(ex);
@@ -1143,7 +1139,7 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         currentItem.put("thumbnail",null);
         currentItem.save();
         updateThumb();
-        updateHTMLview();
+        updateGUI();
         updateGUI();
     }//GEN-LAST:event_jBtnRemoveThumbActionPerformed
 
@@ -1409,29 +1405,6 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         jMIEditDS1.setEnabled(false);
     }*/
 
-    public void updateHTMLview() {
-        /*if ((tabMode==-1) || (RSC.MF.jTPTabList.getSelectedIndex() < 0)) {
-            setStdHTML();
-            return;
-        }
-        RSC.MF.jMIEditDS.setEnabled(true);
-        jMIEditDS1.setEnabled(true);
-        if (celsiusTable!=null) celsiusTable.lastHTMLview=RSC.stdHTMLstring;
-        jHTMLview.setContentType("text/html");
-        jHTMLview.setText(displayString(tabMode,RSC.journalLinks));
-        if (celsiusTable!=null) {
-            celsiusTable.lastHTMLview = jHTMLview.getText();
-            if (tabMode != 0) {
-                celsiusTable.creationHTMLview = celsiusTable.lastHTMLview;
-            }
-        }
-        jHTMLview.setCaretPosition(0);
-        if (jTPItem.getSelectedComponent()==jPLinks) {
-            updateLinks();
-        }
-        updateThumb();*/
-    }
-
     public void updateLinks() {
         if (celsiusTable==null) return;
         if (celsiusTable.getTableType()>=10) return;
@@ -1497,19 +1470,12 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
             switchToTabMode(InformationPanel.TabMode_EMPTY);
             jHTMLview.setText(RSC.stdHTMLstring);
             jHTMLview.setCaretPosition(0);
+            return;
         }
         celsiusTable=RSC.getCurrentTable();
         // library, but no tab TODO: information about library
-        if (celsiusTable==null) {
-            switchToTabMode(InformationPanel.TabMode_EMPTY);
-            jHTMLview.setText(RSC.stdHTMLstring);
-            jHTMLview.setCaretPosition(0);
-            return;
-        }
-        if (celsiusTable.getTableType()==CelsiusTable.EMPTY_TABLE) {
-            switchToTabMode(InformationPanel.TabMode_EMPTY);
-            jHTMLview.setText("<html><body><h2>Empty Table</h2></body></html>");
-            jHTMLview.setCaretPosition(0);
+        if ((celsiusTable==null) || (celsiusTable.getTableType()==CelsiusTable.EMPTY_TABLE)) {
+            guiToNoTab();
             return;
         }
         // see how many items are selected
@@ -1565,9 +1531,12 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         jHTMLview.setText(template.fillIn(data));
     }
     
-    // ####
     private void guiToNoTab() {
-        
+        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        CelsiusTemplate template = library.htmlTemplates.get("-1");
+        currentTemplate = -1;
+        jHTMLview.setText(template.fillIn(RSC.getCurrentlySelectedLibrary().getDataHash()));
+        jHTMLview.setCaretPosition(0);
     }
     
     private void guiToCategory() {
