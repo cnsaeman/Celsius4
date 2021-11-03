@@ -84,6 +84,7 @@ public class MainFrame extends javax.swing.JFrame implements
     public DefaultTreeModel StructureTreeModel;         // libraries structure tree model
 
     public EditConfiguration dialogConfiguration;     // Configuration dialog
+    public ExportBibliography dialogExportBibliography;
     public DeepSearch deepSearch;
     public InformationPanel guiInfoPanel;
     public SearchPanel guiSearchPanel;
@@ -125,13 +126,11 @@ public class MainFrame extends javax.swing.JFrame implements
         guiSearchPanel=new SearchPanel(this);
         jPanel5.add(guiSearchPanel,BorderLayout.CENTER);
         guiPluginPanel=new PluginPanel(RSC);
-        jTPTechnical.addTab("", guiPluginPanel);
+        jSPMain3.setBottomComponent(guiPluginPanel);
 
         jTPSearches.setTabComponentAt(0, new TabLabel("",Resources.categoriesSearchTabIcon,RSC,null,false));
         jTPSearches.setTabComponentAt(1, new TabLabel("",Resources.keyTabIcon,RSC,null,false));
         jTPSearches.setTabComponentAt(2, new TabLabel("",Resources.historyTabIcon,RSC,null,false));
-        jTPTechnical.setTabComponentAt(0, new TabLabel("",Resources.bibliographyTabIcon,RSC,null,false));
-        jTPTechnical.setTabComponentAt(1, new TabLabel("","plugin",RSC,null,false));
         
         jPanel3.setBorder(RSC.stdBorder());
         jCE1=new ClearEdit(RSC,"Enter a category (CTRL+C)");
@@ -140,6 +139,8 @@ public class MainFrame extends javax.swing.JFrame implements
         jPanel9.setBorder(RSC.stdBorder());
         jCE3=new ClearEdit(RSC,"Enter a keyword (CTRL+C)");
         jPanel9.add(jCE3, java.awt.BorderLayout.NORTH);
+        dialogExportBibliography=new ExportBibliography(RSC);
+        dialogConfiguration = new EditConfiguration(this, RSC.configuration);
         initFurther();
     }
 
@@ -149,7 +150,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jCE3.getDocument().addDocumentListener(this);
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(this);
-        dialogConfiguration = new EditConfiguration(this, RSC.configuration);
         RSC.out("Libraries loaded");
         guiPluginPanel.adjustPluginList();
         jTBAdd.setTransferHandler(new AddTransferHandler(this));
@@ -191,11 +191,11 @@ public class MainFrame extends javax.swing.JFrame implements
         DropTarget dt = (new DropTarget(jTStructureTree, this));
         
         // STATEMANAGER
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jBtnExpSel, jMIPeople});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIExportBibliography});
         // TODO: adjust 
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jMIDeepSearch, jTBAdd, jCE3, guiSearchPanel, jBtnExpAll,  guiPluginPanel.jBMPlugins});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2, jBtnExpTab});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jMIDeepSearch, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
         RSC.guiStates.setState("mainFrame","librarySelected", false);
@@ -293,7 +293,7 @@ public class MainFrame extends javax.swing.JFrame implements
             jCBLibraries.setSelectedIndex(RSC.currentLib);
         StructureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         updateStatusBar(true);
-        RSC.plugins.updatePlugins();
+        RSC.plugins.updateExportPlugins();
     }
     
     /**
@@ -450,26 +450,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jPanel23 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jLWhenAdded = new javax.swing.JList<>();
-        jTPTechnical = new javax.swing.JTabbedPane();
-        jPanel18 = new javax.swing.JPanel();
-        jPanel30 = new javax.swing.JPanel();
-        jPanel27 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jPanel28 = new javax.swing.JPanel();
-        jCBExpFilter = new javax.swing.JComboBox();
-        jPanel24 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jRBExpFile = new javax.swing.JRadioButton();
-        jRBExpClip = new javax.swing.JRadioButton();
-        jPanel25 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jBtnExpSel = new javax.swing.JButton();
-        jBtnExpTab = new javax.swing.JButton();
-        jBtnExpAll = new javax.swing.JButton();
-        jPanel26 = new javax.swing.JPanel();
-        jTFExpFile = new javax.swing.JTextField();
-        jBtnSelExpFile = new javax.swing.JButton();
-        jPanel21 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jSPMain = new javax.swing.JSplitPane();
         jTPTabList = new javax.swing.JTabbedPane();
@@ -542,6 +522,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jMBibTeX = new javax.swing.JMenu();
         jMICitationTagClipboard = new javax.swing.JMenuItem();
         jMIBibClipboard = new javax.swing.JMenuItem();
+        jMIExportBibliography = new javax.swing.JMenuItem();
         jMIFullBibToFile = new javax.swing.JMenuItem();
         jSeparator19 = new javax.swing.JPopupMenu.Separator();
         jMIShowCitedinFile = new javax.swing.JMenuItem();
@@ -1071,149 +1052,6 @@ public class MainFrame extends javax.swing.JFrame implements
 
         jSPMain3.setTopComponent(jPanel8);
 
-        jPanel18.setMinimumSize(new java.awt.Dimension(100, 115));
-        jPanel18.setPreferredSize(new java.awt.Dimension(200, 83));
-        jPanel18.setLayout(new java.awt.BorderLayout());
-
-        jPanel30.setLayout(new java.awt.GridLayout(5, 0, 0, RSC.guiScale(5)));
-
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel3.setText("Export:");
-        jLabel3.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jLabel3.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        javax.swing.GroupLayout jPanel27Layout = new javax.swing.GroupLayout(jPanel27);
-        jPanel27.setLayout(jPanel27Layout);
-        jPanel27Layout.setHorizontalGroup(
-            jPanel27Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel27Layout.createSequentialGroup()
-                .addComponent(jLabel3)
-                .addGap(0, 191, Short.MAX_VALUE))
-        );
-        jPanel27Layout.setVerticalGroup(
-            jPanel27Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel27Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addContainerGap())
-        );
-
-        jPanel30.add(jPanel27);
-
-        jPanel28.setPreferredSize(new java.awt.Dimension(190,RSC.guiScale(24)));
-        jPanel28.setLayout(new java.awt.GridLayout(1, 0));
-
-        jCBExpFilter.setPreferredSize(new java.awt.Dimension(190,RSC.guiScale(24)));
-        jCBExpFilter.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCBExpFilterActionPerformed(evt);
-            }
-        });
-        jPanel28.add(jCBExpFilter);
-
-        jPanel30.add(jPanel28);
-
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, RSC.guiScale(5), 5));
-
-        jLabel6.setText("Target:");
-        jPanel24.add(jLabel6);
-
-        buttonGroup3.add(jRBExpFile);
-        jRBExpFile.setSelected(true);
-        jRBExpFile.setText("File");
-        jRBExpFile.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jRBExpFileItemStateChanged(evt);
-            }
-        });
-        jPanel24.add(jRBExpFile);
-
-        buttonGroup3.add(jRBExpClip);
-        jRBExpClip.setText("Clipboard");
-        jPanel24.add(jRBExpClip);
-
-        jPanel30.add(jPanel24);
-
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, RSC.guiScale(5), 5));
-
-        jLabel5.setText("Export");
-        jPanel25.add(jLabel5);
-
-        jBtnExpSel.setText("selected");
-        jBtnExpSel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnExpSelActionPerformed(evt);
-            }
-        });
-        jPanel25.add(jBtnExpSel);
-
-        jBtnExpTab.setText("current table");
-        jBtnExpTab.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnExpTabActionPerformed(evt);
-            }
-        });
-        jPanel25.add(jBtnExpTab);
-
-        jBtnExpAll.setText("all items");
-        jBtnExpAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnExpAllActionPerformed(evt);
-            }
-        });
-        jPanel25.add(jBtnExpAll);
-
-        jPanel30.add(jPanel25);
-
-        jBtnSelExpFile.setText("Choose");
-        jBtnSelExpFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnSelExpFileActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel26Layout = new javax.swing.GroupLayout(jPanel26);
-        jPanel26.setLayout(jPanel26Layout);
-        jPanel26Layout.setHorizontalGroup(
-            jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel26Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(jTFExpFile, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnSelExpFile)
-                .addContainerGap())
-        );
-        jPanel26Layout.setVerticalGroup(
-            jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel26Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addGroup(jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTFExpFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBtnSelExpFile))
-                .addGap(5, 5, 5))
-        );
-
-        jPanel30.add(jPanel26);
-
-        jPanel18.add(jPanel30, java.awt.BorderLayout.NORTH);
-
-        javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
-        jPanel21.setLayout(jPanel21Layout);
-        jPanel21Layout.setHorizontalGroup(
-            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 236, Short.MAX_VALUE)
-        );
-        jPanel21Layout.setVerticalGroup(
-            jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
-        jPanel18.add(jPanel21, java.awt.BorderLayout.CENTER);
-
-        jTPTechnical.addTab("", jPanel18);
-
-        jSPMain3.setRightComponent(jTPTechnical);
-
         jPanel2.add(jSPMain3);
 
         jSplitPane1.setLeftComponent(jPanel2);
@@ -1667,6 +1505,14 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMBibTeX.add(jMIBibClipboard);
+
+        jMIExportBibliography.setText("Export bibliography");
+        jMIExportBibliography.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIExportBibliographyActionPerformed(evt);
+            }
+        });
+        jMBibTeX.add(jMIExportBibliography);
 
         jMIFullBibToFile.setText("Create BibTeX file from library");
         jMIFullBibToFile.addActionListener(new java.awt.event.ActionListener() {
@@ -2427,40 +2273,6 @@ private void jMICreateCombiner1ActionPerformed(java.awt.event.ActionEvent evt) {
     }*/
 }//GEN-LAST:event_jMICreateCombiner1ActionPerformed
 
-private void jRBExpFileItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRBExpFileItemStateChanged
-    boolean b=jRBExpFile.isSelected();
-    jTFExpFile.setEnabled(b);
-    jBtnSelExpFile.setEnabled(b);
-}//GEN-LAST:event_jRBExpFileItemStateChanged
-
-private void jBtnSelExpFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSelExpFileActionPerformed
-        String filename=RSC.selectFile("Indicate the target file", "export", "_ALL", "All files");
-        if (filename!=null) {
-            jTFExpFile.setText(filename);
-        }
-}//GEN-LAST:event_jBtnSelExpFileActionPerformed
-
-private void jBtnExpSelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExpSelActionPerformed
-        int plugin=jCBExpFilter.getSelectedIndex();
-        if (plugin == -1) {
-            return;
-        }
-        CelsiusTable celsiusTable=RSC.getCurrentTable();
-        if (celsiusTable == null) return;
-        ArrayList<TableRow> tableRows=celsiusTable.getSelectedRows();
-        exportBibInfo(celsiusTable.library,tableRows);
-}//GEN-LAST:event_jBtnExpSelActionPerformed
-
-private void jBtnExpAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExpAllActionPerformed
-        int plugin=jCBExpFilter.getSelectedIndex();
-        if (plugin == -1) {
-            return;
-        }
-        Library library=RSC.getCurrentlySelectedLibrary();
-        setThreadMsg("Exporting...");
-        exportBibInfo(library,null);
-}//GEN-LAST:event_jBtnExpAllActionPerformed
-
 private void jMIRemoveHalfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRemoveHalfActionPerformed
         if (RSC.guiStates.getState("mainFrame","tabAvailable")) {
             CelsiusTable IT = RSC.celsiusTables.get(jTPTabList.getSelectedIndex());
@@ -2535,10 +2347,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         goToHistory(jLWhenAdded.getSelectedIndex());
     }//GEN-LAST:event_jLWhenAddedValueChanged
 
-    private void jCBExpFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBExpFilterActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCBExpFilterActionPerformed
-
     private void jMIConvLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConvLibActionPerformed
         String filename=RSC.selectFile("Select the main file of the library you wish to open.", "loadlibraries", "_ALL", "All Files");
         if (filename!=null) {
@@ -2547,16 +2355,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             RSC.showInformation("The library has been converted.", "Action completed.");
         }
     }//GEN-LAST:event_jMIConvLibActionPerformed
-
-    private void jBtnExpTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExpTabActionPerformed
-        int plugin=jCBExpFilter.getSelectedIndex();
-        if (plugin == -1) {
-            return;
-        }
-        CelsiusTable DT=RSC.getCurrentTable();
-        if (DT == null) return;
-        exportBibInfo(DT.library,DT.celsiusTableModel.tableRows);
-    }//GEN-LAST:event_jBtnExpTabActionPerformed
 
     private void jMIMergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMergeActionPerformed
         performPeopleMerge();
@@ -2587,6 +2385,11 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         RSC.removeSelectedFromCurrentTable();
         guiInfoPanel.updateGUI();
     }//GEN-LAST:event_jMIRemoveFromTable2ActionPerformed
+
+    private void jMIExportBibliographyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExportBibliographyActionPerformed
+        dialogExportBibliography.adjustButtons();
+        dialogExportBibliography.setVisible(true);
+    }//GEN-LAST:event_jMIExportBibliographyActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2594,11 +2397,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
-    private javax.swing.JButton jBtnExpAll;
-    private javax.swing.JButton jBtnExpSel;
-    private javax.swing.JButton jBtnExpTab;
-    private javax.swing.JButton jBtnSelExpFile;
-    public javax.swing.JComboBox jCBExpFilter;
     public javax.swing.JComboBox jCBLibraries;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JList jLSearchKeys;
@@ -2606,9 +2404,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JLabel jLThreadStatus;
     private javax.swing.JList<String> jLWhenAdded;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     public javax.swing.JMenu jMActions;
     private javax.swing.JMenu jMBibTeX;
     private javax.swing.JRadioButtonMenuItem jMCDisplayHidden;
@@ -2660,6 +2455,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIEmail;
     private javax.swing.JMenuItem jMIEmail1;
     private javax.swing.JMenuItem jMIExpand;
+    private javax.swing.JMenuItem jMIExportBibliography;
     private javax.swing.JMenuItem jMIExportTab;
     private javax.swing.JMenuItem jMIExportTab1;
     private javax.swing.JMenuItem jMIFullBibToFile;
@@ -2718,26 +2514,16 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JRadioButton jRBExpClip;
-    private javax.swing.JRadioButton jRBExpFile;
     private javax.swing.JSplitPane jSPMain;
     private javax.swing.JSplitPane jSPMain3;
     private javax.swing.JScrollBar jScrollBar1;
@@ -2769,10 +2555,8 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JButton jTBAdd;
-    private javax.swing.JTextField jTFExpFile;
     public javax.swing.JTabbedPane jTPSearches;
     public javax.swing.JTabbedPane jTPTabList;
-    private javax.swing.JTabbedPane jTPTechnical;
     private javax.swing.JTree jTStructureTree;
     // End of variables declaration//GEN-END:variables
 
@@ -2780,9 +2564,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         RSC.plugins.readInAvailablePlugins();
         guiPluginPanel.objectType=-2;
         guiPluginPanel.adjustPluginList();
-        DefaultComboBoxModel DCBM=RSC.plugins.getPluginsDCBM("export",RSC.getCurrentlySelectedLibrary());
-        guiInfoPanel.jCBBibPlugins.setModel(DCBM);
-        jCBExpFilter.setModel(DCBM);
+        RSC.plugins.updateExportPlugins();
     }
     
     public void showAssociatedPeople() {
@@ -3282,33 +3064,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             RSC.showWarning("Error while viewing plain text:\n" + ex.toString(), "Exception:");
             RSC.outEx(ex);
         }
-    }
-    
-    public void exportBibInfo(Library library, ArrayList<TableRow> tableRows) {
-        setThreadMsg("Exporting...");
-        int size=library.numberOfItems;
-        if (tableRows!=null) size=tableRows.size();
-        ProgressMonitor progressMonitor = new ProgressMonitor(this, "Exporting selected items ...", "", 0, size);
-        String n=(String)jCBExpFilter.getSelectedItem();
-        SWApplyPlugin swAP = (new SWApplyPlugin(library, RSC, progressMonitor, RSC.plugins.get(n), RSC.plugins.parameters.get(n), tableRows));
-        swAP.swFinalizer=new SWFinalizer() {
-                public void finalize(HashMap<String,String> communication, StringBuffer buf) {
-                if (jRBExpClip.isSelected()) {
-                    Clipboard Clp = RSC.MF.getToolkit().getSystemClipboard();
-                    StringSelection cont = new StringSelection(buf.toString());
-                    Clp.setContents(cont, RSC.MF);
-                } else {
-                    try {
-                        TextFile f1 = new TextFile(jTFExpFile.getText(), false);
-                        f1.putString(buf.toString());
-                        f1.close(); 
-                    } catch (Exception e) {
-                        RSC.outEx(e);
-                    }
-                }
-            }
-        };
-        RSC.TPE.execute(swAP);        
     }
     
     public void associateFileToCurrentItem() {

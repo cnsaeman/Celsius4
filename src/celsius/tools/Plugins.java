@@ -100,27 +100,6 @@ public class Plugins extends HashMap<String,Plugin> {
         return(DLM);
     }
 
-    /**
-     *
-     * @param type : which type of plugin
-     * @param Lib : which Library
-     * @param sorted : whether the output should be sorted alphabetically
-     * @return
-     */
-    public DefaultComboBoxModel getPluginsDCBM(String type, Library Lib) {
-        DefaultComboBoxModel DCBM = new DefaultComboBoxModel();
-        if (Lib==null) return(DCBM);
-        String pluginsString=Lib.config.get("plugins-"+type);
-        if (pluginsString==null) return(DCBM);
-        String[] plugins=ToolBox.stringToArray(pluginsString);
-        for (String plugin : plugins) {
-            if (this.containsKey(plugin)) {
-                DCBM.addElement(plugin);
-            }
-        }
-        return(DCBM);
-    }
-
     public String getInfo(String name) {
         Plugin current = get(name);
         String params = parameters.get(name);
@@ -192,13 +171,25 @@ public class Plugins extends HashMap<String,Plugin> {
         out.writeBack();
     }
 
-    public void updatePlugins() {
+    public void updateExportPlugins() {
         MainFrame MF=RSC.MF;
-        MF.jCBExpFilter.setModel(getPluginsDCBM("export",RSC.getCurrentlySelectedLibrary()));
-        MF.guiPluginPanel.adjustPluginList();
-        MF.guiInfoPanel.jCBBibPlugins.setModel(getPluginsDCBM("export",RSC.getCurrentlySelectedLibrary()));
-        if (MF.jCBExpFilter.getItemCount()>0)
-            MF.jCBExpFilter.setSelectedIndex(0);
+        DefaultComboBoxModel DCBM = new DefaultComboBoxModel();
+        DefaultListModel DLM=new DefaultListModel();
+        Library library=RSC.getCurrentlySelectedLibrary();
+        if (library!=null) {
+            String pluginsString = library.config.get("plugins-export");
+            if (pluginsString!=null) {
+                String[] plugins = ToolBox.stringToArray(pluginsString);
+                for (String plugin : plugins) {
+                    if (containsKey(plugin)) {
+                        DCBM.addElement(plugin);
+                        DLM.addElement(plugin);
+                    }
+                }
+            }
+        }
+        MF.guiInfoPanel.jCBBibPlugins.setModel(DCBM);
+        MF.dialogExportBibliography.setListModel(DLM);
     }
     
 }

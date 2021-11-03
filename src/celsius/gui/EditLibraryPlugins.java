@@ -187,7 +187,7 @@ public final class EditLibraryPlugins extends javax.swing.JDialog {
 
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
         this.setVisible(false);
-        plugins.updatePlugins();
+        plugins.updateExportPlugins();
         this.dispose();
 }//GEN-LAST:event_jBtnDoneActionPerformed
 

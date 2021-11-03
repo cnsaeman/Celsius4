@@ -5,6 +5,8 @@
  */
 package celsius.tools;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author cnsaeman
@@ -16,12 +18,14 @@ public class JSONParser {
     private int upperBound;
     private int lowerBound;
     private final String content;
+    private final ArrayList<Integer> markers;
     
     public JSONParser(String c) {
         content=c;
         pos=0;
         upperBound=content.length();
         lowerBound=0;
+        markers=new ArrayList<>();
     }
 
     public boolean moveToNextTag(String tag) {
@@ -32,6 +36,15 @@ public class JSONParser {
         } else {
            return(false);
         }
+    }
+    
+    public void pushPosition() {
+        markers.add(pos);
+    }
+    
+    public void pullPosition() {
+        pos=markers.get(markers.size()-1);
+        markers.remove(markers.size()-1);
     }
     
     public String extractStringFromNextTag(String tag) {

@@ -344,7 +344,10 @@ public class PluginUniversalItems extends Thread {
                 String authors="";
                 while(jp.moveToNextTag("ids")) {
                     String bai=jp.extractStringFromNextTag("value");
+                    // ref for author could be empty
+                    jp.pushPosition();
                     String inspirekey=Parser.cutFrom(jp.extractStringFromNextTag("$ref"),"https://inspirehep.net/api/authors/");
+                    jp.pullPosition();
                     String fullname=jp.extractStringFromNextTag("full_name");
                     authors+="|"+fullname;
                     if (bai.length()>2) authors+="#inspirebai::"+bai;

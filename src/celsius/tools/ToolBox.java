@@ -138,7 +138,7 @@ public class ToolBox {
                 f1.close();
             }
             // Count pages for djvu by reading EOPs in plaintxt
-            if (pages==-1) {
+            if ((pages==-1) && (t!=null)) {
                 RSC.out(TI+"Other #pages");
                 pages=0;
                 GZIPInputStream fis  = new GZIPInputStream(new FileInputStream(new File(t)));

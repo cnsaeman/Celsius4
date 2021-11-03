@@ -74,7 +74,7 @@ import javax.swing.tree.DefaultTreeModel;
  *
  * @author cnsaeman
  */
-public final class InformationPanel extends javax.swing.JPanel { //implements DropTargetListener {
+public final class InformationPanel extends javax.swing.JPanel implements GuiEventListener { //implements DropTargetListener {
 
     public final static int TabMode_START_UP=-1;
     public final static int TabMode_EMPTY=0;
@@ -131,6 +131,7 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         jLFiles3.setModel(new DefaultListModel());
         
         jPEdit=new EditorPanel(RSC,true);
+        jPEdit.addChangeListener(this);
         
         RSC.adjustComponents(this.getComponents());
         jTABibTeX.setFont(new java.awt.Font("Monospaced", 0, RSC.guiScale(12)));
@@ -864,8 +865,8 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
         } else if (currentItem.get("type").equals("Preprint") && (btr.get("journal")!=null)) {
             currentItem.put("type","Paper");
         }
-        updateGUI();
         currentItem.save();
+        updateGUI();
         if (currentItem.error==6) RSC.showWarning("Error while saving information file.", "Exception:");
 }//GEN-LAST:event_jBtnApplyBibTeXActionPerformed
 
@@ -1465,7 +1466,7 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
             jHTMLview.setEditorKit(kit);
         };
         jHTMLview.setContentType("text/html");
-        RSC.plugins.updatePlugins();
+        RSC.plugins.updateExportPlugins();
         if (!RSC.guiStates.getState("mainFrame","librarySelected")) {
             switchToTabMode(InformationPanel.TabMode_EMPTY);
             jHTMLview.setText(RSC.stdHTMLstring);
@@ -1833,6 +1834,11 @@ public final class InformationPanel extends javax.swing.JPanel { //implements Dr
       }
     };
   }    
+
+    @Override
+    public void guiEventHappened(String id, String message) {
+        updateGUI();
+    }
 
 
 }
