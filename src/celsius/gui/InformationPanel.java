@@ -860,7 +860,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jTABibTeX.setText(btr.toString());
         currentItem.put("bibtex", btr.toString());
         currentItem.put("citation-tag", btr.getTag());
-        if (currentItem.get("type").equals("Paper") && (btr.get("journal")==null)) {
+        if (btr.type.toLowerCase().equals("book")) {
+            currentItem.put("type","Book");
+        } else if (btr.type.toLowerCase().equals("phdthesis")) {
+            currentItem.put("type","Thesis");
+        } else if (currentItem.get("type").equals("Paper") && (btr.get("journal")==null)) {
             currentItem.put("type","Preprint");
         } else if (currentItem.get("type").equals("Preprint") && (btr.get("journal")!=null)) {
             currentItem.put("type","Paper");

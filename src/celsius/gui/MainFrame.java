@@ -2162,8 +2162,10 @@ public class MainFrame extends javax.swing.JFrame implements
             Clipboard Clp = getToolkit().getSystemClipboard();
             String ref = "";
             Library Lib = RSC.getCurrentlySelectedLibrary();
-            for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows())
+            for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows()) {
+                tableRow.loadLevel(2);
                 ref += "," + tableRow.get("citation-tag");
+            }
             ref = ref.substring(1);
             StringSelection cont = new StringSelection(ref);
             Clp.setContents(cont, this);

@@ -378,9 +378,11 @@ public class PluginUniversalItems extends Thread {
                     String key=jp.extractStringFromNextTag("value");
                     keys+="|"+key;
                 }
-                keys=keys.substring(1);
+                if (keys.length()>0) {
+                    keys=keys.substring(1);
+                    putS("keywords",keys);
+                }
                 jp.releaseLevel();
-                putS("keywords",keys);
                 
                 jp.moveToFirstTag("abstracts");
                 //Abstract
@@ -591,6 +593,7 @@ public class PluginUniversalItems extends Thread {
             }
         }
         if (!blank(BTR.get("journal"))) {
+            if (item.get("type").equals("Preprint")) putS("type", "Paper");
             String identifier=new String("");
             identifier=BTR.get("journal");
             if (!blank(BTR.get("volume"))) identifier+=" "+BTR.get("volume");

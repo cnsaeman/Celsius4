@@ -62,8 +62,40 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
     
     public BibTeXRecord (String bibtex) {
         super();
-        parseError = 0;
         if (bibtex==null) { parseError=255; return; }
+        parseError = 0;
+        // See if the string just indicates a type
+        if (bibtex.equals("Thesis")) {
+            type = "Article";
+            celtype = bibtex;
+            tag = "";
+            put("author", "");
+            put("title", "");
+            put("university", "");
+            put("year", "");
+            return;
+        } else if (bibtex.equals("Book") || bibtex.equals("eBook")) {
+            type = "Book";
+            celtype = bibtex;
+            tag = "";
+            put("author", "");
+            put("title", "");
+            put("publisher", "");
+            put("location", "");
+            put("year", "");
+            return;
+        } else if (bibtex.equals("Preprint") || bibtex.equals("Paper") || bibtex.length()<20) {
+            type = "Article";
+            celtype = bibtex;
+            tag = "";
+            put("author", "");
+            put("title", "");
+            put("journal", "");
+            put("volume", "");
+            put("year", "");
+            put("pages", "");
+            return;
+        }
         bibtex=bibtex.replaceAll("(?m)^%.+?$", "");
         if (bibtex.trim().equals("")) {
             parseError = 254;

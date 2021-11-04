@@ -183,6 +183,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
         swAP.swFinalizer=new SWFinalizer() {
                 public void finalize(HashMap<String,String> communication, StringBuffer buf) {
                     RSC.MF.setThreadMsg("Done.");
+                    RSC.MF.guiInfoPanel.updateGUI();
                     RSC.getCurrentTable().jtable.requestFocus();
             }
         };
@@ -201,6 +202,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
         swAP.swFinalizer=new SWFinalizer() {
                 public void finalize(HashMap<String,String> communication, StringBuffer buf) {
                     RSC.MF.setThreadMsg("Done.");
+                    RSC.MF.guiInfoPanel.updateGUI();
                     RSC.getCurrentTable().jtable.requestFocus();
             }
         };
@@ -221,6 +223,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
         swAP.swFinalizer=new SWFinalizer() {
                 public void finalize(HashMap<String,String> communication, StringBuffer buf) {
                     RSC.MF.setThreadMsg("Done.");
+                    RSC.MF.guiInfoPanel.updateGUI();
                     RSC.getCurrentTable().jtable.requestFocus();
             }
         };

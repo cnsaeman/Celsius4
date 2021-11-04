@@ -49,19 +49,12 @@ public class PluginCreateBibTeX extends Thread {
         if ((currentBibTeX!=null) && (currentBibTeX.length()>0)) {
             BTR=new celsius.data.BibTeXRecord(currentBibTeX);
         } else {
-            BTR=new celsius.data.BibTeXRecord();
-        }
-        // type
-        if ((BTR.type==null) || (BTR.type.length()==0)) {
-            String type="Article";
-            if (item.getS("type").equals("book") || item.getS("type").equals("ebook")) type="Book";
-            if (item.getS("type").equals("thesis")) type="Phdthesis";
-            BTR.type=type;
+            BTR=new celsius.data.BibTeXRecord(item.getS("type"));
         }
         
         // tag
         if ((BTR.getTag()==null) || (BTR.getTag().length()==0)) {
-            String tag=item.linkedPersons.get("authors").get(1).getS("last_name").replaceAll("[^a-zA-Z]", "");
+            String tag=item.linkedPersons.get("authors").get(0).getS("last_name").replaceAll("[^a-zA-Z]", "");
             if (!item.isEmpty("arxiv-number")) {
                 tag+=":"+item.getS("arxiv-number");
             } else {
