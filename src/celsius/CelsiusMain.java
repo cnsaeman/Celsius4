@@ -19,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -36,6 +38,22 @@ public class CelsiusMain {
     private static SplashScreen StartUp;
     
     public static void doWork() {
+        String mainLibraryFile="/home/cnsaeman/Celsius4/Libraries/MathsPhys/CelsiusLibrary.sql";
+        String url="jdbc:sqlite:"+mainLibraryFile;
+        try {
+            Connection dbConnection = DriverManager.getConnection(url);
+            boolean locked=false;
+            try {
+                dbConnection.prepareStatement("BEGIN EXCLUSIVE").execute();
+                dbConnection.prepareStatement("COMMIT").execute();
+            } catch (Exception e) {
+                locked=true;
+            }
+            System.out.println("Locked status: "+locked);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         
         /*RSC.guiNotify=false;
 

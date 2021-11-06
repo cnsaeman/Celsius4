@@ -73,7 +73,7 @@ public class Resources {
     
     public ScheduledExecutorService executorService;
 
-    public final String[] LibraryFields={"name","index","standard-item-fields","column-fields","table-column-headers","table-column-types","table-column-sizes","autosortcolumn","people","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
+    public final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","autosortcolumn","people","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
     public final String[] HistoryFields={"Today","Yesterday","Two Days Ago","This Week","Last Week","This Month","Last Month","This Year","Last Year"};
     
     public static final String historyTabIcon="iconmonstr-calendar-5.svg.24";
@@ -357,7 +357,11 @@ public class Resources {
         if (NewLib.name.equals("??##cancelled")) return;
         if (NewLib.name.startsWith("??#$")) return;
         if (NewLib.name.startsWith("??##")) {
-            (new SafeMessage("Error loading library, library file " + fileName + " has not been loaded:\n" + ToolBox.stripError(NewLib.name), "Warning:", 0)).showMsg();
+            if (NewLib.currentStatus==20) {
+                (new SafeMessage("Error loading library, library " + fileName + " is locked. Library has not been opened.", "Error", 0)).showMsg();
+            } else {
+                (new SafeMessage("Error loading library, library " + fileName + " has not been loaded:\n" + ToolBox.stripError(NewLib.name), "Warning:", 0)).showMsg();
+            }
         } else {
             if (NewLib.currentStatus==10) {
                 (new SafeMessage("The library "+NewLib.name+" may be out of synch. Please sychnronize it as soon as possible.", "Warning:", 0)).showMsg();

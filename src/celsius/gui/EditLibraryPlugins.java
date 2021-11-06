@@ -198,7 +198,7 @@ public final class EditLibraryPlugins extends javax.swing.JDialog {
         jTAPlugin.setCaretPosition(0);
         String ptype=plugins.get(name).metaData.get("type");
         for (String type : Plugins.types) {
-            panels.get(type).jBtnAdd.setEnabled(Parser.listContains(ptype, type)); 
+            panels.get(type).jBtnAdd.setEnabled(Parser.listContains(ptype, Parser.cutUntil(type,"-"))); 
         }
         if (Parser.listContains(ptype, "interactive")) panels.get("manual-items").jBtnAdd.setEnabled(true);
     }//GEN-LAST:event_jLPluginsValueChanged
@@ -209,6 +209,7 @@ public final class EditLibraryPlugins extends javax.swing.JDialog {
 
     private void jBtnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnReloadActionPerformed
         MF.reloadPlugins();
+        jLPlugins.setModel(plugins.getPluginsDLM());
     }//GEN-LAST:event_jBtnReloadActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

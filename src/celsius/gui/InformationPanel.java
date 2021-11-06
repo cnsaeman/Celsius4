@@ -509,7 +509,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         });
         jPanel9.add(jBtnChooseSourceFolder);
 
-        jBtnShowCited.setText("Show cited papers in TeX-File");
+        jBtnShowCited.setText("Show papers cited in TeX-File");
         jBtnShowCited.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnShowCitedActionPerformed(evt);
@@ -763,7 +763,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 709, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

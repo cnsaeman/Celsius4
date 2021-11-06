@@ -204,6 +204,15 @@ public final class Library implements Iterable<Item> {
             mainLibraryFile=baseFolder+"CelsiusLibrary.sql";
             String url="jdbc:sqlite:"+mainLibraryFile;
             dbConnection = DriverManager.getConnection(url);
+            // check if connection locked
+            try {
+                dbConnection.prepareStatement("BEGIN EXCLUSIVE").execute();
+                dbConnection.prepareStatement("COMMIT").execute();
+            } catch (Exception e) {
+                currentStatus=20;
+                this.name="??##";
+                return;
+            }
             RSC.out("Lib>Connection established to SQLite database "+url);
             
             // Read configuration

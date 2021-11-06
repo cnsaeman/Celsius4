@@ -489,6 +489,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jMPeople = new javax.swing.JMenu();
         jMIMerge1 = new javax.swing.JMenuItem();
         jMIRemoveFromTable2 = new javax.swing.JMenuItem();
+        jMIShowItems = new javax.swing.JMenuItem();
         jMItems = new javax.swing.JMenu();
         jMIView = new javax.swing.JMenuItem();
         jMShow1 = new javax.swing.JMenu();
@@ -1290,6 +1291,14 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMPeople.add(jMIRemoveFromTable2);
+
+        jMIShowItems.setText("Show associated items");
+        jMIShowItems.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIShowItemsActionPerformed(evt);
+            }
+        });
+        jMPeople.add(jMIShowItems);
 
         jMainMenu.add(jMPeople);
 
@@ -2392,6 +2401,10 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         dialogExportBibliography.adjustButtons();
         dialogExportBibliography.setVisible(true);
     }//GEN-LAST:event_jMIExportBibliographyActionPerformed
+
+    private void jMIShowItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIShowItemsActionPerformed
+        showAssociatedItems();
+    }//GEN-LAST:event_jMIShowItemsActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2484,6 +2497,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIRenameCat1;
     private javax.swing.JMenuItem jMISaveLib;
     private javax.swing.JMenuItem jMIShowCitedinFile;
+    private javax.swing.JMenuItem jMIShowItems;
     private javax.swing.JMenuItem jMITab2Cat;
     private javax.swing.JMenuItem jMITab2Cat2;
     private javax.swing.JMenuItem jMIUnregisterDoc;
@@ -2569,6 +2583,22 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         RSC.plugins.updateExportPlugins();
     }
     
+    public void showAssociatedItems() {
+        String ids=RSC.getCurrentTable().getSelectedIDsString();
+        Library library=RSC.getCurrentlySelectedLibrary();
+        CelsiusTable table=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Associated Items", "search");
+        try {
+            ResultSet RS=library.executeResEX("SELECT items.* FROM item_person_links INNER JOIN items ON items.id=item_person_links.item_id WHERE person_id IN ("+ids+");");
+            while (RS.next()) {
+                table.addRow(new Item(library,RS));
+            }
+        } catch (Exception ex) {
+            RSC.outEx(ex);
+        }
+        table.resizeTable(true);
+        RSC.MF.guiInfoPanel.updateGUI();
+    }
+
     public void showAssociatedPeople() {
         String ids=RSC.getCurrentTable().getSelectedIDsString();
         Library library=RSC.getCurrentlySelectedLibrary();
@@ -2581,6 +2611,8 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         } catch (Exception ex) {
             RSC.outEx(ex);
         }
+        table.resizeTable(true);
+        RSC.MF.guiInfoPanel.updateGUI();
     }
     
     public void performPeopleMerge() {

@@ -71,7 +71,7 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
     }
     
     public void determineLoadLevel() {
-        ArrayList<String> alwaysLoadedKeys = library.configToArrayList("column-fields");
+        ArrayList<String> alwaysLoadedKeys = library.configToArrayList("item-table-column-fields");
         // no additional fields required
         loadLevel=1;
         for (String key : plugin.requiredFields) {
