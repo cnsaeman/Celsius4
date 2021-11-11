@@ -262,7 +262,7 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
     /**
      * Checks whether a bibtex entry is formed consistently
      */
-    public static boolean isBibTeXConsist(String bibtex) {
+    public static boolean isBibTeXConsistent(String bibtex) {
         boolean consistent=true;
         try {
             BibTeXRecord btr=new BibTeXRecord(bibtex);

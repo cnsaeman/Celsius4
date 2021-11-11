@@ -6,17 +6,18 @@
         <group>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/tools/Plugins.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/Resources.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/ExportBibliography.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/CelsiusTable.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/data/Item.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/CelsiusMain.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/plugins/PluginUniversalItems.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/PluginPanel.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/SwingWorkers/SWBibTeXIntegrity.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/plugins/PluginNormalizeTitle.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/InformationPanel.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/SwingWorkers/SWApplyPlugin.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/data/Library.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/plugins/PluginCreateBibTeX.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/plugins/PluginSimple.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/tools/ToolBox.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/data/BibTeXRecord.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/MainFrame.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/EditLibraryPlugins.java</file>
             <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/SwingWorkers/SWListItems.java</file>
         </group>
     </open-files>

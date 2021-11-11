@@ -10,7 +10,10 @@ import celsius.data.Item;
 import celsius.data.Library;
 import celsius.data.TableRow;
 import celsius.gui.CelsiusTable;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -18,14 +21,14 @@ import javax.swing.SwingWorker;
  *
  * @author cnsaeman
  */
-public class SWListItems extends SwingWorker<Void, TableRow> {
+public class SWListItems extends SwingWorker<Void, TableRow> implements PropertyChangeListener {
 
     public final CelsiusTable celsiusTable;
     public final Library library; 
     public final Resources RSC;
     public final int postID;
     public int done;
-
+    
     /**
      *  Constructor, read in information
      *  itemtable, postID
@@ -38,10 +41,11 @@ public class SWListItems extends SwingWorker<Void, TableRow> {
         postID=pid;
         done=0;
         setProgress(0);
+        addPropertyChangeListener(this);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                RSC.MF.jPBSearch.setMaximum(library.numberOfItems);
+                RSC.MF.jPBSearch.setMaximum(100);
                 RSC.MF.jPBSearch.setValue(0);
                 RSC.MF.setThreadMsg("Searching...");
                 RSC.guiStates.adjustState("mainFrame","itemSelected", false);
@@ -75,6 +79,11 @@ public class SWListItems extends SwingWorker<Void, TableRow> {
     @Override
     protected Void doInBackground() throws Exception {
         return null;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        RSC.MF.jPBSearch.setValue(this.getProgress());
     }
     
 }

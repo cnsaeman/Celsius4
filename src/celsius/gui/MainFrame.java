@@ -1845,7 +1845,7 @@ public class MainFrame extends javax.swing.JFrame implements
         CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Items with corrupt BibTeX","search");
         setThreadMsg("Working...");
         ProgressMonitor progressMonitor = new ProgressMonitor(this, "Checking BibTeX integrity ...", "", 0, RSC.getCurrentlySelectedLibrary().getSize());
-        SWBibTeXIntegrity swBibTeXIntegrity =new SWBibTeXIntegrity(celsiusTable,celsiusTable.postID);
+        SWBibTeXIntegrity swBibTeXIntegrity=new SWBibTeXIntegrity(celsiusTable,celsiusTable.postID);
         swBibTeXIntegrity.execute();
     }//GEN-LAST:event_jMICheckBibActionPerformed
 

@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class SWBibTeXIntegrity extends SWListItems {
     
-    public final int batchSize=100;
+    public final int batchSize=1000;
     
     public SWBibTeXIntegrity(CelsiusTable it, int pid) {
         super(it,pid);
@@ -32,13 +32,13 @@ public class SWBibTeXIntegrity extends SWListItems {
                 while (rs.next() && (!isCancelled())) {
                     String bibtex = rs.getString(2);
                     if ((bibtex != null) && (!bibtex.isBlank())) {
-                        if (!BibTeXRecord.isBibTeXConsist(bibtex)) {
+                        if (!BibTeXRecord.isBibTeXConsistent(bibtex)) {
                             Item item = new Item(library, rs.getString(1));
                             publish(item);
                         }
                     }
                 }
-                setProgress(offset/library.numberOfItems);
+                setProgress((100*offset)/library.numberOfItems);
                 offset+=batchSize;
             }
         } catch (Exception e) {
