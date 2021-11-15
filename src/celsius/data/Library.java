@@ -1,14 +1,10 @@
 //
-// Celsius Library System v2
+// Celsius Library System v4
 // (w) by C. Saemann
 //
 // Library.java
 //
 // This class combines all necessary data for a library
-//
-// typesafesh
-//
-// checked 16.09.2007
 //
 
 package celsius.data;
@@ -90,7 +86,7 @@ public final class Library implements Iterable<Item> {
     public ArrayList<Integer> personTableColumnSizes;
     public String personTableSQLTags;
 
-    public ArrayList<String> styleSheetRules;
+    public StyleSheet styleSheet;
     public LinkedHashMap<String,ArrayList<String>> usbdrives;
     public HashMap<String,String> iconDictionary;
 
@@ -135,7 +131,6 @@ public final class Library implements Iterable<Item> {
         peopleFields=null;
         RSC=rsc;
         //celsiusBaseDir=Parser.cutUntilLast((new File(".")).getAbsolutePath(),".");
-        styleSheetRules=new ArrayList<String>();
         baseFolder=bd;
         //if (!celsiusBaseDir.endsWith(ToolBox.filesep)) celsiusBaseDir+=ToolBox.filesep;
         if (!baseFolder.endsWith(ToolBox.filesep)) baseFolder+=ToolBox.filesep;
@@ -157,12 +152,11 @@ public final class Library implements Iterable<Item> {
         MainFile.put("style", "LD::style.css");
         MainFile.writeBack();*/
 
+        // TODO rewrite
         TextFile TD=new TextFile(baseFolder+"style.css",false);
         TD.putString(RSC.libraryTemplates.get(template).get("stylesheet"));
         TD.close();
 
-        loadStyleSheetRules();
-        
         TD=new TextFile(baseFolder+"librarystructure.xml",false);
         TD.putString(RSC.libraryTemplates.get(template).get("librarystructure"));
         TD.close();
@@ -289,7 +283,7 @@ public final class Library implements Iterable<Item> {
                 name="??##Library file corrupt.";
                 return;
             }
-            loadStyleSheetRules();
+            setStyleSheet();
             for (String field : RSC.LibraryFields) {
                 ensure(field);
             }
@@ -589,6 +583,14 @@ public final class Library implements Iterable<Item> {
             personTableSQLTags += "," + tag;
         }
     }
+    
+    public void setStyleSheet() {
+        styleSheet=new StyleSheet();
+        String[] rules=config.get("css-style").split("\n");
+        for (String rule : rules) {
+            styleSheet.addRule(rule);
+        }
+    }
 
     public void setColumnSize(int c,int w) {
         itemTableColumnSizes.set(c, w);
@@ -745,7 +747,7 @@ public final class Library implements Iterable<Item> {
         Attachment attachment=null;
         if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
         try {
-            String[] uf = configToArray("unique-fields");
+            String[] uf = configToArray("item-unique-fields");
             String sql = "SELECT "+itemTableSQLTags+" FROM items WHERE ";
             String cond = "";
             ArrayList<String> params = new ArrayList<>();
@@ -1428,24 +1430,6 @@ public final class Library implements Iterable<Item> {
         if (sig.equals("LD")) return(baseFolder+s2);
         if (sig.equals("BD")) return(RSC.celsiusBaseFolder+s2);
         return(s);
-    }
-    
-
-    public void adjustStyleSheet(StyleSheet styleSheet) {
-        for (String rule : styleSheetRules) {
-            styleSheet.addRule(rule);
-        }
-    }
-
-    public void loadStyleSheetRules() throws IOException {
-        styleSheetRules = new ArrayList<String>();
-        if (config.get("style") != null) {
-            TextFile style = new TextFile(completeDir(config.get("style"),""));
-            while (style.ready()) {
-                styleSheetRules.add(style.getString());
-            }
-            style.close();
-        }
     }
 
     public DefaultComboBoxModel getTypesDCBM() {

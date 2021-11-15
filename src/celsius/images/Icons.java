@@ -10,9 +10,21 @@ import celsius.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 
@@ -56,131 +68,53 @@ public class Icons extends HashMap<String,ImageIcon> {
     
     private ClassLoader getContextClassLoader() {
         return Thread.currentThread().getContextClassLoader();
-    }    
+    }   
+    
+    public ArrayList<String> listOfIcons() throws URISyntaxException, UnsupportedEncodingException, IOException {
+        ArrayList<String> list=new ArrayList<>();
+        URL dirURL = CelsiusMain.class.getResource("images");
+        if (dirURL!=null && dirURL.getProtocol().equals("file")) {
+            // just a file, no jar file
+            for (String entry : new File(dirURL.toURI()).list()) {
+                if (entry.endsWith(".png")) list.add(entry);
+            }
+        } else { 
+            if (dirURL == null) {
+                String me = CelsiusMain.class.getName().replace(".", "/") + ".class";
+                dirURL = CelsiusMain.class.getClassLoader().getResource(me);
+            }
+            if (dirURL.getProtocol().equals("jar")) {
+                String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
+                JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+                Enumeration<JarEntry> entries = jar.entries();
+                String path="celsius/images/";
+                while (entries.hasMoreElements()) {
+                    String name = entries.nextElement().getName();
+                    if (name.startsWith(path)) {
+                        String entry = name.substring(path.length());
+                        int checkSubdir = entry.indexOf("/");
+                        if (checkSubdir >= 0) {
+                            // if it is a subdirectory, we just return the directory name
+                            entry = entry.substring(0, checkSubdir);
+                        }
+                        if (entry.endsWith(".png")) list.add(entry);
+                    }
+                }
+            }
+        }
+        return(list);
+    }
 
     public Icons(String bf) {
         super();
         basefolder=bf;
         if (basefolder.endsWith(ToolBox.filesep)) basefolder.substring(0,basefolder.length()-1);
         try {
-            loadIcon("iconmonstr-plus-6.svg.16");
-            loadIcon("iconmonstr-plus-6.svg.16.2x");
-            loadIcon("add.2x");
-            loadIcon("Add Icon.2x");
-            loadIcon("Add Icon");
-            loadIcon("add");
-            loadIcon("application_view_tile.2x");
-            loadIcon("application_view_tile");
-            loadIcon("arrow_out.2x");
-            loadIcon("arrow_out");
-            loadIcon("arrow_right.2x");
-            loadIcon("arrow_right");
-            loadIcon("bullet_cross.2x");
-            loadIcon("bullet_cross");
-            loadIcon("closebtn2.2x");
-            loadIcon("closebtn2");
-            loadIcon("closebtn.2x");
-            loadIcon("closebtn");
-            loadIcon("closebtn_sm.2x");
-            loadIcon("closebtn_sm");
-            loadIcon("cross.2x");
-            loadIcon("cross");
-            loadIcon("default.2x");
-            loadIcon("default");
-            loadIcon("edit_add.2x");
-            loadIcon("edit_add");
-            loadIcon("find.2x");
-            loadIcon("find");
-            loadIcon("folder.2x");
-            loadIcon("folder_explore.2x");
-            loadIcon("folder_explore");
-            loadIcon("folder_link.2x");
-            loadIcon("folder_link");
-            loadIcon("folder");
-            loadIcon("folder_star.2x");
-            loadIcon("folder_star");
-            loadIcon("folder_table.2x");
-            loadIcon("folder_table");
-            loadIcon("forward_gray.2x");
-            loadIcon("forward_gray");
-            loadIcon("forward_green.2x");
-            loadIcon("forward_green");
-            loadIcon("iconmonstr-book-4.svg.24.2x");
-            loadIcon("iconmonstr-book-4.svg.24");
-            loadIcon("iconmonstr-calendar-5.svg.24.2x");
-            loadIcon("iconmonstr-calendar-5.svg.24");
-            loadIcon("iconmonstr-crop-12.svg.24.2x");
-            loadIcon("iconmonstr-crop-12.svg.24");
-            loadIcon("iconmonstr-edit-9.svg.24.2x");
-            loadIcon("iconmonstr-edit-9.svg.24");
-            loadIcon("iconmonstr-file-38.svg.24.2x");
-            loadIcon("iconmonstr-file-38.svg.24");
-            loadIcon("iconmonstr-folder-30.svg.24.2x");
-            loadIcon("iconmonstr-folder-30.svg.24");
-            loadIcon("iconmonstr-info-6.svg.24.2x");
-            loadIcon("iconmonstr-info-6.svg.24");
-            loadIcon("iconmonstr-key-2.svg.24.2x");
-            loadIcon("iconmonstr-key-2.svg.24");
-            loadIcon("iconmonstr-link-1.svg.24.2x");
-            loadIcon("iconmonstr-link-1.svg.24");
-            loadIcon("iconmonstr-pen-7.svg.24.2x");
-            loadIcon("iconmonstr-pen-7.svg.24");
-            loadIcon("iconmonstr-picture-1.svg.24.2x");
-            loadIcon("iconmonstr-picture-1.svg.24");
-            loadIcon("iconmonstr-save-14.svg.24.2x");
-            loadIcon("iconmonstr-save-14.svg.24");
-            loadIcon("iconmonstr-user-22-24");
-            loadIcon("iconmonstr-user-22.svg.24.2x");
-            loadIcon("iconmonstr-user-22.svg.24");
-            loadIcon("iconmonstr-wrench-6.svg.24.2x");
-            loadIcon("iconmonstr-wrench-6.svg.24");
-            loadIcon("iconmonstr-wrench-10.svg.16");
-            loadIcon("iconmonstr-wrench-10.svg.16.2x");
-            loadIcon("main_icon.2x");
-            loadIcon("main_icon");
-            loadIcon("notavailable.2x");
-            loadIcon("notavailable");
-            loadIcon("play_gray.2x");
-            loadIcon("play_gray");
-            loadIcon("play_green.2x");
-            loadIcon("play_green");
-            loadIcon("plugin.2x");
-            loadIcon("plugin");
-            loadIcon("rewind_gray.2x");
-            loadIcon("rewind_gray");
-            loadIcon("rewind_green.2x");
-            loadIcon("rewind_green");
-            loadIcon("search2.2x");
-            loadIcon("search2");
-            loadIcon("search.2x");
-            loadIcon("search");
-            loadIcon("Settings_32.2x");
-            loadIcon("Settings_32");
-            loadIcon("star.2x");
-            loadIcon("star");
-            loadIcon("stop_gray.2x");
-            loadIcon("stop_gray");
-            loadIcon("stop_red.2x");
-            loadIcon("stop_red");
-            loadIcon("iconmonstr-file-14.svg.16");
-            loadIcon("iconmonstr-file-14.svg.16.2x");
-            loadIcon("iconmonstr-note-29.svg.16");
-            loadIcon("iconmonstr-note-29.svg.16.2x");
-            loadIcon("iconmonstr-download-20.svg.16");
-            loadIcon("iconmonstr-download-20.svg.16.2x");
-            loadIcon("iconmonstr-square-4.svg.16");
-            loadIcon("iconmonstr-square-4.svg.16.2x");
-            loadIcon("iconmonstr-checkbox-4.svg.16");
-            loadIcon("iconmonstr-checkbox-4.svg.16.2x");
-            loadIcon("iconmonstr-checkbox-28.svg.16");
-            loadIcon("iconmonstr-checkbox-28.svg.16.2x");
-            loadIcon("iconmonstr-shape-20.svg.16");
-            loadIcon("iconmonstr-shape-20.svg.16.2x");
-            loadIcon("iconmonstr-star-7.svg.16");
-            loadIcon("iconmonstr-star-7.svg.16.2x");
-            
-        } catch(Exception e) {
-            e.printStackTrace();
+            for (String s : listOfIcons()) {
+                loadIcon(s);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         Types=new ArrayList<String>();
         readIn(basefolder,"");
@@ -188,7 +122,8 @@ public class Icons extends HashMap<String,ImageIcon> {
 
     private void loadIcon(String s) {
         try {
-            ImageIcon I = new ImageIcon(Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/" + s+".png")));
+            ImageIcon I = new ImageIcon(Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/" + s)));
+            s=s.substring(0,s.length()-4);
             I.setDescription(s);
             put(s, I);
         } catch (Exception e) {

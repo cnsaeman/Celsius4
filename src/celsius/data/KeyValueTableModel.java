@@ -5,6 +5,7 @@
 package celsius.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -53,6 +54,12 @@ public class KeyValueTableModel implements TableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex==0) return(keys.get(rowIndex));
         return(values.get(rowIndex));
+    }
+    
+    public void put(String key, String value) {
+        int pos=keys.indexOf(key);
+        values.remove(pos);
+        values.add(pos, value);
     }
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {

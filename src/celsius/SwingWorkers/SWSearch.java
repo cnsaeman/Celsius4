@@ -27,6 +27,7 @@ public class SWSearch extends SWListItems {
     private final int mode;
     private String sqlTags;
     private String sqlTable;
+    private String sqlOrderBy;
     private String sqlColumn;
     
   
@@ -42,10 +43,12 @@ public class SWSearch extends SWListItems {
         search=sstring.toLowerCase().split(" ");
         sqlTags = library.itemTableSQLTags;
         sqlTable = "items";
+        sqlOrderBy = "ORDER BY " + library.config.get("item-autosortcolumn");
         sqlColumn="search";
         if (mode==2) {
             sqlTags=library.personTableSQLTags;
             sqlTable="persons";
+            sqlOrderBy="ORDER BY "+library.config.get("person-autosortcolumn");
             sqlColumn="search";
         } 
     }

@@ -24,6 +24,7 @@ import celsius.tools.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,7 @@ public class Resources {
     public ScheduledExecutorService executorService;
 
     public final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","autosortcolumn","people","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
+    public final String[] LibraryEditableFields={"name","standard-item-fields","autosortcolumn","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","people","person-search-fields","icon-fields","icon-dictionary","choice-fields","filetypes","hide","essential-fields","default-add-method"};
     public final String[] HistoryFields={"Today","Yesterday","Two Days Ago","This Week","Last Week","This Month","Last Month","This Year","Last Year"};
     
     public static final String historyTabIcon="iconmonstr-calendar-5.svg.24";
@@ -94,6 +96,9 @@ public class Resources {
     public static final String addSingleFileTabIcon="iconmonstr-file-14.svg.16";
     public static final String addManualTabIcon="iconmonstr-note-29.svg.16";
     public static final String addImportTabIcon="iconmonstr-download-20.svg.16";
+    public static final String editTabIcon2="iconmonstr-edit-9.svg.16";
+    public static final String templateTabIcon="iconmonstr-view-4.svg.16";
+    public static final String styleSheetTabIcon="iconmonstr-construction-35.svg.16";
 
     public static final String pluginSetupIcon="iconmonstr-wrench-10.svg.16";
     
@@ -405,7 +410,13 @@ public class Resources {
         if (guiScaleFactor>1.9) {
             s=s+".2x";
         }
-        return icons.getIcon(s).getImage();
+        Image out=null;
+        try {
+            out=icons.getIcon(s).getImage();
+        } catch (Exception ex) {
+            out("ERROR!! Cannot load image "+s);
+        }
+        return out;
     }
     
     public ImageIcon getScaledIcon(String s) {
@@ -662,6 +673,10 @@ public class Resources {
         MF.guiPluginPanel.adjustPluginList();
         //MF.guiInfoPanel.switchModeTo(infoMode);
         return(celsiusTable);
+    }
+    
+    public Font stdFontMono() {
+        return(new java.awt.Font("Monospaced", 0, guiScale(12)));        
     }
     
     public Border stdBorder() {

@@ -673,12 +673,17 @@ public final class Library3 implements Iterable<Item3> {
                 }
             }
             if (indexTags.indexOf("inspirekey")>-1) {
-                configDictionary.put("unique-fields","inspirekey|doi|arxiv-ref|citation-tag|search");
+                configDictionary.put("item-unique-fields","inspirekey|doi|arxiv-ref|citation-tag|search");
             }
             configDictionary.remove("directory");
+            configDictionary.remove("autosortcolumn");
+            configDictionary.remove("style");
+            configDictionary.put("item-autosortcolumn","title");
+            configDictionary.put("person-autosortcolumn","last_name");
             configDictionary.put("person-search-fields", "first_name|last_name");
             configDictionary.put("plugins-import", "Basic Import");
             configDictionary.put("plugins-people", "");
+            configDictionary.put("css-style", TextFile.ReadOutFile(Lib.completeDir(Lib.MainFile.get("style"),"")));
             
             // Write HashMap To File, sorted by keys.
             sql = "INSERT INTO configuration (key,value) VALUES(?,?)";

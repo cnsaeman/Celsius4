@@ -17,6 +17,7 @@ import celsius.Resources;
 import celsius.tools.Parser;
 import celsius.tools.TextFile;
 import celsius.tools.ToolBox;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class EditLibrary extends javax.swing.JDialog {
         RSC=MF.RSC;
         library=lib;
         initComponents();
+        jTPEditMode.setTabComponentAt(0,new TabLabel("General settings",Resources.editTabIcon2,RSC,null,false));
+        jTPEditMode.setTabComponentAt(1,new TabLabel("Templates",Resources.templateTabIcon,RSC,null,false));
+        jTPEditMode.setTabComponentAt(2,new TabLabel("CSS style sheet",Resources.styleSheetTabIcon,RSC,null,false));
         KVTM=new KeyValueTableModel("Property","Value");
         for (String t : RSC.LibraryFields) {
             KVTM.addRow(Parser.lowerEndOfWords(t), library.config.get(t));
@@ -48,6 +52,14 @@ public class EditLibrary extends javax.swing.JDialog {
         jTMain.setModel(KVTM);
         jTMain.getColumnModel().getColumn(0).setPreferredWidth(150);
         jTMain.getColumnModel().getColumn(0).setMaxWidth(150);
+
+        jTAStyleSheet.setText(library.config.get("css-style"));
+        jTAStyleSheet.setFont(RSC.stdFontMono());
+        jTAStyleSheet.setCaretPosition(0);
+        
+        jTATemplate.setText(library.getHTMLTemplate(0).templateString);
+        jTATemplate.setFont(RSC.stdFontMono());
+        jTAStyleSheet.setCaretPosition(0);
 
         GUIToolBox.centerDialog(this,mf);
     }
@@ -62,40 +74,31 @@ public class EditLibrary extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jBtnDone = new javax.swing.JButton();
-        jBtnEditCSS = new javax.swing.JButton();
-        ApplyName = new javax.swing.JButton();
+        jTPEditMode = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTMain = new javax.swing.JTable();
-        jBtnManagePlugins = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTATemplate = new javax.swing.JTextArea();
+        jPanel7 = new javax.swing.JPanel();
         jCBHTMLtemplate = new javax.swing.JComboBox();
-        jBtnEditHTMLtemplate = new javax.swing.JButton();
+        jBtnApply2 = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTAStyleSheet = new javax.swing.JTextArea();
+        jPanel6 = new javax.swing.JPanel();
+        jBtnApply3 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jBtnDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Edit Library Properties");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jBtnDone.setText("Done");
-        jBtnDone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnDoneActionPerformed(evt);
-            }
-        });
-
-        jBtnEditCSS.setText("Edit HTML Stylesheet");
-        jBtnEditCSS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditCSSActionPerformed(evt);
-            }
-        });
-
-        ApplyName.setText("Apply");
-        ApplyName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ApplyNameActionPerformed(evt);
-            }
-        });
+        jPanel3.setLayout(new java.awt.BorderLayout());
 
         jTMain.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -105,58 +108,83 @@ public class EditLibrary extends javax.swing.JDialog {
                 "Title 1", "Title 2"
             }
         ));
+        jTMain.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTMainMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTMain);
 
-        jBtnManagePlugins.setText("Manage Plugins");
-        jBtnManagePlugins.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnManagePluginsActionPerformed(evt);
-            }
-        });
+        jPanel3.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jScrollPane1.getAccessibleContext().setAccessibleDescription("");
+
+        jTPEditMode.addTab("tab1", jPanel3);
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jTATemplate.setColumns(20);
+        jTATemplate.setRows(5);
+        jScrollPane3.setViewportView(jTATemplate);
+
+        jPanel4.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jCBHTMLtemplate.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Document", "Person", "Category", "Multiple Documents", "Identifier search", "General search", "Keyword search", "Links tab", "Just added" }));
-
-        jBtnEditHTMLtemplate.setText("Edit HTML template");
-        jBtnEditHTMLtemplate.addActionListener(new java.awt.event.ActionListener() {
+        jCBHTMLtemplate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditHTMLtemplateActionPerformed(evt);
+                jCBHTMLtemplateActionPerformed(evt);
             }
         });
+        jPanel7.add(jCBHTMLtemplate);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(421, 421, 421)
-                .addComponent(ApplyName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnDone))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jBtnManagePlugins)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCBHTMLtemplate, 0, 125, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnEditHTMLtemplate)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnEditCSS))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBtnEditCSS)
-                    .addComponent(jCBHTMLtemplate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBtnEditHTMLtemplate)
-                    .addComponent(jBtnManagePlugins))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBtnDone)
-                    .addComponent(ApplyName)))
-        );
+        jBtnApply2.setText("Apply");
+        jBtnApply2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnApply2ActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jBtnApply2);
+
+        jPanel4.add(jPanel7, java.awt.BorderLayout.PAGE_END);
+
+        jTPEditMode.addTab("tab2", jPanel4);
+
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jTAStyleSheet.setColumns(20);
+        jTAStyleSheet.setRows(5);
+        jScrollPane2.setViewportView(jTAStyleSheet);
+
+        jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jBtnApply3.setText("Apply");
+        jBtnApply3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnApply3ActionPerformed(evt);
+            }
+        });
+        jPanel6.add(jBtnApply3);
+
+        jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
+
+        jTPEditMode.addTab("tab3", jPanel5);
+
+        jPanel1.add(jTPEditMode, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jBtnDone.setText("Done");
+        jBtnDone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDoneActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jBtnDone);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -172,116 +200,69 @@ public class EditLibrary extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ApplyNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ApplyNameActionPerformed
-        boolean done;
-        boolean changed=false;
-        for (int i=0; i<RSC.LibraryFields.length;i++) {
-            String value=(String)KVTM.getValueAt(i,1);
-            if ((value!=null) && !value.equals(library.config.get(RSC.LibraryFields[i]))) {
-                done=false;
-                if (RSC.LibraryFields[i].equals("name")) {
-                    library.name = value;
-                    library.putConfig("name", library.name);
-                    DefaultComboBoxModel DCBM = (DefaultComboBoxModel) MF.jCBLibraries.getModel();
-                    int ind = MF.RSC.currentLib;
-                    DCBM.removeElementAt(ind);
-                    DCBM.insertElementAt(library.name, ind);
-                    MF.switchToLibrary(library);
-                    MF.jMCopyToDiff.getItem(i).setText(library.name);
-                    MF.jMCopyToDiff1.getItem(i).setText(library.name);
-                    RSC.MF.updateStatusBar(false);
-                    done=true;
-                    changed=true;
-                }
-                if (RSC.LibraryFields[i].equals("index")) {
-                    RSC.showWarning("Changing the fields in the library's main index requires a large amount of rewriting of the index files.\nThis operation is currently not possible", "Not possible");
-                    KVTM.setValueAt(library.config.get(RSC.LibraryFields[i]),i,1);
-                    done=true;
-                }
-                if (!done) {
-                    if (RSC.LibraryFields[i].startsWith("column")) {
-                        if (Parser.howOftenContains(value, "|")==Parser.howOftenContains(library.config.get("column-fields"), "|")) {
-                            library.putConfig(RSC.LibraryFields[i], value);
-                            changed=true;
-                        } else {
-                            RSC.showWarning("The number of elements in the list \""+RSC.LibraryFields[i]+"\" does not match that of the table columns.", "Not possible:");
-                            KVTM.setValueAt(library.config.get(RSC.LibraryFields[i]),i,1);
-                        }
-                    } else {
-                        library.putConfig(RSC.LibraryFields[i], value);
-                        changed=true;
-                    }
-                }
-            }
-        }
-        if (changed) {
-            library.hideFunctionality=new ArrayList<String>(Arrays.asList(library.configToArray("hide")));
-            library.getFieldsFromConfig();
-        }
-    }//GEN-LAST:event_ApplyNameActionPerformed
-
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
         this.setVisible(false);
     }//GEN-LAST:event_jBtnDoneActionPerformed
 
-    private void jBtnEditCSSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditCSSActionPerformed
-        String css="";
-        for (String r : library.styleSheetRules)
-            css+="\n"+r;
-        if (css.length()>0) css=css.substring(1);
-        MultiLineEditor MLE=new MultiLineEditor(MF.RSC,"Edit HTML Stylesheet",css);
+    private void jBtnApply2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApply2ActionPerformed
+        int iM=jCBHTMLtemplate.getSelectedIndex();
+        library.setHTMLTemplate(iM, jTATemplate.getText());
+}//GEN-LAST:event_jBtnApply2ActionPerformed
+
+    private void jBtnApply3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApply3ActionPerformed
+        library.putConfig("css-style", jTAStyleSheet.getText());
+        library.setStyleSheet();
+        RSC.MF.guiInfoPanel.updateCSS();
+    }//GEN-LAST:event_jBtnApply3ActionPerformed
+
+    private void jCBHTMLtemplateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBHTMLtemplateActionPerformed
+        int iM=jCBHTMLtemplate.getSelectedIndex();
+        jTATemplate.setText(library.getHTMLTemplate(iM).templateString);
+        jTATemplate.setCaretPosition(0);
+    }//GEN-LAST:event_jCBHTMLtemplateActionPerformed
+
+    private void jTMainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTMainMouseClicked
+        if (evt.getClickCount() == 2 && evt.getButton() == MouseEvent.BUTTON1) {
+            editCurrentlySelectedKey();
+        }
+    }//GEN-LAST:event_jTMainMouseClicked
+
+    public void editCurrentlySelectedKey() {
+        String key = ((String) jTMain.getModel().getValueAt(jTMain.getSelectedRow(), 0));
+        // standard text editor
+        String value = library.config.get(key.toLowerCase());
+        MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit value", value);
         MLE.setVisible(true);
         if (!MLE.cancel) {
-            if (library.config.get("style")==null) {
-                library.putConfig("style","LD::style.css");
-            } else {
-                if (!(new File(library.completeDir(library.config.get("style"),""))).exists())
-                    library.putConfig("style","LD::style.css");
+            value = MLE.text;
+            if (value.equals("<unknown>")) {
+                value = null;
             }
-            try {
-                TextFile TF=new TextFile(library.completeDir(library.config.get("style"),""),false);
-                TF.putString(MLE.text);
-                TF.close();
-                library.loadStyleSheetRules();
-            } catch (IOException e) {
-                RSC.outEx(e);
-                RSC.showWarning("Error writing style file: "+e.toString(),"Warning:");
-            }
+            library.putConfig(key.toLowerCase(), value);
+            KVTM.put(key,value);
         }
+    }
 
-    }//GEN-LAST:event_jBtnEditCSSActionPerformed
-
-    private void jBtnManagePluginsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnManagePluginsActionPerformed
-        (new EditLibraryPlugins(MF,RSC.getCurrentlySelectedLibrary())).setVisible(true);
-        KVTM.clear();
-        for (String t : RSC.LibraryFields) {
-            KVTM.addRow(Parser.lowerEndOfWords(t), library.config.get(t));
-        }
-        jTMain.setModel(KVTM);
-    }//GEN-LAST:event_jBtnManagePluginsActionPerformed
-
-    private void jBtnEditHTMLtemplateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditHTMLtemplateActionPerformed
-        int iM=jCBHTMLtemplate.getSelectedIndex();
-        String template=library.getHTMLTemplate(iM).templateString;
-        MultiLineEditor MLE=new MultiLineEditor(RSC,"Edit HTML template for "+jCBHTMLtemplate.getSelectedItem(),template);
-        MLE.setVisible(true);
-        if ((!MLE.cancel) && (iM!=0)) {
-            library.setHTMLTemplate(iM, MLE.text);
-        } else {
-            if (!MLE.cancel) RSC.showWarning("The default template cannot be modified.", "No changes applied");
-        }
-}//GEN-LAST:event_jBtnEditHTMLtemplateActionPerformed
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ApplyName;
+    private javax.swing.JButton jBtnApply2;
+    private javax.swing.JButton jBtnApply3;
     private javax.swing.JButton jBtnDone;
-    private javax.swing.JButton jBtnEditCSS;
-    private javax.swing.JButton jBtnEditHTMLtemplate;
-    private javax.swing.JButton jBtnManagePlugins;
     private javax.swing.JComboBox jCBHTMLtemplate;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea jTAStyleSheet;
+    private javax.swing.JTextArea jTATemplate;
     private javax.swing.JTable jTMain;
+    private javax.swing.JTabbedPane jTPEditMode;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -134,7 +134,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPEdit.addChangeListener(this);
         
         RSC.adjustComponents(this.getComponents());
-        jTABibTeX.setFont(new java.awt.Font("Monospaced", 0, RSC.guiScale(12)));
+        jTABibTeX.setFont(RSC.stdFontMono());
 
         // TODO: Questionable
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame", "noLib", new JComponent[] {jMIEditDS1});
@@ -1458,16 +1458,24 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         tabMode=mode;
     }
     
+    public void updateCSS() {
+        kit = new HTMLEditorKit();
+        kit.setStyleSheet(null);
+        library.styleSheet=kit.getStyleSheet();
+        String[] rules=library.config.get("css-style").split("\n");
+        for (String rule : rules) {
+            library.styleSheet.addRule(rule);
+        }
+        jHTMLview.setEditorKit(kit);        
+    }
+    
     /**
      * Update panel and full GUI according to current situation
      */
     public void updateGUI() {
         if (library!=RSC.getCurrentlySelectedLibrary()) {
             library=RSC.getCurrentlySelectedLibrary();
-            kit = new HTMLEditorKit();
-            kit.setStyleSheet(null);
-            library.adjustStyleSheet(kit.getStyleSheet());
-            jHTMLview.setEditorKit(kit);
+            updateCSS();
         };
         jHTMLview.setContentType("text/html");
         RSC.plugins.updateExportPlugins();

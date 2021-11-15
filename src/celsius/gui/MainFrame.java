@@ -191,16 +191,17 @@ public class MainFrame extends javax.swing.JFrame implements
         DropTarget dt = (new DropTarget(jTStructureTree, this));
         
         // STATEMANAGER
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIExportBibliography});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople});
         // TODO: adjust 
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jMIDeepSearch, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jMIDeepSearch, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
         RSC.guiStates.setState("mainFrame","librarySelected", false);
         RSC.guiStates.setState("mainFrame","categorySelected", false);
         RSC.guiStates.setState("mainFrame","itemSelected", false);
+        RSC.guiStates.setState("mainFrame","personSelected", false);
         RSC.guiStates.setState("mainFrame","pluginSelected", false);
         RSC.guiStates.setState("mainFrame","tabAvailable",false);        
         RSC.guiStates.registerListener("mainFrame", this);
@@ -2399,7 +2400,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
     private void jMIExportBibliographyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExportBibliographyActionPerformed
         dialogExportBibliography.adjustButtons();
-        dialogExportBibliography.setVisible(true);
+        dialogExportBibliography.showCentered();
     }//GEN-LAST:event_jMIExportBibliographyActionPerformed
 
     private void jMIShowItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIShowItemsActionPerformed
