@@ -331,27 +331,40 @@ public class PluginUniversalItems extends Thread {
                 Msgs.add("Response: "+inspireRecord);
             }
             if (inspireRecord.length()>2) {
-                Msgs.add("Record found");
+                Msgs.add("XXI Inspire record found");
                 if (item.isEmpty("inspirekey")) {
                     String inspirekey=Parser.cutUntil(Parser.cutFrom(inspireRecord,"\"control_number\":"),",");
                     Msgs.add("Inspire key missing, identified as "+inspirekey);
                     item.put("inspirekey",inspirekey);
                 }
+                Msgs.add("XXI1");
                 
                 JSONParser jp=new JSONParser(inspireRecord);
                 
+                Msgs.add("XXI2");
+                
                 jp.moveToNextTag("authors");
-                String authors="";
-                while(jp.moveToNextTag("ids")) {
-                    String bai=jp.extractStringFromNextTag("value");
+                
+                Msgs.add("XXI3");
+                ArrayList<JSONParser> authorsArray=jp.extractArray();
+                Msgs.add("XXF Found "+String.valueOf(authorsArray.size())+" authors");
+                String authors = "";
+                for (JSONParser author : authorsArray) {
+                    String bai = author.extractStringFromNextTag("value");
                     // ref for author could be empty
-                    jp.pushPosition();
-                    String inspirekey=Parser.cutFrom(jp.extractStringFromNextTag("$ref"),"https://inspirehep.net/api/authors/");
-                    jp.pullPosition();
-                    String fullname=jp.extractStringFromNextTag("full_name");
-                    authors+="|"+fullname;
-                    if (bai.length()>2) authors+="#inspirebai::"+bai;
-                    if (inspirekey.length()>2) authors+="#inspirekey::"+inspirekey;
+                    String ref=author.extractStringFromNextTag("$ref");
+                    String inspirekey=null;
+                    if (ref!=null) {
+                        inspirekey=Parser.cutFrom(ref, "https://inspirehep.net/api/authors/");
+                    }
+                    String fullname = author.extractStringFromNextTag("full_name");
+                    authors += "|" + fullname;
+                    if (bai!=null) {
+                        authors += "#inspirebai::" + bai;
+                    }
+                    if (inspirekey!=null) {
+                        authors += "#inspirekey::" + inspirekey;
+                    }
                 }
                 authors=authors.substring(1);
                 Msgs.add(authors);

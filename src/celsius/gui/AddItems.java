@@ -986,6 +986,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run()  {
+                        progressMonitor.close();
                         DA.adjustJBtnAdd();
                         DA.jBtnAddRec.setEnabled(true);
                     }
@@ -1618,7 +1619,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             }
             if (dr.type==10) {
                 if (!autoDelete) {
-                    res[0]=RSC.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+dr.item.toText(false)+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
+                    res[0]=RSC.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+dr.item.toText(false)+" with id: "+dr.item.id+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
                 } else res[0]=0;
                 item.put("$$beingadded", null);
                 if (res[0]==0) {

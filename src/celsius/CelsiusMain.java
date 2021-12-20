@@ -22,6 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +39,31 @@ public class CelsiusMain {
     private static SplashScreen StartUp;
     
     public static void doWork() {
-        String mainLibraryFile="/home/cnsaeman/Celsius4/Libraries/MathsPhys/CelsiusLibrary.sql";
-        String url="jdbc:sqlite:"+mainLibraryFile;
+        String mainFile="/home/cnsaeman/Celsius4/Celsius4/test.txt";
+        String contents=TextFile.ReadOutFile(mainFile);
+        JSONParser jp=new JSONParser(contents);
+        jp.moveToNextTag("authors");
+        ArrayList<JSONParser> authorsArray=jp.extractArray();
+        String authors = "";
+        for (JSONParser author : authorsArray) {
+            String bai = author.extractStringFromNextTag("value");
+            // ref for author could be empty
+            String ref=author.extractStringFromNextTag("$ref");
+            String inspirekey=null;
+            if (ref!=null) {
+                inspirekey=Parser.cutFrom(ref, "https://inspirehep.net/api/authors/");
+            }
+            String fullname = author.extractStringFromNextTag("full_name");
+            authors += "|" + fullname;
+            if (bai!=null) {
+                authors += "#inspirebai::" + bai;
+            }
+            if (inspirekey!=null) {
+                authors += "#inspirekey::" + inspirekey;
+            }
+        }
+        System.out.println(authors);
+        /*String url="jdbc:sqlite:"+mainLibraryFile;
         try {
             Connection dbConnection = DriverManager.getConnection(url);
             boolean locked=false;

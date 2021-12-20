@@ -34,6 +34,10 @@ import java.sql.*;
 import java.util.zip.GZIPInputStream;
 
 public final class Library implements Iterable<Item> {
+
+    // Library property strings
+    public static final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","people","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
+    public static final String[] LibraryEditableFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","people","person-table-column-fields","person-table-column-headers","person-table-column-types","person-table-column-sizes","person-search-fields","icon-fields","icon-dictionary","choice-fields","filetypes","hide","essential-fields","default-add-method"};
     
     // Status messages after adding a item
     public static final String[] status={
@@ -284,7 +288,7 @@ public final class Library implements Iterable<Item> {
                 return;
             }
             setStyleSheet();
-            for (String field : RSC.LibraryFields) {
+            for (String field : Library.LibraryFields) {
                 ensure(field);
             }
             
@@ -341,6 +345,11 @@ public final class Library implements Iterable<Item> {
             dbConnection=null;
         }
         addingMode=1;
+    }
+    
+    public HashSet<String> properties(String table) {
+        if ("items".equals(table)) return(itemPropertyKeys);
+        return(personPropertyKeys);
     }
     
     // TODO
@@ -501,7 +510,7 @@ public final class Library implements Iterable<Item> {
         return(ToolBox.stringToArrayList(config.get(key)));
     }
     
-    private void initTablePresets() {
+    public void initTablePresets() {
         itemTableTags = new ArrayList<>();
         itemTableHeaders = new ArrayList<>();
         itemTableColumnSizes = new ArrayList<>();
@@ -552,7 +561,7 @@ public final class Library implements Iterable<Item> {
         } else {
             personTableTags=configToArrayList("person-table-column-fields");
             String[] list={};
-            if (config.get("table-column-sizes") != null) {
+            if (config.get("person-table-column-sizes") != null) {
                 list = configToArray("person-table-column-sizes");
                 for (String element : list) {
                     personTableColumnSizes.add(Integer.valueOf(element));
@@ -961,8 +970,19 @@ public final class Library implements Iterable<Item> {
 
     public void autoSortColumn(CelsiusTable celsiusTable) {
         int c=0;
-        if (config.get("autosortcolumn")!=null)
-            c=Integer.valueOf(config.get("autosortcolumn"));
+        if (celsiusTable.getObjectType()==CelsiusTable.ITEM_TABLE) {
+            if (config.get("item-autosortcolumn") != null) {
+                try {
+                    c = Integer.valueOf(config.get("item-autosortcolumn"));
+                } catch (Exception ex) {}
+            }
+        } else if (celsiusTable.getObjectType()==CelsiusTable.PERSON_TABLE) {
+            if (config.get("person-autosortcolumn") != null) {
+                try {
+                    c = Integer.valueOf(config.get("person-autosortcolumn"));
+                } catch (Exception ex) {}
+            }
+        }
         celsiusTable.sortItems(c,true);
     }
 
@@ -1661,11 +1681,13 @@ public final class Library implements Iterable<Item> {
             sql.append(" WHERE ");
             for(String itemDescription : descriptionList) {
                 String[] desc=itemDescription.split(":");
-                sql.append('`');
-                sql.append(desc[0]);
-                sql.append('`');
-                sql.append("=? OR ");
-                data.add(desc[1]);
+                if ((desc.length==2) && (properties(table).contains(desc[0]))) {
+                    sql.append('`');
+                    sql.append(desc[0]);
+                    sql.append('`');
+                    sql.append("=? OR ");
+                    data.add(desc[1]);
+                }
             }
             sql.delete(sql.length()-4, sql.length());
             sql.append(';');
@@ -1903,11 +1925,13 @@ public final class Library implements Iterable<Item> {
             StringBuffer sql=new StringBuffer("SELECT * FROM persons WHERE ");
             for (String descEntry : descList) {
                 String[] descPair=descEntry.split("::");
-                describedAttributes.put(descPair[0],descPair[1]);
-                sql.append(descPair[0]);
-                sql.append("='");
-                sql.append(descPair[1]);
-                sql.append("' OR ");
+                if (descPair.length>1) {
+                    describedAttributes.put(descPair[0], descPair[1]);
+                    sql.append(descPair[0]);
+                    sql.append("='");
+                    sql.append(descPair[1]);
+                    sql.append("' OR ");
+                }
             }
             sql.delete(sql.length()-4, sql.length());
             sql.append(" LIMIT 1;");
@@ -1922,6 +1946,10 @@ public final class Library implements Iterable<Item> {
         } else {
             firstName = Parser.cutUntilLast(description," ").trim();
             lastName = Parser.cutFromLast(description," ").trim();
+            if (lastName.length()==0) {
+                lastName=firstName;
+                firstName="";
+            }
         }
         
         if (person==null) {

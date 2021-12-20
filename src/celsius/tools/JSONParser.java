@@ -52,6 +52,7 @@ public class JSONParser {
         if ((i>-1) && (i<upperBound)) {
            pos=i+4+tag.length();
            i=content.indexOf("\"",pos);
+           if (i==-1) return(null);
            return(content.substring(pos, i));
         } else {
            return(null);
@@ -122,6 +123,23 @@ public class JSONParser {
                 bc='}';
             }
         }
+    }
+        
+    public ArrayList<JSONParser> extractArray() {
+        ArrayList<JSONParser> out=new ArrayList<>();
+        pos=content.indexOf('[',pos);
+        tmppos=pos;
+        closeBracket(']');
+        int maxpos=tmppos;
+        tmppos=pos;
+        int lastpos=pos;
+        while ((tmppos>-1) && (tmppos<maxpos)) {
+            closeBracket(',');
+            System.out.println(content.substring(lastpos+1,tmppos-1));
+            out.add(new JSONParser(content.substring(lastpos+1,tmppos-1)));
+            lastpos=tmppos;
+        }
+        return(out);
     }
 
     // make more sophisticated, recursive

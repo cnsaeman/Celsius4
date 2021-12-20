@@ -86,12 +86,12 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     
     public int postID;
 
-    public CelsiusTable(MainFrame mf,Library lib,String tit,int tt) {
+    public CelsiusTable(MainFrame mf,Library lib,String t,int tt) {
         super();
         library=lib;
         library.addLibraryChangeListener(this);
         sorted=-1;
-        title=tit;
+        title=t;
         properties=new HashMap<>();
         MF=mf;
         RSC=mf.RSC;

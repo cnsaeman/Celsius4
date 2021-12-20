@@ -41,11 +41,13 @@ public class CelsiusTemplate {
             if (templateString.substring(i+1,i+4).equals("if#")) {
                 i=i+3;
                 j=templateString.indexOf("#",i+1);
-                ifs.add(templateString.substring(i+1,j));
+                String ifstring=templateString.substring(i+1,j);
+                if (!ifs.contains(ifstring)) ifs.add(ifstring);
             } else {
                 j=templateString.indexOf("#",i+1);
-                keys.add(templateString.substring(i+1,j));
-                i=templateString.indexOf("#",j+1);
+                String key=templateString.substring(i+1,j);
+                if (!keys.contains(key)) keys.add(key);
+                i=templateString.indexOf("#",j+1);                
             }
         }
     }
@@ -66,7 +68,7 @@ public class CelsiusTemplate {
         
         // setup thumbnail
         if (!item.isEmpty("thumbnail") && item.isEmpty("$thumbnail")) {
-            item.put("$thumbnail",item.library.completeDir(item.get("thumbnail")));
+            item.put("$thumbnail",item.library.completeDir("LD::thumbnails/"+item.id+item.get("thumbnail")));
         }
         
         
@@ -130,7 +132,9 @@ public class CelsiusTemplate {
                     }
                 }
                 if (field.equals("attachments")) insert=item.getAttachments(modifier);
-            } 
+            } else if (item.library.isPeopleField(key)) {
+                insert=item.getNames(field, 3);
+            }
             int i=out.indexOf("#"+key+"#");
             while (i>-1) {
                 String out2="";

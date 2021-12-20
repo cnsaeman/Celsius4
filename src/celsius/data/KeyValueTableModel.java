@@ -47,7 +47,6 @@ public class KeyValueTableModel implements TableModel {
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        if (columnIndex==1) return(false);
         return(false);
     }
 

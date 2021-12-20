@@ -194,7 +194,7 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople});
         // TODO: adjust 
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jMIDeepSearch, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
@@ -409,7 +409,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jSeparator22 = new javax.swing.JSeparator();
         jMICites1 = new javax.swing.JMenuItem();
         jSeparator24 = new javax.swing.JSeparator();
-        jMIAssociateFile1 = new javax.swing.JMenuItem();
         jMIJoin1 = new javax.swing.JMenuItem();
         jMICreateCombiner1 = new javax.swing.JMenuItem();
         jSeparator26 = new javax.swing.JSeparator();
@@ -457,36 +456,32 @@ public class MainFrame extends javax.swing.JFrame implements
         jMainMenu = new javax.swing.JMenuBar();
         jMFile = new javax.swing.JMenu();
         jMIConfig = new javax.swing.JMenuItem();
+        jMIEditLibTemplates = new javax.swing.JMenuItem();
         jMIClearLoggingFile = new javax.swing.JMenuItem();
+        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        jMIConvertLibrary = new javax.swing.JMenuItem();
         jSeparator10 = new javax.swing.JSeparator();
         jMIQuit = new javax.swing.JMenuItem();
         jMLibraries = new javax.swing.JMenu();
-        jMIEditLib = new javax.swing.JMenuItem();
-        jSeparator11 = new javax.swing.JSeparator();
         jMICreateLib = new javax.swing.JMenuItem();
         jMILoadLib = new javax.swing.JMenuItem();
         jMRecent = new javax.swing.JMenu();
         jMISaveLib = new javax.swing.JMenuItem();
         jMICloseLib = new javax.swing.JMenuItem();
         jMIDeleteLib = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator11 = new javax.swing.JSeparator();
         jMIAddToLib = new javax.swing.JMenuItem();
-        jSeparator28 = new javax.swing.JSeparator();
-        jMIDeepSearch = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
+        jMIEditLib = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JSeparator();
         jMIEditDS = new javax.swing.JMenuItem();
-        jSeparator23 = new javax.swing.JPopupMenu.Separator();
-        jMCDisplayHidden = new javax.swing.JRadioButtonMenuItem();
         jSeparator33 = new javax.swing.JPopupMenu.Separator();
-        jMIConvLib = new javax.swing.JMenuItem();
-        jMIEditLibTemplates = new javax.swing.JMenuItem();
         jMIConsistencyCheck = new javax.swing.JMenuItem();
         jMTabs = new javax.swing.JMenu();
         jMIAddTab = new javax.swing.JMenuItem();
         jMICopyTab = new javax.swing.JMenuItem();
         jMITab2Cat = new javax.swing.JMenuItem();
         jMICloseTab = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMPeople = new javax.swing.JMenu();
         jMIMerge1 = new javax.swing.JMenuItem();
         jMIRemoveFromTable2 = new javax.swing.JMenuItem();
@@ -505,7 +500,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIDeleteFile = new javax.swing.JMenuItem();
         jMIRemoveHalf = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JSeparator();
-        jMIAssociateFile = new javax.swing.JMenuItem();
         jMIJoin = new javax.swing.JMenuItem();
         jMICreateCombiner = new javax.swing.JMenuItem();
         jSeparator8 = new javax.swing.JSeparator();
@@ -785,14 +779,6 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jPMItemTable.add(jMICites1);
         jPMItemTable.add(jSeparator24);
-
-        jMIAssociateFile1.setText("Associate file to current entry");
-        jMIAssociateFile1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIAssociateFileActionPerformed(evt);
-            }
-        });
-        jPMItemTable.add(jMIAssociateFile1);
 
         jMIJoin1.setText("Combine the selected items");
         jMIJoin1.addActionListener(new java.awt.event.ActionListener() {
@@ -1099,6 +1085,14 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jMFile.add(jMIConfig);
 
+        jMIEditLibTemplates.setText("Edit library templates");
+        jMIEditLibTemplates.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIEditLibTemplatesActionPerformed(evt);
+            }
+        });
+        jMFile.add(jMIEditLibTemplates);
+
         jMIClearLoggingFile.setText("Clear logging file");
         jMIClearLoggingFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1106,6 +1100,15 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMFile.add(jMIClearLoggingFile);
+        jMFile.add(jSeparator9);
+
+        jMIConvertLibrary.setText("Convert library");
+        jMIConvertLibrary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIConvertLibraryActionPerformed(evt);
+            }
+        });
+        jMFile.add(jMIConvertLibrary);
         jMFile.add(jSeparator10);
 
         jMIQuit.setText("Quit");
@@ -1119,15 +1122,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMainMenu.add(jMFile);
 
         jMLibraries.setText("Libraries");
-
-        jMIEditLib.setText("Edit library properties");
-        jMIEditLib.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditLibActionPerformed(evt);
-            }
-        });
-        jMLibraries.add(jMIEditLib);
-        jMLibraries.add(jSeparator11);
 
         jMICreateLib.setText("Create new library");
         jMICreateLib.addActionListener(new java.awt.event.ActionListener() {
@@ -1171,7 +1165,7 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMLibraries.add(jMIDeleteLib);
-        jMLibraries.add(jSeparator2);
+        jMLibraries.add(jSeparator11);
 
         jMIAddToLib.setText("Add items to library");
         jMIAddToLib.addActionListener(new java.awt.event.ActionListener() {
@@ -1180,15 +1174,15 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMLibraries.add(jMIAddToLib);
-        jMLibraries.add(jSeparator28);
+        jMLibraries.add(jSeparator2);
 
-        jMIDeepSearch.setText("Search in Library");
-        jMIDeepSearch.addActionListener(new java.awt.event.ActionListener() {
+        jMIEditLib.setText("Edit library properties");
+        jMIEditLib.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIDeepSearchActionPerformed(evt);
+                jMIEditLibActionPerformed(evt);
             }
         });
-        jMLibraries.add(jMIDeepSearch);
+        jMLibraries.add(jMIEditLib);
         jMLibraries.add(jSeparator4);
 
         jMIEditDS.setText("Edit HTML template");
@@ -1198,32 +1192,7 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMLibraries.add(jMIEditDS);
-        jMLibraries.add(jSeparator23);
-
-        jMCDisplayHidden.setText("Show hidden items");
-        jMCDisplayHidden.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jMCDisplayHiddenStateChanged(evt);
-            }
-        });
-        jMLibraries.add(jMCDisplayHidden);
         jMLibraries.add(jSeparator33);
-
-        jMIConvLib.setText("Convert Library");
-        jMIConvLib.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIConvLibActionPerformed(evt);
-            }
-        });
-        jMLibraries.add(jMIConvLib);
-
-        jMIEditLibTemplates.setText("Edit library templates");
-        jMIEditLibTemplates.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditLibTemplatesActionPerformed(evt);
-            }
-        });
-        jMLibraries.add(jMIEditLibTemplates);
 
         jMIConsistencyCheck.setText("Check library consistency");
         jMIConsistencyCheck.addActionListener(new java.awt.event.ActionListener() {
@@ -1271,7 +1240,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMTabs.add(jMICloseTab);
-        jMTabs.add(jSeparator5);
 
         jMainMenu.add(jMTabs);
 
@@ -1390,14 +1358,6 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jMItems.add(jMIRemoveHalf);
         jMItems.add(jSeparator6);
-
-        jMIAssociateFile.setText("Associate file to current entry");
-        jMIAssociateFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIAssociateFileActionPerformed(evt);
-            }
-        });
-        jMItems.add(jMIAssociateFile);
 
         jMIJoin.setText("Combine the selected items");
         jMIJoin.addActionListener(new java.awt.event.ActionListener() {
@@ -1587,40 +1547,8 @@ public class MainFrame extends javax.swing.JFrame implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMIJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIJoinActionPerformed
-        if (RSC.guiStates.getState("mainFrame", "tabAvailable")) {
-            // TODO
-            /*            Library Lib = RSC.getCurrentlySelectedLibrary();
-            ArrayList<Item> docs=RSC.getCurrentItemTable().getSelectedRows();
-            if (docs.size() > 2) {
-                RSC.showWarning("Only the first two entries will be joined.", "Warning:");
-            } else {
-                if (docs.size()<2) {
-                    RSC.showWarning("Please selected two items to be joined.", "Warning:");
-                    return;
-                }
-            }
-            String id0=docs.get(0).get("id");
-            String id=docs.get(0).id;
-            String id1=docs.get(1).get("id");
-            if ((Lib,id1,id0)) {
-                RSC.getCurrentItemTable().reloadItem(new Item(Lib,id1));
-                int i=RSC.getCurrentItemTable().getSelectedRow();
-
-                DefaultListSelectionModel DLSM=(DefaultListSelectionModel) RSC.getCurrentItemTable().jtable.getSelectionModel();
-                DLSM.addSelectionInterval(i, i);
-                RSC.getCurrentItemTable().jtable.setSelectionModel(DLSM);
-                RSC.getCurrentItemTable().removeID(id);
-                updateStatusBar(true);
-                jIP.updateHTMLview();
-                jIP.updateCurrentItemInGUI();
-            }*/
-        }
-
+        performItemMerge();
     }//GEN-LAST:event_jMIJoinActionPerformed
-
-    private void jMIAssociateFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAssociateFileActionPerformed
-        associateFileToCurrentItem();
-    }//GEN-LAST:event_jMIAssociateFileActionPerformed
 
     private void jMICopyTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICopyTabActionPerformed
         RSC.guiStates.adjustState("mainFrame", "itemSelected", false);
@@ -2262,15 +2190,6 @@ private void jLSearchKeysValueChanged(javax.swing.event.ListSelectionEvent evt) 
     searchKeysUpdate();
 }//GEN-LAST:event_jLSearchKeysValueChanged
 
-private void jMIDeepSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIDeepSearchActionPerformed
-        if (deepSearch==null) {
-            deepSearch=new DeepSearch(RSC);
-            RSC.adjustComponents(deepSearch.getComponents());
-        }
-        deepSearch.setLib(RSC.getCurrentlySelectedLibrary());
-        deepSearch.setVisible(true);
-}//GEN-LAST:event_jMIDeepSearchActionPerformed
-
 private void jMICreateCombiner1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICreateCombiner1ActionPerformed
     // TODO
     /*CreateCombiner CC=new CreateCombiner(this,RSC.getCurrentItemTable().getSelectedRows());
@@ -2335,10 +2254,6 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     }*/
 }//GEN-LAST:event_jTFMainSearchKeyTyped
 
-private void jMCDisplayHiddenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jMCDisplayHiddenStateChanged
-    RSC.displayHidden=jMCDisplayHidden.isSelected();
-}//GEN-LAST:event_jMCDisplayHiddenStateChanged
-
 private void jMShowCombinedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMShowCombinedActionPerformed
         showCombined();
 }//GEN-LAST:event_jMShowCombinedActionPerformed
@@ -2358,15 +2273,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private void jLWhenAddedValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLWhenAddedValueChanged
         goToHistory(jLWhenAdded.getSelectedIndex());
     }//GEN-LAST:event_jLWhenAddedValueChanged
-
-    private void jMIConvLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConvLibActionPerformed
-        String filename=RSC.selectFile("Select the main file of the library you wish to open.", "loadlibraries", "_ALL", "All Files");
-        if (filename!=null) {
-            // convert Library to SQLite
-            Library3.convertLib(this,filename,RSC);
-            RSC.showInformation("The library has been converted.", "Action completed.");
-        }
-    }//GEN-LAST:event_jMIConvLibActionPerformed
 
     private void jMIMergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMergeActionPerformed
         performPeopleMerge();
@@ -2406,6 +2312,27 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private void jMIShowItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIShowItemsActionPerformed
         showAssociatedItems();
     }//GEN-LAST:event_jMIShowItemsActionPerformed
+
+    private void jMIConvertLibraryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConvertLibraryActionPerformed
+        String filename=RSC.selectFile("Select the main file of the library you wish to open.", "loadlibraries", "_ALL", "All Files");
+        if (filename!=null) {
+            jPBSearch.setIndeterminate(true);
+            Thread DoIt = (new Thread() {
+                @Override
+                public void run() {
+                    Library3.convertLib(filename,RSC);
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            jPBSearch.setIndeterminate(false);
+                            RSC.showInformation("The library has been converted.", "Action completed.");
+                        }
+                    });
+                }
+            });
+            DoIt.start();
+        }
+    }//GEN-LAST:event_jMIConvertLibraryActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2422,7 +2349,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JLabel jLabel1;
     public javax.swing.JMenu jMActions;
     private javax.swing.JMenu jMBibTeX;
-    private javax.swing.JRadioButtonMenuItem jMCDisplayHidden;
     private javax.swing.JMenu jMCategories;
     public javax.swing.JMenu jMCopyToDiff;
     public javax.swing.JMenu jMCopyToDiff1;
@@ -2431,8 +2357,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIAddTab;
     private javax.swing.JMenuItem jMIAddToLib;
-    public javax.swing.JMenuItem jMIAssociateFile;
-    public javax.swing.JMenuItem jMIAssociateFile1;
     private javax.swing.JMenuItem jMIBibClipboard;
     private javax.swing.JMenuItem jMICatDown;
     private javax.swing.JMenuItem jMICatDown1;
@@ -2452,14 +2376,13 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMICollapse;
     private javax.swing.JMenuItem jMIConfig;
     private javax.swing.JMenuItem jMIConsistencyCheck;
-    private javax.swing.JMenuItem jMIConvLib;
+    private javax.swing.JMenuItem jMIConvertLibrary;
     private javax.swing.JMenuItem jMICopyTab;
     private javax.swing.JMenuItem jMICopyTab2;
     private javax.swing.JMenuItem jMICreateCombiner;
     private javax.swing.JMenuItem jMICreateCombiner1;
     private javax.swing.JMenuItem jMICreateLib;
     private javax.swing.JMenuItem jMICreateTxt;
-    private javax.swing.JMenuItem jMIDeepSearch;
     private javax.swing.JMenuItem jMIDelCat;
     private javax.swing.JMenuItem jMIDelCat1;
     private javax.swing.JMenuItem jMIDeleteFile;
@@ -2557,19 +2480,17 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator22;
-    private javax.swing.JPopupMenu.Separator jSeparator23;
     private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator26;
-    private javax.swing.JSeparator jSeparator28;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator30;
     private javax.swing.JPopupMenu.Separator jSeparator31;
     private javax.swing.JPopupMenu.Separator jSeparator33;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JPopupMenu.Separator jSeparator9;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JButton jTBAdd;
     public javax.swing.JTabbedPane jTPSearches;
@@ -2623,6 +2544,16 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             MP.setVisible(true);
         } else {
             RSC.showWarning("You have to selected more than one person to merge.", "Cancelled:");
+        }
+    }
+        
+    public void performItemMerge() {
+        if (RSC.getCurrentTable().jtable.getSelectedRowCount()==2) {
+            String ids=RSC.getCurrentTable().getSelectedIDsString();
+            MergeItems MI=new MergeItems(RSC,ids);
+            MI.setVisible(true);
+        } else {
+            RSC.showWarning("You have to selected exactly two items to merge.", "Cancelled:");
         }
     }
     
@@ -3099,42 +3030,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             RSC.showWarning("Error while viewing plain text:\n" + ex.toString(), "Exception:");
             RSC.outEx(ex);
         }
-    }
-    
-    public void associateFileToCurrentItem() {
-        if (RSC.guiStates.getState("mainFrame","tabAvailable")) {
-            Library library = RSC.getCurrentlySelectedLibrary();
-            Item item=(Item)RSC.getCurrentTable().getSelectedRows().get(0);
-            String filename = RSC.selectFile("Indicate the file to be associated with the selected record", "associate", "_ALL", "All files");
-            if (filename != null) {
-                String name = null;
-                if (item.linkedAttachments.size() == 0) {
-                    name = "";
-                } else {
-                    final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a description for the associated file", "", true);
-                    DSLE.setVisible(true);
-                    if (!DSLE.cancel) {
-                        name = DSLE.text.trim();
-                    }
-                    DSLE.dispose();
-                }
-                if (name != null) {
-                    if (name.length() == 0) {
-                        name = "Main file";
-                    }
-                    try {
-                        item.associateWithFile(filename, name);
-                        library.itemChanged(item.id);
-                        RSC.out("LIBFA>Added file " + filename + " to record with ID: " + item.get("id"));
-                    } catch (IOException ex) {
-                        RSC.out("LIBFA>Failed::Adding file " + filename + " to record with ID: " + item.get("id"));
-                        RSC.outEx(ex);
-                    }
-                }
-            }
-        }
-        updateStatusBar(true);
-        guiInfoPanel.updateGUI();        
     }
 
     @Override

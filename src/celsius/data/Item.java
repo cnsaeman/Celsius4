@@ -52,7 +52,6 @@ public final class Item extends TableRow implements Editable {
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
         error=0;
-        currentLoadLevel=0;
     }
 
     public Item(Library lib) {
@@ -63,6 +62,8 @@ public final class Item extends TableRow implements Editable {
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
         error=0;
+        // mark as newly created, ensure that all "shorts" are updated
+        currentLoadLevel=1000; 
     }
     
     /**
@@ -253,7 +254,12 @@ public final class Item extends TableRow implements Editable {
                             for (String personDescription : personList) {
                                 Person person = library.findOrCreatePerson(personDescription);
                                 person.save();
-                                linkedPersons.get(field).add(person);
+                                // Check that that person is not already linked
+                                boolean add=true;
+                                for (Person linkedPerson : linkedPersons.get(field)) {
+                                    if (linkedPerson.id.equals(person.id)) add=false;
+                                }
+                                if (add) linkedPersons.get(field).add(person);
                             }
                         } else {
                             // make sure that all people exist and are saved
@@ -831,7 +837,6 @@ public final class Item extends TableRow implements Editable {
         fields.remove("last_modifiedTS");
         fields.remove("createdTS");
         fields.remove("remarks");
-        fields.remove("bibtex");
         fields.remove("id");
         return(fields);
     }

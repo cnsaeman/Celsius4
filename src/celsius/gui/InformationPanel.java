@@ -81,6 +81,8 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public final static int TabMode_ITEM=1;
     public final static int TabMode_PERSON=2;
     public final static int TabMode_CATEGORY=3;
+    public final static int TabMode_ITEM_SEARCH=4;
+    public final static int TabMode_PERSON_SEARCH=5;
     
     // 4 and 7 missing?
 
@@ -1314,7 +1316,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }//GEN-LAST:event_jLAttachmentsValueChanged
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        RSC.MF.associateFileToCurrentItem();
+        associateFileToCurrentItem();
     }//GEN-LAST:event_jBtnAddActionPerformed
 
 
@@ -1536,7 +1538,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToItemSearchResults() {
-        switchToTabMode(InformationPanel.TabMode_ITEM);
+        switchToTabMode(InformationPanel.TabMode_ITEM_SEARCH);
         CelsiusTemplate template=library.getHTMLTemplate(5);
         currentTemplate=5;
         RSC.getCurrentTable().updateStats();
@@ -1589,7 +1591,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToMultiPerson() {
-        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        switchToTabMode(InformationPanel.TabMode_PERSON_SEARCH);
         CelsiusTemplate template=library.getHTMLTemplate(9);
         currentTemplate=9;
         RSC.getCurrentTable().updateStats();
@@ -1851,6 +1853,43 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public void guiEventHappened(String id, String message) {
         updateGUI();
     }
+    
+    public void associateFileToCurrentItem() {
+        if (RSC.guiStates.getState("mainFrame","tabAvailable")) {
+            Library library = RSC.getCurrentlySelectedLibrary();
+            Item item=(Item)RSC.getCurrentTable().getSelectedRows().get(0);
+            String filename = RSC.selectFile("Indicate the file to be associated with the selected record", "associate", "_ALL", "All files");
+            if (filename != null) {
+                String name = null;
+                if (item.linkedAttachments.size() == 0) {
+                    name = "";
+                } else {
+                    final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a description for the associated file", "", true);
+                    DSLE.setVisible(true);
+                    if (!DSLE.cancel) {
+                        name = DSLE.text.trim();
+                    }
+                    DSLE.dispose();
+                }
+                if (name != null) {
+                    if (name.length() == 0) {
+                        name = "Main file";
+                    }
+                    try {
+                        item.associateWithFile(filename, name);
+                        library.itemChanged(item.id);
+                        RSC.out("LIBFA>Added file " + filename + " to record with ID: " + item.get("id"));
+                    } catch (IOException ex) {
+                        RSC.out("LIBFA>Failed::Adding file " + filename + " to record with ID: " + item.get("id"));
+                        RSC.outEx(ex);
+                    }
+                }
+            }
+        }
+        RSC.MF.updateStatusBar(true);
+        updateGUI();        
+    }
+    
 
 
 }

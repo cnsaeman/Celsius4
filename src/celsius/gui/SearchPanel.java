@@ -71,10 +71,11 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
         });
         add(jTFMainSearch);
 
+        jPanel22.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jPanel22.setMaximumSize(null);
-        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 5));
 
-        jCBSearchMode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item index", "Item search index", "Person" }));
+        jCBSearchMode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item index", "Plain Text", "Person" }));
         jPanel22.add(jCBSearchMode);
 
         add(jPanel22);

@@ -162,7 +162,7 @@ public final class Library3 implements Iterable<Item3> {
     }
     
     /** Loads an existing library */
-    public Library3(MainFrame mf, String fn,Resources rsc) {
+    public Library3(String fn,Resources rsc) {
         currentStatus=0;
         lastAddedItem=null;
         PeopleTags=null;
@@ -545,7 +545,11 @@ public final class Library3 implements Iterable<Item3> {
         StringBuffer buffer=new StringBuffer();
         String tmp;
         try {
-            GZIPInputStream fis = new GZIPInputStream(new FileInputStream(new File(completeDir(item.get(tag),item.get("id")))));
+            String path=completeDir(item.get(tag),item.get("id"));
+            if (path==null) return(buffer);
+            File f=new File(path);
+            if (!f.exists()) return(buffer);
+            GZIPInputStream fis = new GZIPInputStream(new FileInputStream(f));
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             while ((tmp = br.readLine()) != null) {
@@ -571,9 +575,9 @@ public final class Library3 implements Iterable<Item3> {
     // - additional attributes in index, in particular secondary files
     // 
     
-    public static void convertLib(MainFrame MF, String fn,Resources RSC) {
+    public static void convertLib(String fn,Resources RSC) {
         try {
-            Library3 Lib=new Library3(MF,fn,RSC);
+            Library3 Lib=new Library3(fn,RSC);
             int done=0;
             
             String folder=Parser.cutUntilLast(fn,ToolBox.filesep)+ToolBox.filesep+Lib.MainFile.get("directory");
@@ -581,6 +585,7 @@ public final class Library3 implements Iterable<Item3> {
             String dbsname=folder+ToolBox.filesep+"CelsiusSearchIndex.sql";
             FileTools.deleteIfExists(dbfname);
             FileTools.deleteIfExists(dbsname);
+            FileTools.makeDir(folder+ToolBox.filesep+"thumbnails");
             /*if ((new File(dbfname)).exists()) {
                 toolbox.Warning(RSC.getMF(), "Library3 seems to be in SQLite format.", "Can't convert:");
                 return;
@@ -596,7 +601,8 @@ public final class Library3 implements Iterable<Item3> {
             
             // get all the headers
             ArrayList<String> indexTags = ToolBox.stringToArrayList(Lib.MainFile.get("index"));
-            if (indexTags.indexOf("inspirekey")>-1) {
+            boolean isArXivDB=indexTags.indexOf("inspirekey")>-1;
+            if (isArXivDB) {
                 indexTags.add("doi");
                 indexTags.add("arxiv-ref");
                 indexTags.add("arxiv-name");
@@ -646,7 +652,6 @@ public final class Library3 implements Iterable<Item3> {
                     if (tag.equals("columnsizes")) tag="item-table-column-sizes";
                     if (tag.equals("tablecolumns")) tag="item-table-column-fields";
                     if (tag.equals("naming-convention")) tag="item-naming-convention";
-                    if (tag.equals("seach-fields")) tag="item-search-fields";
                     if (tag.equals("people")) tag="person-fields";
                     if (tag.equals("plugins-manual")) tag="plugins-manual-items";
                     if (tag.equals("plugins-auto")) tag="plugins-auto-items";
@@ -665,21 +670,38 @@ public final class Library3 implements Iterable<Item3> {
                         value = Parser.replace(value, "|pages|", "|");
                     }
                     if (tag.equals("searchtags")) {
-                        tag="search-fields";
-                        searchtags="type|short_authors|title|identifier|arxiv-ref|doi|citation-tag";
-                        value=searchtags;                        
+                        tag="item-search-fields";
+                        if (isArXivDB) {
+                            searchtags="type|short_authors|title|identifier|arxiv-ref|doi|citation-tag";
+                            value=searchtags;                        
+                        }
                     }
                     configDictionary.put(tag, value);
                 }
             }
-            if (indexTags.indexOf("inspirekey")>-1) {
+            if (isArXivDB) {
                 configDictionary.put("item-unique-fields","inspirekey|doi|arxiv-ref|citation-tag|search");
             }
             configDictionary.remove("directory");
             configDictionary.remove("autosortcolumn");
             configDictionary.remove("style");
             configDictionary.put("item-autosortcolumn","title");
+            String[] columnFields=ToolBox.stringToArray(configDictionary.get("item-table-column-fields"));
+            List<String> peopleFields=Arrays.asList(ToolBox.stringToArray(configDictionary.get("person-fields")));
+            String out="";
+            for (String field : columnFields) {
+                if (peopleFields.contains(field)) {
+                    out+="|short_"+field;
+                } else {
+                    out+="|"+field;
+                }
+            }
+            configDictionary.put("item-table-column-fields",out);
             configDictionary.put("person-autosortcolumn","last_name");
+            configDictionary.put("person-table-column-fields", "last_name|first_name");
+            configDictionary.put("person-table-column-headers", "Last name|First name");
+            configDictionary.put("person-table-column-sizes", "200|100");
+            configDictionary.put("person-table-column-types", "text|text");
             configDictionary.put("person-search-fields", "first_name|last_name");
             configDictionary.put("plugins-import", "Basic Import");
             configDictionary.put("plugins-people", "");
@@ -695,9 +717,6 @@ public final class Library3 implements Iterable<Item3> {
                 statement.setString(2, configDictionary.get(key));                
                 statement.execute();
             }
-            
-            // remember searchtags for quicksearch fields
-            String[] searchtagslist=ToolBox.stringToArray(searchtags);
             
             RSC.out("Copying HTML templates");
             sql = "CREATE TABLE IF NOT EXISTS html_templates(\n    mode text UNIQUE,\n";
@@ -749,8 +768,8 @@ public final class Library3 implements Iterable<Item3> {
             }
             sql+= "    attributes blob,\n";
             sql+= "    search text,\n";
-            sql+= "    created integer,\n";
-            sql+= "    last_modified integer);";
+            sql+= "    createdTS integer,\n";
+            sql+= "    last_modifiedTS integer);";
             stmt = Lib.conn.createStatement();
             RSC.out(sql);
             stmt.execute(sql);
@@ -767,8 +786,8 @@ public final class Library3 implements Iterable<Item3> {
                 sql+= "    inspirebai text,\n";
                 sql+= "    inspirekey long,\n";
             }            
-            sql+= "    created integer);";
-            sql+= "    last_modified integer);";
+            sql+= "    createdTS integer);";
+            sql+= "    last_modifiedTS integer);";
             stmt = Lib.conn.createStatement();
             RSC.out(sql);
             stmt.execute(sql);
@@ -847,12 +866,16 @@ public final class Library3 implements Iterable<Item3> {
             // Close Library3 and open new library for writing
             Lib.conn.close();
             RSC.guiNotify=false;
+            
+            // open library
             Library library=new Library(folder,RSC);
+            
+            // copy over elements
             
             Lib.Index.position=-1;
             Lib.Index.nextElement();
+            
             while (!Lib.Index.endReached) {
-            //while (!Lib.Index.endReached && (done<100)) {
                 
                 Item3 item3=new Item3(Lib,Lib.Index.get("id"));
                 item3.ensureAddInfo();
@@ -869,7 +892,11 @@ public final class Library3 implements Iterable<Item3> {
                 Item item=new Item(library);
                 for (String tag: indexTags) {
                     if (!tag.equals("addinfo") && !tag.equals("id")) {
-                        item.put(tag, item3.get(tag));
+                        if (tag.equals("thumbnail")) {
+                            item.put(tag, Parser.cutFrom(item3.get(tag),"AI::"));
+                        } else {
+                            item.put(tag, item3.get(tag));
+                        }
                     }
                 }
 
@@ -904,7 +931,11 @@ public final class Library3 implements Iterable<Item3> {
                 // attributes
                 for(String tag : item3.getAITags()) {
                     if (!excludeTags.contains(tag) && (!tag.startsWith("altversion-")) && !tag.equals("id")) {
-                        item.put(tag,item3.get(tag));
+                        if (tag.equals("thumbnail")) {
+                            item.put(tag, Parser.cutFrom(item3.get(tag),"AI::"));
+                        } else {
+                            item.put(tag,item3.get(tag));
+                        }
                     }
                 }
 
@@ -922,7 +953,17 @@ public final class Library3 implements Iterable<Item3> {
                 
                 // adjust time
                 String lastUpdated=String.valueOf((Files.getLastModifiedTime(Paths.get(item3.getCompleteDirS("addinfo")))).toMillis()/1000);
-                library.executeEX("UPDATE items SET created=?, last_modified=? WHERE id=?", new String[]{lastUpdated,lastUpdated,item.id});
+                library.executeEX("UPDATE items SET createdTS=?, last_modifiedTS=? WHERE id=?", new String[]{lastUpdated,lastUpdated,item.id});
+
+                // write Thumbnails
+                if (!item.isEmpty("thumbnail")) {
+                    String thumbName=item3.completeDir(item3.get("thumbnail"));
+                    try {
+                        FileTools.copyFile(thumbName, folder+ToolBox.filesep+"thumbnails"+ToolBox.filesep+item.id+item.get("thumbnail"));
+                    } catch (Exception e) {
+                        RSC.out(">>E>> Couldn't copy thumbnail: "+thumbName);
+                    }
+                }
                 
                 if (!item3.getS("location").isBlank()) {
                     PreparedStatement statement = library.dbConnection.prepareStatement("INSERT INTO attachments (name,path,filetype,pages) VALUES(?,?,?,?);");
@@ -941,7 +982,7 @@ public final class Library3 implements Iterable<Item3> {
                     statement.execute();
                     StringBuffer search = Lib.getPlainText(item3, "plaintxt");
                     search.append("\n");
-                    for (String tag : searchtagslist) {
+                    for (String tag : library.itemSearchFields) {
                         search.append(item3.getS(tag));
                         search.append("\n");
                     }
@@ -970,7 +1011,7 @@ public final class Library3 implements Iterable<Item3> {
                         statement.execute();
                         search = Lib.getPlainText(item3, "plaintxt");
                         search.append("\n");
-                        for (String tag : searchtagslist) {
+                        for (String tag : library.itemSearchFields) {
                             search.append(item3.getS(tag));
                             search.append("\n");
                         }
@@ -992,6 +1033,9 @@ public final class Library3 implements Iterable<Item3> {
             
             // END of conversion
             library.close();
+            
+            // move item directory 
+            FileTools.moveFile(Lib.completeDir("LD::documents","0"), Lib.completeDir("LD::items","0"));
                     
         } catch (Exception e) {
             e.printStackTrace();

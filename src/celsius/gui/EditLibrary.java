@@ -17,6 +17,7 @@ import celsius.Resources;
 import celsius.tools.Parser;
 import celsius.tools.TextFile;
 import celsius.tools.ToolBox;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +47,12 @@ public class EditLibrary extends javax.swing.JDialog {
         jTPEditMode.setTabComponentAt(1,new TabLabel("Templates",Resources.templateTabIcon,RSC,null,false));
         jTPEditMode.setTabComponentAt(2,new TabLabel("CSS style sheet",Resources.styleSheetTabIcon,RSC,null,false));
         KVTM=new KeyValueTableModel("Property","Value");
-        for (String t : RSC.LibraryFields) {
+        for (String t : Library.LibraryEditableFields) {
             KVTM.addRow(Parser.lowerEndOfWords(t), library.config.get(t));
         }
         jTMain.setModel(KVTM);
-        jTMain.getColumnModel().getColumn(0).setPreferredWidth(150);
-        jTMain.getColumnModel().getColumn(0).setMaxWidth(150);
+        jTMain.getColumnModel().getColumn(0).setPreferredWidth(250);
+        //jTMain.getColumnModel().getColumn(0).setMaxWidth(150);
 
         jTAStyleSheet.setText(library.config.get("css-style"));
         jTAStyleSheet.setFont(RSC.stdFontMono());
@@ -60,6 +61,8 @@ public class EditLibrary extends javax.swing.JDialog {
         jTATemplate.setText(library.getHTMLTemplate(0).templateString);
         jTATemplate.setFont(RSC.stdFontMono());
         jTAStyleSheet.setCaretPosition(0);
+        setPreferredSize(new Dimension(RSC.guiScale(700),RSC.guiScale(600)));
+        pack();
 
         GUIToolBox.centerDialog(this,mf);
     }
@@ -239,6 +242,7 @@ public class EditLibrary extends javax.swing.JDialog {
                 value = null;
             }
             library.putConfig(key.toLowerCase(), value);
+            library.initTablePresets();
             KVTM.put(key,value);
         }
     }

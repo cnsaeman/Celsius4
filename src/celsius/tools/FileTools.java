@@ -146,5 +146,9 @@ public class FileTools {
         fis.close();
         fos.close();
     }
+
+    public static void makeDir(String name) {
+        (new File(name)).mkdir();
+    }
     
 }

@@ -28,6 +28,8 @@ import javax.swing.DefaultListModel;
  */
 public class EditLibraryTemplates extends javax.swing.JDialog {
 
+    // TODO!!!
+    
     private final MainFrame MF;
     private final Resources RSC;
     private final DefaultListModel DLM;
@@ -58,7 +60,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
         goToSelected();
         KVTM=new KeyValueTableModel("Property","Value");
         int j=jLTemplates.getSelectedIndex();
-        for (String t : RSC.LibraryFields) {
+        for (String t : Library.LibraryFields) {
             KVTM.addRow(Parser.lowerEndOfWords(t), xml.get(t));
         }
         jTLibTemplates.setModel(KVTM);
@@ -233,11 +235,11 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
         goToSelected();
         boolean done;
         boolean changed=false;
-        for (int i=0; i<RSC.LibraryFields.length;i++) {
+        for (int i=0; i<Library.LibraryEditableFields.length;i++) {
             String value=(String)KVTM.getValueAt(i,1);
-            if ((value!=null) && !value.equals(xml.get(RSC.LibraryFields[i]))) {
+            if ((value!=null) && !value.equals(xml.get(Library.LibraryEditableFields[i]))) {
                 done=false;
-                if (RSC.LibraryFields[i].equals("name")) {
+                if (Library.LibraryEditableFields[i].equals("name")) {
                     if (DLM.contains(value)) {
                         done=true;
                         RSC.showWarning("A library template with this name already exists.", "Cancelled...");
@@ -255,7 +257,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
                     }
                 }
                 if (!done) {
-                    xml.put(RSC.LibraryFields[i], value);
+                    xml.put(Library.LibraryEditableFields[i], value);
                     changed=true;
                 }
             }
@@ -292,8 +294,8 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
             RSC.libraryTemplates.put("New template",xml);
             Library Lib=RSC.getCurrentlySelectedLibrary();
             if (Lib!=null) {
-                for (i=1;i<RSC.LibraryFields.length;i++) {
-                    xml.put(RSC.LibraryFields[i], Lib.config.get(RSC.LibraryFields[i]));
+                for (i=1;i<Library.LibraryFields.length;i++) {
+                    xml.put(Library.LibraryFields[i], Lib.config.get(Library.LibraryFields[i]));
                 }
                 /*String tmp=TextFile.ReadOutFile(Lib.completeDir(Lib.config.get("style"), ""));
                 for (int j=0;j<8;j++) {
