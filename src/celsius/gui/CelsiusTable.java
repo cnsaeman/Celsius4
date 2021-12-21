@@ -223,11 +223,12 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     }*/
 
     public void setLibraryAndTableType(Library l, int tt) {
-        library=l;
         tableType=tt;
         if (library!=l) {
-            celsiusTableModel.setLibrary(library);
+            celsiusTableModel.setLibrary(l);
+            library=l;
             setSizes(library.itemTableColumnSizes);
+            celsiusTableModel.clearToObjectType(-1);
         }
         celsiusTableModel.tableview=true;
         int objectType=-1;

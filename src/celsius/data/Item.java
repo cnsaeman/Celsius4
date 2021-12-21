@@ -225,6 +225,13 @@ public final class Item extends TableRow implements Editable {
     public void putS(String key,String value) {
         if ((value!=null) && (value.trim().length()!=0)) put(key,value);
     }
+    
+    public String getThumbnailPath() {
+        if (!isEmpty("thumbnail")) {
+            return(library.completeDir("LD::thumbnails/"+id+get("thumbnail")));
+        } 
+        return(null);
+    }
 
     /**
      * Save an item. Note that this should only be done if loadlevel is maximal

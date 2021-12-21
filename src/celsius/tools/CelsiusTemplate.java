@@ -67,8 +67,9 @@ public class CelsiusTemplate {
         }
         
         // setup thumbnail
-        if (!item.isEmpty("thumbnail") && item.isEmpty("$thumbnail")) {
-            item.put("$thumbnail",item.library.completeDir("LD::thumbnails/"+item.id+item.get("thumbnail")));
+        String thumb=item.getThumbnailPath();
+        if (thumb!=null) {
+            item.put("$thumbnail",thumb);
         }
         
         

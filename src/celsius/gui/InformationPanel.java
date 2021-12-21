@@ -28,6 +28,8 @@ import celsius.data.StructureNode;
 import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -36,6 +38,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -74,7 +82,7 @@ import javax.swing.tree.DefaultTreeModel;
  *
  * @author cnsaeman
  */
-public final class InformationPanel extends javax.swing.JPanel implements GuiEventListener { //implements DropTargetListener {
+public final class InformationPanel extends javax.swing.JPanel implements GuiEventListener, DropTargetListener {
 
     public final static int TabMode_START_UP=-1;
     public final static int TabMode_EMPTY=0;
@@ -117,8 +125,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         DefaultComboBoxModel addModel=new DefaultComboBoxModel(vec);
         addModel.setSelectedItem(addModel.getElementAt(0));
         jCBAddProperty.setModel(addModel);
-        jHTMLview.setTransferHandler( createTransferHandler(this));
-        //DropTarget dt = (new DropTarget(jHTMLview, DnDConstants.ACTION_COPY_OR_MOVE,this,true,null));
+        DropTarget dt = (new DropTarget(jHTMLview, DnDConstants.ACTION_COPY_OR_MOVE,this,true,null));
         kit = new HTMLEditorKit();
         jHTMLview.setEditorKit(kit);
         jTPItem.setTabComponentAt(0,new TabLabel("Info",Resources.infoTabIcon,rsc,null,false));
@@ -154,13 +161,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (celsiusTable==null) return;
         if (jPThumb.isVisible()) {
             // TODO Person Thumb
-            /*Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
+            Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
             if (currentItem!=null) {
-                if (currentItem.get("thumbnail")!=null) {
+                String thumbPath=currentItem.getThumbnailPath();
+                if (thumbPath!=null) {
                     jBtnResizeThumb.setEnabled(true);
                     jBtnRemoveThumb.setEnabled(true);
                     try {
-                        jLIcon.setIcon(new ImageIcon(new URL("file://"+currentItem.getCompletedDirKey("thumbnail"))));
+                        jLIcon.setIcon(new ImageIcon(new URL("file://"+thumbPath)));
                     } catch (Exception e) {
                         RSC.outEx(e);
                     }
@@ -173,7 +181,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 jBtnResizeThumb.setEnabled(false);
                 jBtnRemoveThumb.setEnabled(false);
                 jLIcon.setIcon(null);
-            }*/
+            }
         }
     }
     
@@ -1071,7 +1079,21 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         Clipboard cb=Toolkit.getDefaultToolkit().getSystemClipboard();
         if ((tabMode==0) && cb.isDataFlavorAvailable(DataFlavor.imageFlavor)) {
             try {
-                createThumb(cb.getData(DataFlavor.imageFlavor));
+                Item currentItem = (Item) celsiusTable.getCurrentlySelectedRow();
+                String target = currentItem.library.baseFolder + "thumbnails" + ToolBox.filesep + currentItem.id + ".jpg";
+                Image image = (Image) cb.getData(DataFlavor.imageFlavor);
+                FileTools.deleteIfExists(target);
+                // convert from no longer supported types.
+                BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+                Graphics bg = bufferedImage.getGraphics();
+                bg.drawImage(image, 0, 0, null);
+                bg.dispose();
+                if (ImageIO.write(bufferedImage, "jpeg", new File(target))) {
+                    currentItem.put("thumbnail", ".jpg");
+                    currentItem.save();
+                } else {
+                    RSC.out("Saving jpge failed!");
+                }
             } catch (UnsupportedFlavorException ex) {
                 RSC.outEx(ex);
             } catch (IOException ex) {
@@ -1087,13 +1109,15 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         String filename=RSC.selectFile("Indicate the file containing the thumbnail", "thumbnail", "_ALL", "All files");
         if (filename!=null) {
             try {
-                String filetype=FileTools.getFileType(filename);
-                FileTools.deleteIfExists(currentItem.getCompletedDirKey("thumbnail"));
-                String target="AI::"+filetype;
-                while ((new File(library.completeDir(target))).exists()) target+="x";
-                currentItem.put("thumbnail", target);
-                FileTools.moveFile(filename, currentItem.getCompletedDirKey("thumbnail"));
+                String filetype="."+FileTools.getFileType(filename);
+                String oldThumb=currentItem.getThumbnailPath();
+                if (oldThumb!=null) {
+                    FileTools.deleteIfExists(oldThumb);
+                }
+                currentItem.put("thumbnail", filetype);
+                FileTools.moveFile(filename, currentItem.getThumbnailPath());
                 currentItem.save();
+                updateGUI();
             } catch (IOException ex) {
                 RSC.showWarning("Error writing thumbnail: "+ex.toString(), "Warning:");
                 RSC.outEx(ex);
@@ -1134,7 +1158,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             currentItem.putS("thumbnail", library.compressFilePath(targetname));
             if (!target.equals(targetname))
                 FileTools.deleteIfExists(target);
-            updateThumb();
             updateGUI();
         } catch (IOException ex) {
             RSC.outEx(ex);
@@ -1143,10 +1166,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     private void jBtnRemoveThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRemoveThumbActionPerformed
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
+        FileTools.deleteIfExists(currentItem.getThumbnailPath());
         currentItem.put("thumbnail",null);
         currentItem.save();
-        updateThumb();
-        updateGUI();
         updateGUI();
     }//GEN-LAST:event_jBtnRemoveThumbActionPerformed
 
@@ -1703,151 +1725,88 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 jLFiles3.setModel(listModel);
             }
         }
+        updateThumb();
         adjustAttachmentButtons();
     }
     
-//    public void dragEnter(DropTargetDragEvent dtde) {
-//        if (!acceptData(dtde.getTransferable()))
-//            dtde.rejectDrag();
-//    }
-//
-//    public void dragOver(DropTargetDragEvent dtde) {
-//        if (!acceptData(dtde.getTransferable()))
-//            dtde.rejectDrag();
-//    }
-//
-//    public void dropActionChanged(DropTargetDragEvent dtde) {
-//        System.out.println("Drop action changed");
-//    }
-//
-//    public void dragExit(DropTargetEvent dte) {
-//        System.out.println("Drag exit");
-//        System.out.println("Drop3:"+dte.toString());
-//    }
-//
-//    public void drop(DropTargetDropEvent dtde) {
-//        dtde.acceptDrop(DnDConstants.ACTION_COPY);
-//        System.out.println("Drop1");
-//        if (acceptData(dtde.getTransferable())) {
-//            System.out.println("Drop2");
-//            dtde.acceptDrop(dtde.getDropAction());
-//            try {
-//                System.out.println("Drop3:"+dtde.getTransferable().getTransferData(DataFlavor.imageFlavor).toString());
-//                createThumb(dtde.getTransferable().getTransferData(DataFlavor.imageFlavor));
-//            } catch (UnsupportedFlavorException ex) {
-//                RSC.Msg1.printStackTrace(ex);
-//            } catch (IOException ex) {
-//                RSC.Msg1.printStackTrace(ex);
-//            }
-//        }
-//    }
+    public void dragEnter(DropTargetDragEvent dtde) {
+        if (!acceptData(dtde.getTransferable()))
+            dtde.rejectDrag();
+    }
 
-//    private boolean acceptData(Transferable t) {
-//        boolean ret = false;
-//        try {
-//            if (t == null) {
-//                return (false);
-//            }
-//            if (infoMode != 0) {
-//                return (false);
-//            }
-//            ret = t.isDataFlavorSupported(DataFlavor.imageFlavor);
-//        } catch (Exception e) {
-//            ret = false;
-//            RSC.MF.Msg1.printStackTrace(e);
-//        }
-//        return (ret);
-//    }
-//
-    private void createThumb(Object o) {
-        Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
-        try {
-            Image i = (Image)o;
-            String target=currentItem.get("thumbnail");
-            if (target==null) {
-                target="AI::";
-                if (!library.completeDir(target+".jpg").equals(currentItem.getCompletedDirKey("thumbnail")))
-                    while ((new File(library.completeDir(target+".jpg"))).exists()) target+="x";
+    public void dragOver(DropTargetDragEvent dtde) {
+        if (!acceptData(dtde.getTransferable()))
+            dtde.rejectDrag();
+    }
+
+    public void dropActionChanged(DropTargetDragEvent dtde) {
+        System.out.println("Drop action changed");
+    }
+
+    public void dragExit(DropTargetEvent dte) {
+        System.out.println("Drag exit");
+        System.out.println("Drop3:"+dte.toString());
+    }
+
+    public void drop(DropTargetDropEvent dtde) {
+        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+        System.out.println("Drop1");
+        if (acceptData(dtde.getTransferable())) {
+            System.out.println("Drop2");
+            dtde.acceptDrop(dtde.getDropAction());
+            try {
+                Item currentItem = (Item) celsiusTable.getCurrentlySelectedRow();
+                String target = currentItem.library.baseFolder + "thumbnails" + ToolBox.filesep + currentItem.id + ".jpg";
+                if (dtde.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+                    System.out.println("Drop3:"+dtde.getTransferable().getTransferData(DataFlavor.imageFlavor).toString());
+                    Image image = (Image) dtde.getTransferable().getTransferData(DataFlavor.imageFlavor);
+                    FileTools.deleteIfExists(target);
+                    // convert from no longer supported types.
+                    BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+                    Graphics bg = bufferedImage.getGraphics();
+                    bg.drawImage(image, 0, 0, null);
+                    bg.dispose();
+                    if (ImageIO.write(bufferedImage, "jpeg", new File(target))) {
+                        currentItem.put("thumbnail", ".jpg");
+                        currentItem.save();
+                    } else {
+                        RSC.out("Saving jpge failed!");
+                    }
+                } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    System.out.println("Drop4:"+dtde.getTransferable().getTransferData(DataFlavor.stringFlavor).toString());
+                    String path=Parser.cutFrom(dtde.getTransferable().getTransferData(DataFlavor.stringFlavor).toString(),"file://");
+                    if ((new File(path)).exists()) {
+                        System.out.println("Drop42:copy");
+                        FileTools.copyFile(path, target);
+                        currentItem.put("thumbnail", ".jpg");
+                        currentItem.save();
+                    }
+                }
+                updateGUI();
+            } catch (UnsupportedFlavorException ex) {
+                RSC.outEx(ex);
+            } catch (IOException ex) {
+                RSC.outEx(ex);
             }
-            currentItem.put("thumbnail", target+".jpg");
-            ImageIO.write((RenderedImage) i, "jpeg", new File( currentItem.getCompletedDirKey("thumbnail")) );
-            currentItem.save();
-        } catch (IOException ex) {
-            RSC.showWarning("Error writing thumbnail: "+ex.toString(), "Warning:");
-            RSC.outEx(ex);
         }
     }
-    
-  private static TransferHandler createTransferHandler(InformationPanel jip){
-    return new TransferHandler(  ){
-      @Override
-      public boolean importData( JComponent comp, Transferable aTransferable ) {
-        System.out.println("IMPORT1");
-        Object o = null;
-        Image image = null;
-        try {
-            DataFlavor[] transferData2 = aTransferable.getTransferDataFlavors();
-            for(DataFlavor df:transferData2){
-                System.out.println(df.toString());
-            }
-//            if (aTransferable.isDataFlavorSupported (DataFlavor.imageFlavor)) {
-//                try {
-//                        o = aTransferable.getTransferData (DataFlavor.imageFlavor);
-//                } catch (UnsupportedFlavorException ufe) {
-//                        ufe.printStackTrace ();
-//                } catch (IOException ioe) {
-//                        ioe.printStackTrace ();
-//                }
-//                System.out.println(o.toString());
-//            }
-            if (aTransferable.isDataFlavorSupported (DataFlavor.stringFlavor)) {
-                o = aTransferable.getTransferData (DataFlavor.stringFlavor);
-                URL url = new URL((String) o);
-                image = ImageIO.read(url);
-                if (image!=null) {
-                    jip.createThumb(image);
-                }
-            }
-//            if (aTransferable.isDataFlavorSupported (DataFlavor.javaFileListFlavor)) {
-//
-//            try {
-//                    o = aTransferable.getTransferData (DataFlavor.javaFileListFlavor);
-//            } catch (UnsupportedFlavorException ufe) {
-//                    ufe.printStackTrace ();
-//            } catch (IOException ioe) {
-//                    ioe.printStackTrace ();
-//            }
-//
-//            // if o is still null we had an exception
-//            if ((o != null) && (o instanceof List)) {
-//                    List  fileList = (List) o;
-//                    final int length = fileList.size ();
-//
-//                    for (int i = 0; i < length; ++ i) {
-//                        System.out.println(((File) fileList.get (i)).toString());
-//                    }
-//            }            
-//            }
-//            
-//            System.out.println("IMPORT1.5");
-//          Object transferData = aTransferable.getTransferData( DataFlavor.imageFlavor );
-//            System.out.println("IMPORT2");
-//          jip.createThumb(transferData);
-//            System.out.println("IMPORT3");
-        } catch ( UnsupportedFlavorException e ) {
-            System.out.println("UFE: "+e.toString());
-        } catch ( IOException e ) {
-            System.out.println("IOE: "+e.toString());
-        }
-        return true;
-      }
 
-      @Override
-      public boolean canImport( JComponent comp, DataFlavor[] transferFlavors ) {
-        return true;
-      }
-    };
-  }    
+    private boolean acceptData(Transferable t) {
+        boolean ret = false;
+        try {
+            if (t == null) {
+                return (false);
+            }
+            if (tabMode != InformationPanel.TabMode_ITEM) {
+                return (false);
+            }
+            ret=true;
+        } catch (Exception e) {
+            ret = false;
+            RSC.outEx(e);
+        }
+        return (ret);
+    }
 
     @Override
     public void guiEventHappened(String id, String message) {
