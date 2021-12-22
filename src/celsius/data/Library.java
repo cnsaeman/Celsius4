@@ -36,8 +36,8 @@ import java.util.zip.GZIPInputStream;
 public final class Library implements Iterable<Item> {
 
     // Library property strings
-    public static final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","people","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
-    public static final String[] LibraryEditableFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","people","person-table-column-fields","person-table-column-headers","person-table-column-types","person-table-column-sizes","person-search-fields","icon-fields","icon-dictionary","choice-fields","filetypes","hide","essential-fields","default-add-method"};
+    public static final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","person-fields","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
+    public static final String[] LibraryEditableFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","person-fields","person-table-column-fields","person-table-column-headers","person-table-column-types","person-table-column-sizes","person-search-fields","icon-fields","icon-dictionary","choice-fields","filetypes","hide","essential-fields","default-add-method"};
     
     // Status messages after adding a item
     public static final String[] status={
@@ -1181,12 +1181,12 @@ public final class Library implements Iterable<Item> {
         }
     }
 
-    public String getCollaborators(String person) {
+    /*public String getCollaborators(String person) {
         final ArrayList<String> coll = new ArrayList<String>();
         String collabs,colab;
         boolean ok;
         for (Item item : this) {
-            for (String peopletag : configToArray("people")) {
+            for (String peopletag : configToArray("person-fields")) {
                 collabs = item.get(peopletag)+"|";
                 int i=collabs.indexOf(person);
                 int j=i+person.length();
@@ -1215,7 +1215,7 @@ public final class Library implements Iterable<Item> {
         String collaborators = coll.toString();
         collaborators = collaborators.substring(1, collaborators.length() - 1);
         return(collaborators);
-    }
+    }*/
 
     public String addLinks(String s) {
         String tmp = "";

@@ -171,6 +171,16 @@ public class CelsiusTemplate {
             String insert = tableRow.getS(field);
             if (field.equals("last_modifiedTS")) {
                 insert = timeStampToDateTimeString(Long.valueOf(insert));
+            } else if (field.equals("collaborators")) {
+                String[] collaborators = ToolBox.stringToArray(((Person) tableRow).collaborators);
+                String[] collaboratorsID = ToolBox.stringToArray(((Person) tableRow).collaboratorsID);
+                insert = "";
+                for (int j = 0; j < collaborators.length; j++) {
+                    insert += ", <a href='http://$$person." + collaboratorsID[j] + "'>" + collaborators[j] + "</a>";
+                }
+                if (insert.length() > 0) {
+                    insert = insert.substring(2);
+                }
             } else if (key.contains("&")) {
                 int modifier = 0;
                 modifier=Integer.valueOf(Parser.cutFrom(key, "&"));
@@ -197,58 +207,6 @@ public class CelsiusTemplate {
     public String timeStampToDateTimeString(long ts) {
         Date date = new java.util.Date(ts*1000L); 
         return(FDF.format(date));
-    }
-    
-
-    public String fillIn(HashMap<String,String> data,Person person) {
-        String  out=templateString;
-        for (String ift : ifs) {
-            int i=out.indexOf("#if#"+ift+"#");
-            while (i>-1) {
-                String out2="";
-                if (i>0) out2+=out.substring(0,i);
-                if (!person.getS(ift).isBlank()) {
-                    out2+=out.substring(i+5+ift.length());
-                } else {
-                    int j=out.indexOf("\n",i);
-                    if (j>0) out2+=out.substring(j+1);
-                }
-                out=out2;
-                i=out.indexOf("#if#"+ift+"#");
-            }
-        }
-        for (String key : keys) {
-            String field=key;
-            int i=out.indexOf("#"+key+"#");
-            while (i>-1) {
-                String out2="";
-                if (i>0) out2+=out.substring(0,i);
-                String insert;
-                switch (field) {
-                    case "collaborators" :
-                        String[] collaborators=ToolBox.stringToArray(person.collaborators);
-                        String[] collaboratorsID=ToolBox.stringToArray(person.collaboratorsID);
-                        insert="";
-                        for(int j=0;j<collaborators.length;j++) {
-                            insert+=", <a href='http://$$person."+collaboratorsID[j]+"'>"+collaborators[j]+"</a>";
-                        }
-                        if (insert.length()>0) insert=insert.substring(2);
-                        break;
-                    case "currentitems" :
-                        insert=data.get("currentitems");
-                        break;
-                    case "currentpages" :
-                        insert=data.get("currentpages");
-                        break;
-                    default : 
-                        insert=person.getS(field);
-                }
-                out2+=insert+out.substring(i+2+key.length());
-                out=out2;
-                i=out.indexOf("#"+key+"#");
-            }
-        }
-        return(out.toString());
     }
     
     public String getS(HashMap<String,String> properties, String key) {

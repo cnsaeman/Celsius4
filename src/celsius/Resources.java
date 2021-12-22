@@ -177,7 +177,7 @@ public class Resources {
                 LibraryTemplatesX.put("index", "title|authors|pages|identifier|type|keywords");
                 // TODO adjust
                 LibraryTemplatesX.put("tablecolumns", "type|title|authors|identifier");
-                LibraryTemplatesX.put("people", "authors");
+                LibraryTemplatesX.put("person-fields", "authors");
                 LibraryTemplatesX.put("plugins","*");
                 LibraryTemplatesX.put("filetypes","*");
                 LibraryTemplatesX.writeBack();

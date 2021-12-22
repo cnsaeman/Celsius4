@@ -303,16 +303,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIRemoveHalfActionPerformed"/>
           </Events>
         </MenuItem>
-        <Component class="javax.swing.JSeparator" name="jSeparator22">
-        </Component>
-        <MenuItem class="javax.swing.JMenuItem" name="jMICites1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Add rule &quot;cites&quot;"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMICitesActionPerformed"/>
-          </Events>
-        </MenuItem>
         <Component class="javax.swing.JSeparator" name="jSeparator24">
         </Component>
         <MenuItem class="javax.swing.JMenuItem" name="jMIJoin1">

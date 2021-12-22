@@ -406,8 +406,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIUnregisterDoc1 = new javax.swing.JMenuItem();
         jMIDeleteFile1 = new javax.swing.JMenuItem();
         jMIRemoveHalf1 = new javax.swing.JMenuItem();
-        jSeparator22 = new javax.swing.JSeparator();
-        jMICites1 = new javax.swing.JMenuItem();
         jSeparator24 = new javax.swing.JSeparator();
         jMIJoin1 = new javax.swing.JMenuItem();
         jMICreateCombiner1 = new javax.swing.JMenuItem();
@@ -769,15 +767,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMItemTable.add(jMIRemoveHalf1);
-        jPMItemTable.add(jSeparator22);
-
-        jMICites1.setText("Add rule \"cites\"");
-        jMICites1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICitesActionPerformed(evt);
-            }
-        });
-        jPMItemTable.add(jMICites1);
         jPMItemTable.add(jSeparator24);
 
         jMIJoin1.setText("Combine the selected items");
@@ -1836,22 +1825,6 @@ public class MainFrame extends javax.swing.JFrame implements
         }
     }//GEN-LAST:event_jMIExportTabActionPerformed
 
-   // +
-    private void jMICitesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICitesActionPerformed
-        Library Lib = RSC.getCurrentlySelectedLibrary();
-        String paper = RSC.getCurrentTable().getSelectedRows().get(0).get("identifier");
-        String target=getSelectedCategory().toString();
-        if ((paper==null) || (target==null)) {
-            RSC.showWarning("No item or category selected!", "Warning:");
-            return;
-        }
-        HashMap<String,String> data = new HashMap<String,String>();
-        data.put("paper",paper);
-        data.put("target",target);
-        updateStatusBar(false);
-        //TODO updateRulesByCategory();
-    }//GEN-LAST:event_jMICitesActionPerformed
-
     private void jMIUnregisterDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIUnregisterDocActionPerformed
         StructureNode structureNode = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
         if (structureNode != null) {
@@ -2368,7 +2341,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMICatUp1;
     private javax.swing.JMenuItem jMICheckBib;
     private javax.swing.JMenuItem jMICitationTagClipboard;
-    private javax.swing.JMenuItem jMICites1;
     private javax.swing.JMenuItem jMIClearLoggingFile;
     private javax.swing.JMenuItem jMICloseLib;
     public javax.swing.JMenuItem jMICloseTab;
@@ -2479,7 +2451,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JPopupMenu.Separator jSeparator19;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator20;
-    private javax.swing.JSeparator jSeparator22;
     private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator26;
     private javax.swing.JSeparator jSeparator3;

@@ -1625,6 +1625,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         switchToTabMode(InformationPanel.TabMode_PERSON);
         Person person=(Person)celsiusTable.getCurrentlySelectedRow();
         person.loadLevel(2);
+        person.loadCollaborators();
         CelsiusTemplate template=library.getHTMLTemplate(1);
         currentTemplate=1;
         person.put("$$currentitems",library.getNumberOfItemsForPerson(person));
