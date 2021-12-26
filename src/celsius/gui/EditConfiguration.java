@@ -64,7 +64,7 @@ public class EditConfiguration extends javax.swing.JDialog {
         });
         jTabbedPane1.setTabComponentAt(0, new TabLabel("General Configuration",Resources.pluginSetupIcon,RSC,null,false));
         jTabbedPane1.setTabComponentAt(1, new TabLabel("File support","default",RSC,null,false));
-        setIconImage(RSC.getImage(Resources.pluginSetupIcon));
+        setIconImage(RSC.celsiusIcon);
         jLFileTypes.setModel(configuration.getTypeDLM());
         jLFileTypes.setSelectedIndex(0);
         jTFIconFolder.setText(RSC.configuration.getConfigurationProperty("iconfolder"));

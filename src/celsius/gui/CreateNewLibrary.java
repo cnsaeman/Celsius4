@@ -16,6 +16,7 @@ package celsius.gui;
 
 import celsius.data.Library;
 import celsius.Resources;
+import celsius.data.LibraryTemplate;
 import celsius.tools.FFilter;
 import celsius.tools.FileTools;
 import celsius.tools.Parser;
@@ -48,15 +49,14 @@ public class CreateNewLibrary extends javax.swing.JDialog {
         super(parent, true);
         changed=false;
         RSC=rsc;
-        setIconImage(RSC.getImage("new"));
+        setIconImage(RSC.celsiusIcon);
         MF=parent;
         initComponents();
         jTFLibDir.setText(RSC.HomeDirectory+"/Libraries/NewLibrary");
-        jTFMainFile.setText(RSC.HomeDirectory+"/Libraries/NewLibrary.xml");
         Lib=null;
         DCBM=new DefaultComboBoxModel();
-        for (String s : RSC.libraryTemplates.keySet())
-            DCBM.addElement(s);
+        for (LibraryTemplate template : RSC.libraryTemplates)
+            DCBM.addElement(template);
         jCBtemplate.setModel(DCBM);
         jCBtemplate.setSelectedIndex(0);
         jTFName.getDocument().addDocumentListener(new DocumentListener() {
@@ -64,7 +64,6 @@ public class CreateNewLibrary extends javax.swing.JDialog {
             public void change() {
                 if (!changed) {
                     String tmp=jTFName.getText();
-                    jTFMainFile.setText(RSC.HomeDirectory+"/Libraries/"+tmp+".xml");
                     jTFLibDir.setText(RSC.HomeDirectory+"/Libraries/"+tmp);
                 }
             }
@@ -92,12 +91,9 @@ public class CreateNewLibrary extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jBtnSelMainLibFile = new javax.swing.JButton();
         jTFName = new javax.swing.JTextField();
-        jTFMainFile = new javax.swing.JTextField();
         jBtnselLibDir = new javax.swing.JButton();
         jTFLibDir = new javax.swing.JTextField();
         jBCancel = new javax.swing.JButton();
@@ -109,26 +105,11 @@ public class CreateNewLibrary extends javax.swing.JDialog {
         setTitle("Create new Library");
         setResizable(false);
 
-        jLabel1.setText("Main library file:");
-
         jLabel2.setText("Library directory:");
 
         jLabel3.setText("Name of the library:");
 
-        jBtnSelMainLibFile.setText("...");
-        jBtnSelMainLibFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnSelMainLibFileActionPerformed(evt);
-            }
-        });
-
         jTFName.setText("New Library");
-
-        jTFMainFile.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTFMainFileKeyTyped(evt);
-            }
-        });
 
         jBtnselLibDir.setText("...");
         jBtnselLibDir.addActionListener(new java.awt.event.ActionListener() {
@@ -167,26 +148,21 @@ public class CreateNewLibrary extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel1)
                     .addComponent(jLabel2)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jCBtemplate, 0, 221, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTFLibDir, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBtnselLibDir))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jBAccept)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jBCancel))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTFLibDir, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
-                            .addComponent(jTFMainFile, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBtnSelMainLibFile, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jBtnselLibDir, javax.swing.GroupLayout.Alignment.TRAILING)))
-                    .addComponent(jTFName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+                    .addComponent(jTFName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE)
+                    .addComponent(jCBtemplate, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -196,22 +172,19 @@ public class CreateNewLibrary extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jTFName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jBtnSelMainLibFile)
-                    .addComponent(jTFMainFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBtnselLibDir)
+                    .addComponent(jLabel2)
                     .addComponent(jTFLibDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(jBtnselLibDir))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jCBtemplate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBCancel)
-                    .addComponent(jBAccept)
-                    .addComponent(jCBtemplate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                    .addComponent(jBAccept))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -232,68 +205,20 @@ public class CreateNewLibrary extends javax.swing.JDialog {
             jTFLibDir.setText(FC.getSelectedFile().getAbsolutePath());
     }//GEN-LAST:event_jBtnselLibDirActionPerformed
 
-    // Select a library main file
-    private void jBtnSelMainLibFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSelMainLibFileActionPerformed
-        JFileChooser FC=new JFileChooser();
-        FC.setDialogTitle("Select the main file of the library.");
-        FC.setCurrentDirectory(new File(RSC.HomeDirectory+"/Libraries"));
-        FC.setDialogType(JFileChooser.SAVE_DIALOG);
-        RSC.adjustComponents(FC.getComponents());
-        // cancelled?
-        if (!(FC.showOpenDialog(this)==JFileChooser.CANCEL_OPTION)) 
-            jTFMainFile.setText(FC.getSelectedFile().getAbsolutePath());
-    }//GEN-LAST:event_jBtnSelMainLibFileActionPerformed
-
     // Create Library
     private void jBAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAcceptActionPerformed
-        try {
-            String name=jTFName.getText();
-            for (Library lib : RSC.libraries) {
-                if (name.equals(lib.config.get("name"))) {
-                    RSC.showWarning("A library with this name is already loaded. Cancelling...","Warning:");
-                    return;
-                }
-            }
-            if (jTFLibDir.getText().endsWith("/")) jTFLibDir.setText(Parser.cutUntilLast(jTFLibDir.getText(),"/"));
-            
-            boolean proceed=true;
-            if ((new File(jTFMainFile.getText())).exists()) {
-                proceed=(RSC.askQuestionOC("A file with the selected name already exists.\nOverwrite the existing file?","Warning:")==JOptionPane.YES_OPTION);
-            }
-            if (proceed && ((new File(jTFLibDir.getText())).exists())) {
-                proceed=(RSC.askQuestionOC("A directory with the selected name already exists.\nContinue anyway?","Warning:")==JOptionPane.YES_OPTION);
-            }
-            if (!proceed) return;
-            String fn=jTFMainFile.getText();
-            int i=fn.indexOf(ToolBox.filesep,1);
-            boolean ok=true;
-            while ((i>0) && ok) {
-                if (!(new File(fn.substring(0,i)).exists()))
-                    ok=(new File(fn.substring(0,i))).mkdir();
-                i=jTFMainFile.getText().indexOf(ToolBox.filesep,i+1);
-            }
-            if (!ok) {
-                RSC.showWarning("The directory for the library could not be created.","Warning");
-                return;
-            }
-            FileTools.deleteIfExists(jTFMainFile.getText());            
-            Lib=new Library(jTFLibDir.getText(),jTFMainFile.getText(),jTFName.getText(),RSC,(String)jCBtemplate.getSelectedItem());
-            RSC.libraries.add(Lib);
-            this.dispose();
-        } catch (Exception ex) {
-            RSC.outEx(ex);
-            RSC.showWarning("Exception: "+ex.toString(), "Warning");
-        }
+        LibraryTemplate libraryTemplate=(LibraryTemplate)DCBM.getSelectedItem();
+        String name=jTFName.getText();
+        String folder=jTFLibDir.getText();
+        libraryTemplate.createLibrary(name,folder);
+        RSC.loadLibrary(folder,false);
+        this.dispose();
     }//GEN-LAST:event_jBAcceptActionPerformed
 
     // Cancel and dispose DialogCreateNewLibrary
     private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_jBCancelActionPerformed
-
-    private void jTFMainFileKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFMainFileKeyTyped
-        changed=true;
-    }//GEN-LAST:event_jTFMainFileKeyTyped
 
     private void jTFLibDirKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFLibDirKeyTyped
         changed=true;
@@ -303,15 +228,12 @@ public class CreateNewLibrary extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAccept;
     private javax.swing.JButton jBCancel;
-    private javax.swing.JButton jBtnSelMainLibFile;
     private javax.swing.JButton jBtnselLibDir;
     private javax.swing.JComboBox jCBtemplate;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField jTFLibDir;
-    private javax.swing.JTextField jTFMainFile;
     private javax.swing.JTextField jTFName;
     // End of variables declaration//GEN-END:variables
     

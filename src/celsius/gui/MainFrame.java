@@ -207,8 +207,7 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.guiStates.registerListener("mainFrame", this);
         RSC.guiStates.adjustStates("mainFrame");
 
-        final Image image = Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
-        setIconImage(image);
+        setIconImage(RSC.celsiusIcon);
    }
 
     public void setShortCuts() {
@@ -2025,7 +2024,7 @@ public class MainFrame extends javax.swing.JFrame implements
                         setThreadMsg("Opening library...");
                         MF.jPBSearch.setIndeterminate(true);
                         try {
-                            RSC.openLibrary(filename,true);
+                            RSC.loadLibrary(filename,true);
                         } catch (Exception e) {
                             RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
                         }

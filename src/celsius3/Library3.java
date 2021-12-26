@@ -199,9 +199,6 @@ public final class Library3 implements Iterable<Item3> {
             }
             Changed=false;
             loadStyleSheetRules();
-            for (String field : LibraryFields) {
-                ensure(field);
-            }
             if (Changed) {
                 MainFile.writeBack();
                 Changed=false;
@@ -264,13 +261,6 @@ public final class Library3 implements Iterable<Item3> {
         if (PeopleTags.contains(t)) return(true);
         if (t.equals("keywords")) return(true);
         return(false);
-    }
-
-    public void ensure(String k) {
-        if (MainFile.get(k)==null) {
-            MainFile.put(k,RSC.libraryTemplates.get("Default").get(k));
-            Changed=true;
-        }
     }
 
     public String[] listOf(String s) {

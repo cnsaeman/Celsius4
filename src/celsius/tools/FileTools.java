@@ -148,7 +148,7 @@ public class FileTools {
     }
 
     public static void makeDir(String name) {
-        (new File(name)).mkdir();
+        if (!(new File(name)).exists()) (new File(name)).mkdir();
     }
     
 }

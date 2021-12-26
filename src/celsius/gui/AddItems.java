@@ -80,14 +80,8 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         RSC = rsc;
         library = RSC.getCurrentlySelectedLibrary();
         library.addLibraryChangeListener(this);
-        standardKeys=new ArrayList<>();
-        for (String key : library.configToArray("index")) {
-            standardKeys.add(key);
-        }
-        for (String key : library.configToArray("standard-item-fields")) {
-            if (!standardKeys.contains(key)) standardKeys.add(key);
-        }
-        setIconImage(RSC.getImage("iconmonstr-plus-6.svg.16"));
+        standardKeys=(new Item(library)).getEditableFields();
+        setIconImage(RSC.celsiusIcon);
         preparedItems = new ArrayList<>();
         addedItems = new ArrayList<>();
         getDetailsSWs = new ArrayList<>();

@@ -107,7 +107,7 @@ public final class Configurator {
                     lastLibraries.put(rs.getString(1), rs.getString(2));
                     addRecentLib(rs.getString(1), rs.getString(2));
                 } else {
-                    RSC.openLibrary(rs.getString(2),false);
+                    RSC.loadLibrary(rs.getString(2),false);
                     if (highest<rs.getInt(3)) {
                         highest=rs.getInt(3);
                         selectedLibrary=RSC.libraries.size()-1;
@@ -149,7 +149,7 @@ public final class Configurator {
                             RSC.MF.setThreadMsg("Opening library...");
                             RSC.MF.jPBSearch.setIndeterminate(true);
                             try {
-                                RSC.openLibrary(source,true);
+                                RSC.loadLibrary(source,true);
                             } catch (Exception e) {
                                 RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
                             }

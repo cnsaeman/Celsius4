@@ -36,8 +36,8 @@ import java.util.zip.GZIPInputStream;
 public final class Library implements Iterable<Item> {
 
     // Library property strings
-    public static final String[] LibraryFields={"name","index","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","person-fields","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","differentiating-fields","item-representation","item-sort-representation","item-naming-convention","choice-fields","icon-fields","icon-dictionary","default-add-method", "item-folder"};
-    public static final String[] LibraryEditableFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","person-fields","person-table-column-fields","person-table-column-headers","person-table-column-types","person-table-column-sizes","person-search-fields","icon-fields","icon-dictionary","choice-fields","filetypes","hide","essential-fields","default-add-method"};
+    public static final String[] LibraryFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-autosortcolumn","person-fields","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields","choice-fields","icon-fields","icon-dictionary","css-style","default-add-method", "item-folder"};
+    public static final String[] LibraryEditableFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-autosortcolumn","item-search-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields", "item-folder","person-fields","person-table-column-fields","person-table-column-headers","person-table-column-types","person-table-column-sizes","person-search-fields","icon-fields","icon-dictionary","choice-fields","css-style","filetypes","hide","essential-fields","default-add-method"};
     
     // Status messages after adding a item
     public static final String[] status={
@@ -156,21 +156,6 @@ public final class Library implements Iterable<Item> {
         MainFile.put("style", "LD::style.css");
         MainFile.writeBack();*/
 
-        // TODO rewrite
-        TextFile TD=new TextFile(baseFolder+"style.css",false);
-        TD.putString(RSC.libraryTemplates.get(template).get("stylesheet"));
-        TD.close();
-
-        TD=new TextFile(baseFolder+"librarystructure.xml",false);
-        TD.putString(RSC.libraryTemplates.get(template).get("librarystructure"));
-        TD.close();
-        
-        TD=new TextFile(baseFolder+"rules.xml",false);
-        TD.putString(RSC.libraryTemplates.get(template).get("libraryrules"));
-        TD.close();
-                
-        createHTMLTemplates(template);
-                
         getFieldsFromConfig();
 
         libraryChangeListeners=new ArrayList<>();
@@ -317,18 +302,6 @@ public final class Library implements Iterable<Item> {
             if ((itemFolderTemplate==null) || (itemFolderTemplate.equals(""))) itemFolderTemplate="LD::documents";
             itemFolder=new CelsiusTemplate(RSC,itemFolderTemplate);
 
-            //TODO needs to be rewitten:
-
-            // get header names
-            /*String sql="PRAGMA table_info(items);)";
-            PreparedStatement statement=conn.prepareStatement(sql);
-            ResultSet rs=statement.executeQuery();
-            while (rs.next()) {
-                System.out.println(rs.getString(1));
-                System.out.println(rs.getString(2));
-                System.out.println(rs.getString(3));
-            }*/
-
             getFieldsFromConfig();
             /* Old code to correct stuff...
              String[] files = (new File(basedir + "/information")).list();
@@ -418,26 +391,6 @@ public final class Library implements Iterable<Item> {
         return(new DefaultTreeModel(root));
     }
 
-    /**
-     * TODO: rewrite and adjust
-     * @param template
-     * @throws IOException 
-     */
-    private void createHTMLTemplates(String template) throws IOException {
-        XMLHandler.Create("celsiusv2.2.htmltemplates",baseFolder+"htmltemplates.xml");
-        /*HTMLtemplates=new XMLHandler(basedir+"htmltemplates.xml");
-        XMLHandler XH=RSC.LibraryTemplates.get(template);
-        for(int i=0;i<8;i++) {
-            String n="infoMode-"+String.valueOf(i).trim();
-            if (XH.get(n)!=null) {
-                HTMLtemplates.addEmptyElement();
-                HTMLtemplates.put("infoMode",String.valueOf(i));
-                HTMLtemplates.put("template",XH.get(n));
-            }
-        }
-        HTMLtemplates.writeBack();*/
-    }
-
     public void getFieldsFromConfig() {
         name=config.get("name");
         iconFields=configToArray("icon-fields");
@@ -490,9 +443,14 @@ public final class Library implements Iterable<Item> {
         //if (isPeopleOrKeywordTag(t)) PeopleOrKeywordsChanged=true;
     }
 
+    /**
+     *  TODO: ensure default fields
+     * @param k 
+     */
     public void ensure(String k) {
         if (emptyConfigFor(k)) {
-            putConfig(k,RSC.libraryTemplates.get("Default").get(k));
+            System.out.println("Ensuring: "+k);
+            //putConfig(k,RSC.libraryTemplates.get("Default").get(k));
         }
     }
     
@@ -1168,54 +1126,20 @@ public final class Library implements Iterable<Item> {
             }
         }
     }
-
+    
     public CelsiusTemplate getHTMLTemplate(int infoMode) {
         String mode=String.valueOf(infoMode).trim();
         if (htmlTemplates.containsKey(mode)) {
             return htmlTemplates.get(mode);
         } else {
-            String n="infoMode-"+mode;
+            // TODO: set default values
+            /*String n="infoMode-"+mode;
             if (RSC.libraryTemplates.get(n)!=null) {
                 return(new CelsiusTemplate(RSC,RSC.libraryTemplates.get("Default").get(n)));
-            } else return(new CelsiusTemplate(RSC,"Error loading display strings from HTMLtemplates!"));
+            } else return(new CelsiusTemplate(RSC,"Error loading display strings from HTMLtemplates!"));*/
+            return(new CelsiusTemplate(RSC,"No HTMLtemplate available!"));
         }
-    }
-
-    /*public String getCollaborators(String person) {
-        final ArrayList<String> coll = new ArrayList<String>();
-        String collabs,colab;
-        boolean ok;
-        for (Item item : this) {
-            for (String peopletag : configToArray("person-fields")) {
-                collabs = item.get(peopletag)+"|";
-                int i=collabs.indexOf(person);
-                int j=i+person.length();
-                if (i>-1) {
-                    ok=false;
-                    if ((i==0) && ((collabs.charAt(j)==',') || (collabs.charAt(j)=='|'))) ok=true;
-                    if ((i>0) && (collabs.charAt(i-1)=='|') && ((collabs.charAt(j)==',') || (collabs.charAt(j)=='|'))) ok=true;
-                    if (ok) {
-                        while (collabs.length() > 0) {
-                            colab=Parser.returnFirstItem(collabs);
-                            if (!coll.contains(colab)) {
-                                coll.add(colab);
-                            }
-                            collabs = Parser.cutFirstItem(collabs);
-                        }
-                    }
-                }
-            }
-        }
-        coll.remove(person);
-        Collections.sort(coll);
-        for (int i=0;i<coll.size();i++) {
-            collabs=coll.get(i);
-            coll.set(i, Parser.cutFrom(collabs,",").trim()+" "+Parser.cutUntil(collabs, ","));
-        }
-        String collaborators = coll.toString();
-        collaborators = collaborators.substring(1, collaborators.length() - 1);
-        return(collaborators);
-    }*/
+    }    
 
     public String addLinks(String s) {
         String tmp = "";

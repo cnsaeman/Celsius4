@@ -16,6 +16,7 @@ import celsius.data.BibTeXRecord;
 import celsius.gui.TabLabel;
 import celsius.data.Item;
 import celsius.data.Library;
+import celsius.data.LibraryTemplate;
 import celsius.data.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.gui.InformationPanel;
@@ -26,6 +27,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -118,7 +120,7 @@ public class Resources {
     public Icons icons;       // class for all the icons
     public Configurator configuration;    // configuration handler
 
-    public HashMap<String,XMLHandler> libraryTemplates;
+    public final ArrayList<LibraryTemplate> libraryTemplates;
 
     public double guiScaleFactor;
 
@@ -129,6 +131,7 @@ public class Resources {
     public GuiStates guiStates;
     
     public String celsiusBaseFolder;
+    public final Image celsiusIcon;
 
     public boolean displayHidden;
 
@@ -147,8 +150,9 @@ public class Resources {
         displayHidden=false;
         stdHTMLstring=createstdHTMLstring();
         HomeDirectory = Parser.cutUntil((new File(".")).getAbsolutePath(), "/.");
+        libraryTemplates = new ArrayList<>();
         celsiusTables = new ArrayList<CelsiusTable>();
-        currentLib=-1;
+        currentLib = -1;
         libraries = new ArrayList<Library>();
         journalLinks = new HashMap<String, String>();
         guiStates=new GuiStates();
@@ -156,6 +160,7 @@ public class Resources {
         executorService=java.util.concurrent.Executors.newScheduledThreadPool(5);
         LBQ=new LinkedBlockingQueue<Runnable>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
+        celsiusIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
     }
 
     public void initResources() {
@@ -164,32 +169,10 @@ public class Resources {
             configuration = new Configurator(this);
             icons=new Icons(configuration.getConfigurationProperty("iconfolder"));
 
-            // LibraryTemplates
-            if (!(new File("LibraryTemplates")).exists()) {
-                out("RES>Creating simple library templates...");
-                (new File("LibraryTemplates")).mkdir();
-            }
-            if (!(new File("LibraryTemplates/Default.xml")).exists()) {
-                XMLHandler.Create("celsiusv2.2.librarytemplates", "LibraryTemplates/Default.xml");
-                XMLHandler LibraryTemplatesX=new XMLHandler("LibraryTemplates/Default.xml");
-                LibraryTemplatesX.addEmptyElement();
-                LibraryTemplatesX.put("name", "Default");
-                LibraryTemplatesX.put("index", "title|authors|pages|identifier|type|keywords");
-                // TODO adjust
-                LibraryTemplatesX.put("tablecolumns", "type|title|authors|identifier");
-                LibraryTemplatesX.put("person-fields", "authors");
-                LibraryTemplatesX.put("plugins","*");
-                LibraryTemplatesX.put("filetypes","*");
-                LibraryTemplatesX.writeBack();
-            } 
             out("RES>Loading library templates...");
-            String templates[]=(new File("LibraryTemplates")).list();
-            libraryTemplates=new HashMap<String,XMLHandler>();
-            for (int i=0;i<templates.length;i++) {
-                if (templates[i].endsWith(".xml")) {
-                    XMLHandler XH = new XMLHandler("LibraryTemplates/" + templates[i]);
-                    libraryTemplates.put(XH.getS("name"), XH);
-                }
+            String templates[] = (new File("templates")).list();
+            for (String template : templates) {
+                libraryTemplates.add(new LibraryTemplate(this,"templates/"+template));
             }
         } catch (Exception e) {
             outEx(e);
@@ -355,7 +338,7 @@ public class Resources {
         }
     }
 
-    public void openLibrary(String fileName,boolean remember) {
+    public void loadLibrary(String fileName,boolean remember) {
         final Library NewLib = new Library(fileName, this);
         if (NewLib.name.equals("??##cancelled")) return;
         if (NewLib.name.startsWith("??#$")) return;

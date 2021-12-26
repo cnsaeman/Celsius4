@@ -28,7 +28,7 @@ public class ChoiceEditor extends javax.swing.JDialog {
     public ChoiceEditor(Resources rsc, String title, ArrayList<String> choices, String s) {
         super(rsc.MF, true);
         RSC=rsc;
-        setIconImage(RSC.getImage("iconmonstr-edit-9.svg.24"));
+        setIconImage(RSC.celsiusIcon);
         this.setTitle(title);
         DCBM=new DefaultComboBoxModel();
         DCBM.addAll(choices);

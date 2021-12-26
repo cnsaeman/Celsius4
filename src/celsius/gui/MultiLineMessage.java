@@ -29,7 +29,7 @@ public class MultiLineMessage extends javax.swing.JDialog {
     public MultiLineMessage(Resources rsc, String title, String txt) {
         super(rsc.MF, true);
         RSC=rsc;
-        setIconImage(RSC.getImage("main_icon"));
+        setIconImage(RSC.celsiusIcon);
         this.setTitle(title);
         initComponents();
         text=txt;

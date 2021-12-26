@@ -826,7 +826,7 @@ public final class Item extends TableRow implements Editable {
     public ArrayList<String> getEditableFields() {
         ArrayList<String> fields=new ArrayList<>();
         fields=new ArrayList<>();
-        for (String key : library.configToArray("index")) {
+        for (String key : library.itemPropertyKeys) {
             fields.add(key);
         }
         for (String key : library.configToArray("standard-item-fields")) {
@@ -837,7 +837,6 @@ public final class Item extends TableRow implements Editable {
         }
         for (String person : library.peopleFields) {
             fields.remove("short_"+person);
-            fields.remove(person+"_ids");
             if (!fields.contains(person)) fields.add(person);
         }
         fields.remove("search");

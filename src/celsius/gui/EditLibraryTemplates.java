@@ -14,27 +14,31 @@ package celsius.gui;
 import celsius.data.KeyValueTableModel;
 import celsius.data.Library;
 import celsius.Resources;
+import celsius.data.LibraryTemplate;
 import celsius.tools.FileTools;
 import celsius.tools.Parser;
 import celsius.tools.TextFile;
 import celsius.tools.XMLHandler;
 import celsius.tools.ToolBox;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author cnsaeman
  */
-public class EditLibraryTemplates extends javax.swing.JDialog {
+public class EditLibraryTemplates extends javax.swing.JDialog implements MouseListener, KeyListener {
 
-    // TODO!!!
-    
     private final MainFrame MF;
     private final Resources RSC;
     private final DefaultListModel DLM;
     private KeyValueTableModel KVTM;
-    private XMLHandler xml;
+    private LibraryTemplate libraryTemplate;
 
     /** Creates new form EditLibraryTemplates */
     public EditLibraryTemplates(MainFrame mf, Resources rsc) {
@@ -43,21 +47,44 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
         RSC=rsc;
         initComponents();
         DLM=new DefaultListModel();
-        for (String s : RSC.libraryTemplates.keySet())
-            DLM.addElement(s);
-        xml=RSC.libraryTemplates.get("Default");
+        for (LibraryTemplate template : RSC.libraryTemplates)
+            DLM.addElement(template);
         jLTemplates.setModel(DLM);
         jLTemplates.setSelectedIndex(0);
+        jTabConfiguration.addMouseListener(this);
+        jTabConfiguration.addKeyListener(this);
+        jTabHTMLTemplates.addMouseListener(this);
+        jTabHTMLTemplates.addKeyListener(this);
+        jTabCreationInstructions.addMouseListener(this);
+        jTabCreationInstructions.addKeyListener(this);
+        jTabbedPane.setTabComponentAt(0,new TabLabel("Configuration",Resources.editTabIcon,RSC,null,false));        
+        jTabbedPane.setTabComponentAt(1,new TabLabel("HTML templates",Resources.editTabIcon,RSC,null,false));        
+        jTabbedPane.setTabComponentAt(2,new TabLabel("Creation Instructions",Resources.editTabIcon,RSC,null,false));        
+        this.pack();
+        this.setSize(RSC.guiScale(600), RSC.guiScale(500));
+        goToSelected();
         GUIToolBox.centerDialog(this,mf);
     }
 
     public void goToSelected() {
-        String name=(String)jLTemplates.getSelectedValue();
-        xml=RSC.libraryTemplates.get(name);
+        int i=jLTemplates.getSelectedIndex();
+        if (i>-1) {
+            libraryTemplate = (LibraryTemplate) jLTemplates.getSelectedValue();
+            jTabConfiguration.setModel(libraryTemplate.getConfigurationModel());
+            jTabHTMLTemplates.setModel(libraryTemplate.getHTMLTemplatesModel());
+            jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiScale(40));
+            jTabHTMLTemplates.getColumnModel().getColumn(1).setCellRenderer(new TableTTRenderer(RSC));
+            jTabCreationInstructions.setModel(libraryTemplate.getCreationInstructionsModel());
+        } else {
+            libraryTemplate=null;
+            jTabConfiguration.setModel(new DefaultTableModel());
+            jTabHTMLTemplates.setModel(new DefaultTableModel());
+            jTabCreationInstructions.setModel(new DefaultTableModel());
+        }
     }
 
     public void updateTable() {
-        goToSelected();
+        /*goToSelected();
         KVTM=new KeyValueTableModel("Property","Value");
         int j=jLTemplates.getSelectedIndex();
         for (String t : Library.LibraryFields) {
@@ -65,7 +92,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
         }
         jTLibTemplates.setModel(KVTM);
         jTLibTemplates.getColumnModel().getColumn(0).setPreferredWidth(150);
-        jTLibTemplates.getColumnModel().getColumn(0).setMaxWidth(150);
+        jTLibTemplates.getColumnModel().getColumn(0).setMaxWidth(150);*/
     }
 
     /** This method is called from within the constructor to
@@ -77,22 +104,64 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jBtnAdd = new javax.swing.JButton();
+        jBtnRename = new javax.swing.JButton();
+        jBtnDelete = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jLTemplates = new javax.swing.JList();
-        jBtnApply = new javax.swing.JButton();
-        jBtnAdd = new javax.swing.JButton();
-        jBtnDelete = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
         jBtnDone = new javax.swing.JButton();
-        jCBHTMLtemplate = new javax.swing.JComboBox();
-        jBtnEditHTMLtemplate = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTLibTemplates = new javax.swing.JTable();
-        jBtnEditStyleFile = new javax.swing.JButton();
-        jBtnEditLibStructure = new javax.swing.JButton();
-        jBtnEditLibRules = new javax.swing.JButton();
+        jTabbedPane = new javax.swing.JTabbedPane();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTabConfiguration = new javax.swing.JTable();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTabHTMLTemplates = new javax.swing.JTable();
+        jPanel9 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTabCreationInstructions = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Edit Library Templates");
+        setPreferredSize(null);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jBtnAdd.setText("Add");
+        jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAddActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jBtnAdd);
+
+        jBtnRename.setText("Rename");
+        jBtnRename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnRenameActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jBtnRename);
+
+        jBtnDelete.setText("Delete");
+        jBtnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDeleteActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jBtnDelete);
+
+        jPanel1.add(jPanel5, java.awt.BorderLayout.PAGE_END);
+
+        jPanel6.setRequestFocusEnabled(false);
+        jPanel6.setLayout(new java.awt.GridLayout());
 
         jLTemplates.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLTemplates.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -102,26 +171,15 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
         });
         jScrollPane1.setViewportView(jLTemplates);
 
-        jBtnApply.setText("Apply");
-        jBtnApply.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnApplyActionPerformed(evt);
-            }
-        });
+        jPanel6.add(jScrollPane1);
 
-        jBtnAdd.setText("Add");
-        jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnAddActionPerformed(evt);
-            }
-        });
+        jPanel1.add(jPanel6, java.awt.BorderLayout.CENTER);
 
-        jBtnDelete.setText("Delete");
-        jBtnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnDeleteActionPerformed(evt);
-            }
-        });
+        getContentPane().add(jPanel1, java.awt.BorderLayout.WEST);
+
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jBtnDone.setText("Done");
         jBtnDone.addActionListener(new java.awt.event.ActionListener() {
@@ -129,147 +187,64 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
                 jBtnDoneActionPerformed(evt);
             }
         });
+        jPanel3.add(jBtnDone);
 
-        jCBHTMLtemplate.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Document", "Person", "Category", "Multiple Documents", "Identifier search", "General search", "Keyword search", "Links tab", "Just added" }));
+        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
-        jBtnEditHTMLtemplate.setText("Edit HTML template");
-        jBtnEditHTMLtemplate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditHTMLtemplateActionPerformed(evt);
-            }
-        });
+        jPanel7.setLayout(new java.awt.GridLayout());
 
-        jTLibTemplates.setModel(new javax.swing.table.DefaultTableModel(
+        jTabConfiguration.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Title 1", "Title 2"
+
             }
         ));
-        jScrollPane2.setViewportView(jTLibTemplates);
+        jScrollPane3.setViewportView(jTabConfiguration);
 
-        jBtnEditStyleFile.setText("Edit style file");
-        jBtnEditStyleFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditStyleFileActionPerformed(evt);
+        jPanel7.add(jScrollPane3);
+
+        jTabbedPane.addTab("Configuration", jPanel7);
+
+        jPanel8.setLayout(new java.awt.GridLayout());
+
+        jTabHTMLTemplates.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
             }
-        });
+        ));
+        jScrollPane4.setViewportView(jTabHTMLTemplates);
 
-        jBtnEditLibStructure.setText("Edit structure");
-        jBtnEditLibStructure.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditLibStructureActionPerformed(evt);
+        jPanel8.add(jScrollPane4);
+
+        jTabbedPane.addTab("HTML Templates", jPanel8);
+
+        jPanel9.setLayout(new java.awt.GridLayout());
+
+        jTabCreationInstructions.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
             }
-        });
+        ));
+        jScrollPane5.setViewportView(jTabCreationInstructions);
 
-        jBtnEditLibRules.setText("Edit rules");
-        jBtnEditLibRules.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnEditLibRulesActionPerformed(evt);
-            }
-        });
+        jPanel9.add(jScrollPane5);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBtnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnDelete))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jCBHTMLtemplate, 0, 122, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnEditHTMLtemplate)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnEditStyleFile)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnApply))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBtnEditLibStructure)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnEditLibRules)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
-                        .addComponent(jBtnDone)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jCBHTMLtemplate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jBtnEditHTMLtemplate))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jBtnEditStyleFile)
-                                .addComponent(jBtnApply))))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
-                .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBtnDone)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jBtnAdd)
-                        .addComponent(jBtnDelete)
-                        .addComponent(jBtnEditLibStructure)
-                        .addComponent(jBtnEditLibRules)))
-                .addContainerGap())
-        );
+        jTabbedPane.addTab("Database setup", jPanel9);
+
+        jPanel2.add(jTabbedPane, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jBtnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApplyActionPerformed
-        goToSelected();
-        boolean done;
-        boolean changed=false;
-        for (int i=0; i<Library.LibraryEditableFields.length;i++) {
-            String value=(String)KVTM.getValueAt(i,1);
-            if ((value!=null) && !value.equals(xml.get(Library.LibraryEditableFields[i]))) {
-                done=false;
-                if (Library.LibraryEditableFields[i].equals("name")) {
-                    if (DLM.contains(value)) {
-                        done=true;
-                        RSC.showWarning("A library template with this name already exists.", "Cancelled...");
-                        updateTable();
-                    } else {
-                        String oldname=xml.get("name");
-                        xml.put("name", value);
-                        DLM.setElementAt(value,jLTemplates.getSelectedIndex());
-                        RSC.libraryTemplates.remove(oldname);
-                        RSC.libraryTemplates.put(value, xml);
-                        FileTools.deleteIfExists(xml.source);
-                        xml.source="LibraryTemplates/"+Parser.cutProhibitedChars(value)+".xml";
-                        done=true;
-                        changed=true;
-                    }
-                }
-                if (!done) {
-                    xml.put(Library.LibraryEditableFields[i], value);
-                    changed=true;
-                }
-            }
-        }
-        if (changed) {
-            try {
-                xml.writeBack();
-            } catch (IOException ex) {
-                RSC.outEx(ex);
-            }
-        }
-    }//GEN-LAST:event_jBtnApplyActionPerformed
 
     /**
      * TODO check functionality and rewrite
@@ -277,139 +252,155 @@ public class EditLibraryTemplates extends javax.swing.JDialog {
      * @param evt 
      */
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        if (RSC.libraryTemplates.get("New template")!=null) {
-            RSC.showWarning("Please rename template called 'New template' first.", "Not possible:");
-            return;
-        }
-        int i=RSC.askQuestionOC("This will create a new library template from the currently active library.", "Add a new library template");
-        if (i==0) {
-            DLM.addElement("New template");
-            try {
-                XMLHandler.Create("celsiusv2.2.librarytemplates", "LibraryTemplates/New template.xml");
-                xml=new XMLHandler("LibraryTemplates/New template.xml");
-                xml.put("name","New template");
-            } catch (IOException e) {
-                RSC.outEx(e);
+        Library library = RSC.getCurrentlySelectedLibrary();
+        if (library != null) {
+            int i = RSC.askQuestionOC("This will create a new library template from the currently active library.", "Add a new library template");
+            if (i == 0) {
+                LibraryTemplate libraryTemplate=new LibraryTemplate(RSC,library);
+                DLM.addElement(libraryTemplate);
+                RSC.libraryTemplates.add(libraryTemplate);
             }
-            RSC.libraryTemplates.put("New template",xml);
-            Library Lib=RSC.getCurrentlySelectedLibrary();
-            if (Lib!=null) {
-                for (i=1;i<Library.LibraryFields.length;i++) {
-                    xml.put(Library.LibraryFields[i], Lib.config.get(Library.LibraryFields[i]));
-                }
-                /*String tmp=TextFile.ReadOutFile(Lib.completeDir(Lib.config.get("style"), ""));
-                for (int j=0;j<8;j++) {
-                    Lib.HTMLtemplates.goToFirst("infoMode", String.valueOf(j).trim());
-                    xml.put("infoMode-"+String.valueOf(j).trim(),Lib.HTMLtemplates.get("template"));
-                }
-                xml.put("stylesheet",tmp);
-                tmp=TextFile.ReadOutFile(Lib.completeDir("LD::librarystructure.xml", ""));
-                xml.put("librarystructure",tmp);
-                tmp=TextFile.ReadOutFile(Lib.completeDir("LD::rules.xml", ""));
-                xml.put("libraryrules",tmp);
-                try {
-                    xml.writeBack();
-                } catch (IOException ex) {
-                    RSC.Msg1.printStackTrace(ex);
-                    toolbox.Warning(this,"Error saving library templates.", "IOError:");
-                }*/
-            } else {
-                RSC.showWarning("There is currently no library open.", "Cancelled...");
-            }
+        } else {
+            RSC.showWarning("There is currently no library open.", "Cancelled...");
         }
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
         int i=RSC.askQuestionYN("Do you really want to delete this library template?", "Please confirm:");
         if (i==0) {
-            goToSelected();
-            RSC.libraryTemplates.remove(xml.get("name"));
-            FileTools.deleteIfExists(xml.source);
-            i=jLTemplates.getSelectedIndex();
-            jLTemplates.setSelectedIndex(0);
-            DLM.removeElementAt(i);
+            LibraryTemplate libraryTemplate=(LibraryTemplate)jLTemplates.getSelectedValue();
+            DLM.removeElement(libraryTemplate);
+            RSC.libraryTemplates.remove(libraryTemplate);
+            FileTools.deleteIfExists(libraryTemplate.fileName);
         }
     }//GEN-LAST:event_jBtnDeleteActionPerformed
 
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
-        this.setVisible(false);
-        this.dispose();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_jBtnDoneActionPerformed
 
     private void jLTemplatesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLTemplatesValueChanged
-        if (jLTemplates.getSelectedIndex()==0) {
-            this.jBtnApply.setEnabled(false);
-            this.jBtnDelete.setEnabled(false);
+        if (jLTemplates.getSelectedIndex()<0) {
+            jBtnRename.setEnabled(false);
+            jBtnDelete.setEnabled(false);
         } else {
-            this.jBtnApply.setEnabled(true);
-            this.jBtnDelete.setEnabled(true);
+            jBtnRename.setEnabled(true);
+            jBtnDelete.setEnabled(true);
         }
-        this.goToSelected();
-        updateTable();
+        goToSelected();
     }//GEN-LAST:event_jLTemplatesValueChanged
 
-    private void jBtnEditHTMLtemplateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditHTMLtemplateActionPerformed
-        goToSelected();
-        String n="infoMode-"+String.valueOf(jCBHTMLtemplate.getSelectedIndex()).trim();
-        String prev=xml.get(n);
-        if (prev==null) prev="";
-        MultiLineEditor MLE=new MultiLineEditor(RSC,"Edit HTML template for "+jCBHTMLtemplate.getSelectedItem(),prev);
-        MLE.setVisible(true);
-        if ((!MLE.cancel) && (jLTemplates.getSelectedIndex()!=0)) {
-            xml.put(n, MLE.text);
-            try {
-                xml.writeBack();
-            } catch (IOException ex) {
-                RSC.outEx(ex);
-                RSC.showWarning("Error saving library templates.", "IOError:");
-            }
-        } else {
-            if (!MLE.cancel) RSC.showWarning("The default template cannot be modified.", "No changes applied");
+    private void jBtnRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRenameActionPerformed
+        String name=libraryTemplate.name;
+        SingleLineEditor SLE = new SingleLineEditor(RSC, "Rename template", name,true);
+        SLE.setVisible(true);
+        if (!SLE.cancel && (!SLE.text.equals(name))) {
+            libraryTemplate.rename(SLE.text);
+            // update UI
+            int i=DLM.indexOf(libraryTemplate);
+            DLM.setElementAt(libraryTemplate, i);
         }
-    }//GEN-LAST:event_jBtnEditHTMLtemplateActionPerformed
-
-    private void jBtnEditStyleFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditStyleFileActionPerformed
-        edit("stylesheet","Edit stylesheet");
-    }//GEN-LAST:event_jBtnEditStyleFileActionPerformed
-
-    private void jBtnEditLibStructureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditLibStructureActionPerformed
-        edit("librarystructure","Edit structure");
-    }//GEN-LAST:event_jBtnEditLibStructureActionPerformed
-
-    private void jBtnEditLibRulesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEditLibRulesActionPerformed
-        edit("libraryrules","Edit structure");
-    }//GEN-LAST:event_jBtnEditLibRulesActionPerformed
+        
+    }//GEN-LAST:event_jBtnRenameActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAdd;
-    private javax.swing.JButton jBtnApply;
     private javax.swing.JButton jBtnDelete;
     private javax.swing.JButton jBtnDone;
-    private javax.swing.JButton jBtnEditHTMLtemplate;
-    private javax.swing.JButton jBtnEditLibRules;
-    private javax.swing.JButton jBtnEditLibStructure;
-    private javax.swing.JButton jBtnEditStyleFile;
-    private javax.swing.JComboBox jCBHTMLtemplate;
+    private javax.swing.JButton jBtnRename;
     private javax.swing.JList jLTemplates;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTLibTemplates;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTable jTabConfiguration;
+    private javax.swing.JTable jTabCreationInstructions;
+    private javax.swing.JTable jTabHTMLTemplates;
+    private javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration//GEN-END:variables
 
-    private void edit(String tag, String title) {
-        goToSelected();
-        String prev=xml.get(tag);
-        if (prev==null) prev="";
-        MultiLineEditor MLE=new MultiLineEditor(RSC,title,prev);
-        MLE.setVisible(true);
-        if (!MLE.cancel) {
-            xml.put(tag, MLE.text);
-            try {
-                xml.writeBack();
-            } catch (IOException ex) {
-                RSC.outEx(ex);
-                RSC.showWarning("Error saving library templates.", "IOError:");
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+            editLine(e.getSource());
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        e.consume();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        e.consume();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        e.consume();
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        e.consume();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        e.consume();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if( e.getKeyCode() == KeyEvent.VK_ENTER ) {
+            editLine(e.getSource());
+            e.consume();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        e.consume();
+    }
+    
+    public void editLine(Object source) {
+        if (source==jTabConfiguration) {
+           String key=(String)jTabConfiguration.getModel().getValueAt(jTabConfiguration.getSelectedRow(),0);
+            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit configuration string", libraryTemplate.configuration.get(key));
+            MLE.setVisible(true);
+            if (!MLE.cancel) {
+                libraryTemplate.setConfiguration(key,MLE.text);
+                jTabConfiguration.setModel(libraryTemplate.getConfigurationModel());
+            }
+        } else if (source==jTabHTMLTemplates) {
+           String key=(String)jTabHTMLTemplates.getModel().getValueAt(jTabHTMLTemplates.getSelectedRow(),0);
+            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML Template", libraryTemplate.htmlTemplates.get(key));
+            MLE.setVisible(true);
+            if (!MLE.cancel) {
+                libraryTemplate.setHTMLTemplate(key,MLE.text);
+                jTabHTMLTemplates.setModel(libraryTemplate.getHTMLTemplatesModel());
+                jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiScale(40));
+                jTabHTMLTemplates.getColumnModel().getColumn(1).setCellRenderer(new TableTTRenderer(RSC));
+            }
+        } else if (source==jTabCreationInstructions) {
+            int row=jTabCreationInstructions.getSelectedRow();
+            String value=(String)jTabCreationInstructions.getModel().getValueAt(row,0);
+            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit SQLite Instructions", libraryTemplate.creationInstructions.get(row));
+            MLE.setVisible(true);
+            if (!MLE.cancel) {
+                libraryTemplate.setCreationInstruction(row,MLE.text);
+                jTabCreationInstructions.setModel(libraryTemplate.getCreationInstructionsModel());
             }
         }
     }

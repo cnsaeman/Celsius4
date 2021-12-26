@@ -30,7 +30,7 @@ public class ChooseItemCategory extends javax.swing.JDialog {
     public ChooseItemCategory(Resources rsc) {
         super(rsc.MF, true);
         RSC=rsc;
-        setIconImage(rsc.getImage("folder_table"));
+        setIconImage(RSC.celsiusIcon);
         initComponents();
         jTreeCategories.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTreeCategories.setShowsRootHandles(true);

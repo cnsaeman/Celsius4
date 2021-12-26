@@ -32,7 +32,7 @@ public class SingleLineEditor extends javax.swing.JDialog {
     public SingleLineEditor(Resources rsc, String title, String txt, boolean c) {
         super(rsc.MF, true);
         RSC=rsc;
-        setIconImage(RSC.getImage("iconmonstr-edit-9.svg.24"));
+        setIconImage(RSC.celsiusIcon);
         this.setTitle(title);
         initComponents();
         text=txt;
