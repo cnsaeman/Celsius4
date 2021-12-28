@@ -105,6 +105,8 @@ public class CelsiusTemplate {
             String insert = item.getS(field);
             if (field.equals("last_modifiedTS")) {
                 insert = timeStampToDateTimeString(Long.valueOf(insert));
+            } else if (field.equals("list_links")) {
+                insert=item.getLinkListString();
             } else if (key.contains("&")) {
                 int modifier = 0;
                 modifier=Integer.valueOf(Parser.cutFrom(key, "&"));
@@ -171,6 +173,8 @@ public class CelsiusTemplate {
             String insert = tableRow.getS(field);
             if (field.equals("last_modifiedTS")) {
                 insert = timeStampToDateTimeString(Long.valueOf(insert));
+            } else if (field.equals("list_links")) {
+                insert=((Person) tableRow).getLinkListString();
             } else if (field.equals("collaborators")) {
                 String[] collaborators = ToolBox.stringToArray(((Person) tableRow).collaborators);
                 String[] collaboratorsID = ToolBox.stringToArray(((Person) tableRow).collaboratorsID);

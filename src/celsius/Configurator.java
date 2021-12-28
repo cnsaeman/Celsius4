@@ -115,6 +115,7 @@ public final class Configurator {
                 }
             }
             closeConnection();
+            RSC.setSelectedLibrary(selectedLibrary);
         } catch (Exception ex) {
             RSC.outEx(ex);
         }
@@ -127,13 +128,11 @@ public final class Configurator {
                 lastLibraries.remove(library.name);
             }
         }
-        writeBackLibraryStatus();
     }
     
     public void libraryClosed(Library library) {
         lastLibraries.put(library.name,library.baseFolder);
         addRecentLib(library.name, library.baseFolder);
-        writeBackLibraryStatus();
     }
     
     public void addRecentLib(String name, final String source) {
@@ -163,6 +162,9 @@ public final class Configurator {
             RSC.MF.jMRecent.add(jmi);
     }
     
+    /**
+     * Saves the current library status to Celsius's config database
+     */
     public void writeBackLibraryStatus() {
         try {
             openConnection();

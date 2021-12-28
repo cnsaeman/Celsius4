@@ -234,7 +234,7 @@ public class MainFrame extends javax.swing.JFrame implements
      */
     private void closeCelsius() {
         // write init data and close everything
-        RSC.closeResources();
+        RSC.close();
         dispose();
         System.exit(0);
     }
@@ -2822,6 +2822,14 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         person.loadCollaborators();
         CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(CelsiusTable.TABLETYPE_ITEMS_OF_PERSON, person.get("last_name"),Resources.personTabIcon);
         RSC.getCurrentlySelectedLibrary().showItemsWithPersonIDs(personID, celsiusTable);
+        guiInfoPanel.updateGUI();
+    }
+
+    public void goToItem(String itemID) {
+        Library library=RSC.getCurrentlySelectedLibrary();
+        CelsiusTable celsiusTable=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Linked item",Resources.linksTabIcon);
+        RSC.getCurrentlySelectedLibrary().showItemWithID(itemID, celsiusTable);
+        RSC.getCurrentTable().selectFirst();
         guiInfoPanel.updateGUI();
     }
     

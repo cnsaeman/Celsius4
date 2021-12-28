@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -36,6 +37,8 @@ public class TableRow {
     public ArrayList<String> orderedStandardKeys; 
     public final HashSet<String> propertyKeys;
     public HashSet<String> tableHeaders;
+    
+    public HashMap<Integer,ArrayList<Item>> linkedItems;
     
     public TableRow(Library lib, String tab, String i, HashSet<String> pF) {
         library=lib;
@@ -362,5 +365,29 @@ public class TableRow {
     public void notifyChanged() {
         
     }
+    
+    public String getLinkListString() {
+        if (linkedItems.isEmpty()) return("");
+        StringBuffer out=new StringBuffer();
+        for (Integer i : linkedItems.keySet()) {
+            out.append("<p><b>");
+            out.append(library.linkTypes.get(i));
+            out.append("</b></p>");
+            ArrayList<String> entries=new ArrayList<>();
+            for (Item item : linkedItems.get(i)) {
+                entries.add(item.getLinkedText(false));
+            }
+            Collections.sort(entries);
+            out.append("<ul>");
+            for(String entry : entries) {
+                out.append("<li>");
+                out.append(entry);
+                out.append("</li>");
+            }
+            out.append("</ul>");
+        }
+        return(out.toString());
+    }
+    
     
 }

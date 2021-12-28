@@ -37,6 +37,7 @@ public final class Item extends TableRow implements Editable {
         super(lib,"items",String.valueOf(i),lib.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
+        linkedItems=new HashMap<>();
         tableHeaders=library.itemPropertyKeys;
         orderedStandardKeys=library.orderedItemPropertyKeys;
         error=0;
@@ -49,6 +50,7 @@ public final class Item extends TableRow implements Editable {
         super(lib,"items",i,lib.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
+        linkedItems=new HashMap<>();
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
         error=0;
@@ -58,6 +60,7 @@ public final class Item extends TableRow implements Editable {
         super(lib,"items",lib.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
+        linkedItems=new HashMap<>();
         library=lib;
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
@@ -76,6 +79,7 @@ public final class Item extends TableRow implements Editable {
         super(lib,"items",rs,lib.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
+        linkedItems=new HashMap<>();
         library=lib;
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
@@ -156,6 +160,21 @@ public final class Item extends TableRow implements Editable {
         } catch (Exception e) {
             library.RSC.outEx(e);
         }
+        
+        // read in links
+        sql = "SELECT * FROM item_item_links JOIN items on item_item_links.item2_id=items.id WHERE item1_id="+id+";";
+        try {
+            ResultSet rs = library.executeResEX(sql);
+            while (rs.next()) {
+                Integer itemLinkType=rs.getInt(3);
+                Item item=new Item(library,rs);
+                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<Item>());
+                linkedItems.get(itemLinkType).add(item);
+            }
+        } catch (Exception e) {
+            library.RSC.outEx(e);
+        }
+        // 
         
         properties.put("$attachment-count", String.valueOf(linkedAttachments.size()));
     }
@@ -871,6 +890,10 @@ public final class Item extends TableRow implements Editable {
         return(KVTM);
     }
     
+    public String getLinkedText(boolean renew) {
+        return ("<a href='http://$$item." + id + "'>" + toText(renew).trim() + "</a>");
+    }
+    
     public DefaultListModel getAttachmentListModel() {
         DefaultListModel DLM=new DefaultListModel();
         for (Attachment attachment : linkedAttachments) {
@@ -888,7 +911,7 @@ public final class Item extends TableRow implements Editable {
     public void notifyChanged() {
         library.itemChanged(id);        
     }
-    
+
     class CompareItems implements Comparator<Item> {
 
         public CompareItems() {

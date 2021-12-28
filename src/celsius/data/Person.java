@@ -10,6 +10,8 @@ import celsius.tools.Parser;
 import java.sql.ResultSet;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  *
@@ -20,12 +22,13 @@ public class Person extends TableRow implements Editable {
     public final Library library;
     public String collaborators;
     public String collaboratorsID;
-    
+
     public Person(Library lib,String id) {
         super(lib,"persons",id,lib.personPropertyKeys);
         library=lib;
         orderedStandardKeys=library.orderedPersonPropertyKeys;
         tableHeaders=library.personPropertyKeys;
+        linkedItems=new HashMap<>();
     }
     
     public Person(Library lib, ResultSet rs) {
@@ -33,6 +36,7 @@ public class Person extends TableRow implements Editable {
         library=lib;
         orderedStandardKeys=library.orderedPersonPropertyKeys;
         tableHeaders=library.personPropertyKeys;
+        linkedItems=new HashMap<>();
     }
 
     public void save() {
@@ -63,6 +67,22 @@ public class Person extends TableRow implements Editable {
             }
         } catch (Exception ex) {
             library.RSC.outEx(ex);
+        }
+    }
+    
+    public void loadLinkedData() {
+        // read in links
+        String sql = "SELECT * FROM person_item_links JOIN items on person_item_links.item_id=items.id WHERE person_id="+id+";";
+        try {
+            ResultSet rs = library.executeResEX(sql);
+            while (rs.next()) {
+                Integer itemLinkType=rs.getInt(3);
+                Item item=new Item(library,rs);
+                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<Item>());
+                linkedItems.get(itemLinkType).add(item);
+            }
+        } catch (Exception e) {
+            library.RSC.outEx(e);
         }
     }
     
@@ -161,6 +181,5 @@ public class Person extends TableRow implements Editable {
         }
         return (getS(tag));
     }
-    
 
 }

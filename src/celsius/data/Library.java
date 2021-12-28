@@ -77,6 +77,7 @@ public final class Library implements Iterable<Item> {
     public String[] personSearchFields;
     public ArrayList<String> hideFunctionality;
     public ArrayList<String> linkedFields;
+    public ArrayList<String> linkTypes;
 
     public ArrayList<String> itemTableHeaders;
     public ArrayList<String> itemTableTags;
@@ -549,6 +550,7 @@ public final class Library implements Iterable<Item> {
         for (String tag : personTableTags) {
             personTableSQLTags += "," + tag;
         }
+        linkTypes=configToArrayList("link-types");
     }
     
     public void setStyleSheet() {
@@ -958,6 +960,20 @@ public final class Library implements Iterable<Item> {
         celsiusTable.setLibraryAndTableType(this,CelsiusTable.TABLETYPE_ITEMS_IN_CATEGORY);
         celsiusTable.addRows(executeResEX("SELECT "+itemTableSQLTags+" FROM item_category_links LEFT JOIN items ON item_category_links.item_id=items.id WHERE category_id=?;", category.id));
         autoSortColumn(celsiusTable);
+        celsiusTable.celsiusTableModel.fireTableDataChanged();
+        celsiusTable.resizeTable(true);
+    }
+
+    /**
+     * List all items in given category in celsiusTable
+     * 
+     * @param category
+     * @param celsiusTable
+     * @throws SQLException 
+     */
+    public void showItemWithID(String itemID,CelsiusTable celsiusTable) {
+        celsiusTable.setLibraryAndTableType(this,CelsiusTable.TABLETYPE_ITEMS_IN_CATEGORY);
+        celsiusTable.addRow(new Item(this,itemID));
         celsiusTable.celsiusTableModel.fireTableDataChanged();
         celsiusTable.resizeTable(true);
     }

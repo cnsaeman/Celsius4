@@ -165,6 +165,10 @@ public class Resources {
 
     public void initResources() {
         try {
+            out("RES>Verifying standard folders");
+            if (!(new File("icons")).exists()) FileTools.makeDir("icons");
+            if (!(new File("plugins")).exists()) FileTools.makeDir("plugins");
+            if (!(new File("templates")).exists()) FileTools.makeDir("templates");
             out("RES>Loading configuration file...");
             configuration = new Configurator(this);
             icons=new Icons(configuration.getConfigurationProperty("iconfolder"));
@@ -317,9 +321,8 @@ public class Resources {
         return(new java.awt.Color(204,204,204));
     }
 
-    public void closeResources() {
-        // This one shouldn't be necessary.
-        //configuration.writeBackLibraryStatus();
+    public void close() {
+        configuration.writeBackLibraryStatus();
         for (Library Lib : libraries)
             Lib.close();
         try {

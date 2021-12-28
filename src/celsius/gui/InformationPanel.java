@@ -846,6 +846,10 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 String personID=Parser.cutFrom(cmd,"http://$$person.");
                 RSC.MF.goToPerson(personID);
                 return;
+            } else if (cmd.startsWith("http://$$item.")) {
+                String itemID=Parser.cutFrom(cmd,"http://$$item.");
+                RSC.MF.goToItem(itemID);
+                return;
             }
             RSC.configuration.viewHTML(evt.getURL().toString());
         }

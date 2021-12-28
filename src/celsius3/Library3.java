@@ -827,18 +827,18 @@ public final class Library3 implements Iterable<Item3> {
             RSC.out(sql);
             stmt.execute(sql);            
 
-            RSC.out("Creating item_reference_links");
-            sql = "CREATE TABLE IF NOT EXISTS item_reference_links (item_id integer, reference_id integer, CONSTRAINT unq UNIQUE (item_id , reference_id));";
+            RSC.out("Creating item_item_links");
+            sql = "CREATE TABLE IF NOT EXISTS item_item_links (item1_id integer, item2_id integer, link_type integer);";
             stmt = Lib.conn.createStatement();
             RSC.out(sql);
             stmt.execute(sql);            
 
-            RSC.out("Creating item_citation_links");
-            sql = "CREATE TABLE IF NOT EXISTS item_citation_links (item_id integer, citation_id integer, CONSTRAINT unq UNIQUE (item_id , citation_id));";
+            RSC.out("Creating person_item_links");
+            sql = "CREATE TABLE IF NOT EXISTS person_item_links (person_id integer, item_id integer, link_type integer);";
             stmt = Lib.conn.createStatement();
             RSC.out(sql);
             stmt.execute(sql);            
-            
+
             RSC.out("Creating keywords");
             sql = "CREATE TABLE IF NOT EXISTS keywords (\n    id integer primary key,\n label text UNIQUE,\n remarks text);";
             stmt = Lib.conn.createStatement();
