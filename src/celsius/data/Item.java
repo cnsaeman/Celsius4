@@ -712,6 +712,10 @@ public final class Item extends TableRow implements Editable {
         if (toText=="") toText=this.toString();
         return(toText);
     }
+    
+    public String toString() {
+        return(toText(false));
+    }
 
     /**
      * Create a string representation that can be used for sorting the items

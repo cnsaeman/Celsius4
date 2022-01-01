@@ -15,8 +15,10 @@ import celsius.gui.SafeMessage;
 import celsius.data.BibTeXRecord;
 import celsius.gui.TabLabel;
 import celsius.data.Item;
+import celsius.data.ItemSelection;
 import celsius.data.Library;
 import celsius.data.LibraryTemplate;
+import celsius.data.Person;
 import celsius.data.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.gui.InformationPanel;
@@ -115,6 +117,8 @@ public class Resources {
 
     public HashMap<String, String> shortCuts; // list of shortcuts, implemented in this way to allow for shortcut editor later
     public HashMap<String,String> journalLinks;
+    
+    public ItemSelection lastItemSelection;
 
     public Plugins plugins;                    // protocol class
     public Icons icons;       // class for all the icons
@@ -283,6 +287,10 @@ public class Resources {
     
     public Item getCurrentlySelectedItem() {
         return(guiInformationPanel.getItem());        
+    }
+
+    public Person getCurrentlySelectedPerson() {
+        return(guiInformationPanel.getPerson());        
     }
     
     public void out() {

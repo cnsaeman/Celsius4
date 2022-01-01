@@ -152,11 +152,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         tabMode=-1000;
     }
 
-    // TODO
     public Item getItem() {
         return((Item)RSC.getCurrentTable().getCurrentlySelectedRow());
     }
 
+    public Person getPerson() {
+        return((Person)RSC.getCurrentTable().getCurrentlySelectedRow());
+    }
+    
     public void updateThumb() {
         if (celsiusTable==null) return;
         if (jPThumb.isVisible()) {
