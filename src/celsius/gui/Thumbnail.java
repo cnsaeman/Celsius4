@@ -11,8 +11,6 @@
 
 package celsius.gui;
 
-import celsius.gui.CelsiusTable;
-import celsius.data.Item;
 import celsius.SwingWorkers.ThreadLoadThumbnail;
 import celsius.data.TableRow;
 import java.awt.Color;
@@ -24,20 +22,20 @@ import javax.swing.UIManager;
  *
  * @author cnsaeman
  */
-public class ThumbNail extends javax.swing.JPanel {
+public class Thumbnail extends javax.swing.JPanel {
 
     public int spx;
     public int spy;
 
     public TableRow tableRow;
-    public final CelsiusTable DT;
+    public final CelsiusTable celsiusTable;
 
     /** Creates new form ThumbNail */
-    public ThumbNail(TableRow tr, CelsiusTable dt) {
-        DT=dt;
+    public Thumbnail(TableRow tr, CelsiusTable ct) {
+        celsiusTable=ct;
         initComponents();
-        spx=dt.MF.RSC.guiScale(140);
-        spy=dt.MF.RSC.guiScale(160);
+        spx=ct.MF.RSC.guiScale(140);
+        spy=ct.MF.RSC.guiScale(160);
         setPreferredSize(new Dimension(spx-3,spy-3));
         setMaximumSize(new Dimension(spx-3,spy-3));
         jLIcon.setPreferredSize(new Dimension(spx-3,spy-20-3));
@@ -46,19 +44,17 @@ public class ThumbNail extends javax.swing.JPanel {
         jLIcon.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         jLIcon.setAlignmentY(JLabel.CENTER_ALIGNMENT);
         jLIcon.setHorizontalAlignment(JLabel.CENTER);
-        jLIcon.addMouseListener(DT);
-        jTFDesc.addMouseListener(DT);
+        jLIcon.addMouseListener(celsiusTable);
+        jTFDesc.addMouseListener(celsiusTable);
         tableRow=tr;
-        jLIcon.setName(tableRow.get("id"));
-        jTFDesc.setName(tableRow.get("id"));
+        jLIcon.setName(tableRow.id);
+        jTFDesc.setName(tableRow.id);
         jTFDesc.setText("loading");
-        DT.TPE.execute(new ThreadLoadThumbnail(this,DT.MF.RSC));
+        celsiusTable.TPE.execute(new ThreadLoadThumbnail(this,celsiusTable.MF.RSC));
     }
 
-    public void updateDoc(Item d) {
-        jLIcon.setName(tableRow.get("id"));
-        jTFDesc.setName(tableRow.get("id"));
-        DT.TPE.execute(new ThreadLoadThumbnail(this,DT.MF.RSC));
+    public void updateTableRow() {
+        celsiusTable.TPE.execute(new ThreadLoadThumbnail(this,celsiusTable.MF.RSC));
     }
 
     /** This method is called from within the constructor to
@@ -94,7 +90,7 @@ public class ThumbNail extends javax.swing.JPanel {
     }
 
     public void setGrey() {
-        setComponentPopupMenu(DT.MF.jPMItemTable);
+        setComponentPopupMenu(celsiusTable.MF.jPMItemTable);
         setBackground(UIManager.getColor("Table[Enabled+Selected].textBackground"));
         repaint();
     }

@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
-import javax.swing.table.TableModel;
 
 /**
  *
@@ -168,7 +167,7 @@ public final class Item extends TableRow implements Editable {
             while (rs.next()) {
                 Integer itemLinkType=rs.getInt(3);
                 Item item=new Item(library,rs);
-                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<Item>());
+                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<>());
                 linkedItems.get(itemLinkType).add(item);
             }
         } catch (Exception e) {
@@ -180,6 +179,7 @@ public final class Item extends TableRow implements Editable {
     }
             
 
+    @Override
     public String getIconField(String s) {
         String tmp=get(s);
         if (tmp==null) tmp="";
@@ -188,6 +188,7 @@ public final class Item extends TableRow implements Editable {
         return(tmp);
     }
 
+    @Override
     public String getExtended(String tag) {
         int i = tag.indexOf("&");
         if (i > -1) {
@@ -227,14 +228,6 @@ public final class Item extends TableRow implements Editable {
         return (getS(tag));
     }
 
-    public String getCompletedDir(String k) {
-        return(library.completeDir(k));
-    }
-
-    public String getCompletedDirKey(String k) {
-        return(library.completeDir(getS(k)));
-    }
-
     /**
      * Checks if value is null or blank, if not write it
      * 
@@ -245,11 +238,14 @@ public final class Item extends TableRow implements Editable {
         if ((value!=null) && (value.trim().length()!=0)) put(key,value);
     }
     
+    @Override
+    public boolean hasThumbnail() {
+        return((new File(library.completeDir("LD::item-thumbnails/"+id+".jpg"))).exists());
+    }
+    
+    @Override
     public String getThumbnailPath() {
-        if (!isEmpty("thumbnail")) {
-            return(library.completeDir("LD::thumbnails/"+id+get("thumbnail")));
-        } 
-        return(null);
+        return(library.completeDir("LD::item-thumbnails/"+id+".jpg"));
     }
 
     /**
@@ -440,6 +436,7 @@ public final class Item extends TableRow implements Editable {
     }
         
     /* incorporate into others */
+    @Override
     public void updateShorts() {
         // update other short keys
         if (currentLoadLevel>2) {
@@ -567,6 +564,7 @@ public final class Item extends TableRow implements Editable {
     /**
      * Reloads the full information from the database
      */
+    @Override
     public void reloadfullInformation() {
         currentLoadLevel=0;
         linkedAttachments.clear();
@@ -706,13 +704,15 @@ public final class Item extends TableRow implements Editable {
      * 
      * @return the string
      */
+    @Override
     public String toText(boolean renew) {
         if (!renew && (toText!=null)) return(toText);
         toText=library.itemRepresentation.fillIn(this,true);
-        if (toText=="") toText=this.toString();
+        if (toText.equals("")) toText=this.toString();
         return(toText);
     }
     
+    @Override
     public String toString() {
         return(toText(false));
     }
@@ -722,6 +722,7 @@ public final class Item extends TableRow implements Editable {
      * 
      * @return the string
      */
+    @Override
     public String toSort() {
         if (toSort!=null) return(toSort);
         toSort=library.itemSortRepresentation.fillIn(this,true);
@@ -741,6 +742,7 @@ public final class Item extends TableRow implements Editable {
      * 
      * @param deleteFilesOfAttachments : delete also the files of the attachments?
      */
+    @Override
     public void destroy(boolean deleteFilesOfAttachments) {
         if (deleteFilesOfAttachments) deleteFilesOfAttachments();
         library.executeEX("DELETE FROM items where id="+id+";");
@@ -766,17 +768,19 @@ public final class Item extends TableRow implements Editable {
         }
     }
     
+    @Override
     public boolean containsKey(String key) {
         return(properties.keySet().contains(key));
     }
     
+    @Override
     public String getRawData() {
         StringBuilder out=new StringBuilder(super.getRawData());
         out.append("\n");
         out.append("Attachments:\n");
         out.append("------------------\n");
         for (Attachment attachment : linkedAttachments) {
-            out.append(attachment.get("id")+" | "+attachment.get("name")+" | "+attachment.get("filetype")+" | "+attachment.get("path")+" | "+attachment.get("pages")+" | "+attachment.get("source")+" | "+attachment.get("createdTS")+" | "+attachment.get("md5")+"\n");
+            out.append(attachment.id+" | "+attachment.get("name")+" | "+attachment.get("filetype")+" | "+attachment.get("path")+" | "+attachment.get("pages")+" | "+attachment.get("source")+" | "+attachment.get("createdTS")+" | "+attachment.get("md5")+"\n");
         }
         return(out.toString());
     }
@@ -848,7 +852,6 @@ public final class Item extends TableRow implements Editable {
     
     public ArrayList<String> getEditableFields() {
         ArrayList<String> fields=new ArrayList<>();
-        fields=new ArrayList<>();
         for (String key : library.itemPropertyKeys) {
             fields.add(key);
         }
@@ -870,6 +873,7 @@ public final class Item extends TableRow implements Editable {
         return(fields);
     }
 
+    @Override
     public KeyValueTableModel getEditModel() {
         KeyValueTableModel KVTM=new KeyValueTableModel("Tag", "Value");
         for (String personType : linkedPersons.keySet()) {
@@ -883,8 +887,7 @@ public final class Item extends TableRow implements Editable {
         ArrayList<String> tags=getEditableFields();
         for (String key : tags) {
             if (!KVTM.keys.contains(key)) {
-                String t = null;
-                t = get(key);
+                String t = get(key);
                 if (t == null) {
                     t = "<unknown>";
                 }
@@ -906,16 +909,16 @@ public final class Item extends TableRow implements Editable {
         return(DLM);
     }
     
-    
-    
+    @Override
     public Library getLibrary() {
         return(library);
     }
     
+    @Override
     public void notifyChanged() {
         library.itemChanged(id);        
     }
-
+    
     class CompareItems implements Comparator<Item> {
 
         public CompareItems() {

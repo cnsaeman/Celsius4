@@ -194,7 +194,7 @@ public class MainFrame extends javax.swing.JFrame implements
         // STATEMANAGER TODO: check
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIRememberSelectedItems, jMIRememberSelectedItems1});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems,jMIEditItemLinksForPerson});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMISaveLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
@@ -467,7 +467,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMICreateLib = new javax.swing.JMenuItem();
         jMILoadLib = new javax.swing.JMenuItem();
         jMRecent = new javax.swing.JMenu();
-        jMISaveLib = new javax.swing.JMenuItem();
         jMICloseLib = new javax.swing.JMenuItem();
         jMIDeleteLib = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
@@ -1161,14 +1160,6 @@ public class MainFrame extends javax.swing.JFrame implements
 
         jMRecent.setText("Open recent libraries");
         jMLibraries.add(jMRecent);
-
-        jMISaveLib.setText("Save current library");
-        jMISaveLib.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMISaveLibActionPerformed(evt);
-            }
-        });
-        jMLibraries.add(jMISaveLib);
 
         jMICloseLib.setText("Close current library");
         jMICloseLib.addActionListener(new java.awt.event.ActionListener() {
@@ -2033,28 +2024,8 @@ public class MainFrame extends javax.swing.JFrame implements
         switchToLibrary(null);
         guiInfoPanel.updateGUI();
     }//GEN-LAST:event_jCBLibrariesActionPerformed
-    // Save Current Library
-    private void jMISaveLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISaveLibActionPerformed
-        final MainFrame MF=this;
-        (new Thread("SavingCurrentLib") {
 
-            @Override
-            public void run() {
-                setThreadMsg("Saving library...");
-                MF.jPBSearch.setIndeterminate(true);
-                try {
-                    RSC.getCurrentlySelectedLibrary().writeBack();
-                } catch (Exception e) {
-                    RSC.outEx(e);
-                    RSC.showWarning("Saving current library failed:\n" + e.toString(), "Warning:");
-                }
-                setThreadMsg("Ready.");
-                MF.jPBSearch.setIndeterminate(false);
-                updateStatusBar(false);
-            }
-        }).start();
-    }//GEN-LAST:event_jMISaveLibActionPerformed
-    // Close Current Library
+   // Close Current Library
     private void jMICloseLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICloseLibActionPerformed
         closeCurrentLibrary(true);
     }//GEN-LAST:event_jMICloseLibActionPerformed
@@ -2443,7 +2414,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIRemoveHalf1;
     private javax.swing.JMenuItem jMIRenameCat;
     private javax.swing.JMenuItem jMIRenameCat1;
-    private javax.swing.JMenuItem jMISaveLib;
     private javax.swing.JMenuItem jMIShowCitedinFile;
     private javax.swing.JMenuItem jMIShowItems;
     private javax.swing.JMenuItem jMIShowItems1;

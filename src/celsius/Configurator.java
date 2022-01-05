@@ -1,6 +1,7 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Configurator
+ *
+ * Bundles configuration details for celsius and handles viewing etc.
  */
 
 package celsius;
@@ -11,7 +12,6 @@ import celsius.data.Library;
 import celsius.data.RecentLibraryCache;
 import celsius.tools.Parser;
 import celsius.tools.*;
-import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.swing.DefaultComboBoxModel;
@@ -137,27 +136,23 @@ public final class Configurator {
     
     public void addRecentLib(String name, final String source) {
             JMenuItem jmi = new JMenuItem(name);
-            jmi.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    (new Thread("LoadingLib") {
-
-                        @Override
-                        public void run() {
-                            RSC.MF.setThreadMsg("Opening library...");
-                            RSC.MF.jPBSearch.setIndeterminate(true);
-                            try {
-                                RSC.loadLibrary(source,true);
-                            } catch (Exception e) {
-                                RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
-                            }
-                            RSC.MF.setThreadMsg("Ready.");
-                            RSC.MF.jPBSearch.setIndeterminate(false);
-                            RSC.MF.updateStatusBar(false);
+            jmi.addActionListener((java.awt.event.ActionEvent evt) -> {
+                (new Thread("LoadingLib") {
+                    
+                    @Override
+                    public void run() {
+                        RSC.MF.setThreadMsg("Opening library...");
+                        RSC.MF.jPBSearch.setIndeterminate(true);
+                        try {
+                            RSC.loadLibrary(source,true);
+                        } catch (Exception e) {
+                            RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
                         }
-                    }).start();
-                }
+                        RSC.MF.setThreadMsg("Ready.");
+                        RSC.MF.jPBSearch.setIndeterminate(false);
+                        RSC.MF.updateStatusBar(false);
+                    }
+                }).start();
             });
             RSC.MF.jMRecent.add(jmi);
     }
@@ -326,7 +321,6 @@ public final class Configurator {
      * Extract plain text (protocol, Filename source, FileName target)
      */
     public void extractText(String TI, String s,String t) throws IOException {
-        String filetype;
         String stmp;    // tatsächlicher Dateiname (evtl. ohne ".gz")
         // if gzipped, extract the file first
         if (s.toLowerCase().endsWith(".gz")) {
@@ -343,7 +337,7 @@ public final class Configurator {
                 RSC.out(TI+"no extraction necessary, wrong ending, corrected");
             }
         } else { stmp=s; }
-        // geeigneten Extractor finden
+        // find suitable extractor
         String extractorstr;
         try {
             String fileType=null;
@@ -436,14 +430,12 @@ public final class Configurator {
                     RSC.showWarning("Standard viewer for " + fileType + " reports an error!", "Warning");
                     RSC.outEx(ex);
                 }
-            } else if (viewer!=null) {
+            } else {
                 String cmdln = viewer + " ";
-                if (cmdln.indexOf("'%from%'")>-1) location=Parser.replace(location, "'", "\\'");
+                if (cmdln.contains("'%from%'")) location=Parser.replace(location, "'", "\\'");
                 cmdln = cmdln.replace("%from%", location);
                 RSC.out("MAIN>Viewer command: " + cmdln);
                 (new ExecutionShell(cmdln, 0, true)).start();
-            } else {
-                RSC.showWarning("No viewer for " + fileType + " installed!", "Warning");
             }
         }
     }
@@ -474,17 +466,16 @@ public final class Configurator {
      */
     public String getFileType(String path) throws IOException {
         String filetype=FileTools.getFileType(path);
-        File f = new File(path);
+        File file = new File(path);
         byte[] buffer = new byte[10]; 
-        InputStream in = new FileInputStream(f); 
+        InputStream in = new FileInputStream(file); 
         in.read(buffer); 
         in.close();
         String tmp = new String(buffer);
-        if (tmp!=null) {
-            String fileType=null;
-            for (String key : supportedFileTypes.keySet()) {
-                String ident=supportedFileTypes.get(key).get("ident");
-                if ((ident!=null) && (ident.length()!=0) && (tmp.startsWith(ident))) filetype=key;
+        for (String key : supportedFileTypes.keySet()) {
+            String ident = supportedFileTypes.get(key).get("ident");
+            if ((ident != null) && (ident.length() != 0) && (tmp.startsWith(ident))) {
+                filetype = key;
             }
         }
         return(filetype);

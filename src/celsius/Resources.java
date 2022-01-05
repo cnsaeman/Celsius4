@@ -155,14 +155,14 @@ public class Resources {
         stdHTMLstring=createstdHTMLstring();
         HomeDirectory = Parser.cutUntil((new File(".")).getAbsolutePath(), "/.");
         libraryTemplates = new ArrayList<>();
-        celsiusTables = new ArrayList<CelsiusTable>();
+        celsiusTables = new ArrayList<>();
         currentLib = -1;
-        libraries = new ArrayList<Library>();
-        journalLinks = new HashMap<String, String>();
+        libraries = new ArrayList<>();
+        journalLinks = new HashMap<>();
         guiStates=new GuiStates();
         sequentialExecutor=java.util.concurrent.Executors.newSingleThreadExecutor();
         executorService=java.util.concurrent.Executors.newScheduledThreadPool(5);
-        LBQ=new LinkedBlockingQueue<Runnable>();
+        LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
         celsiusIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
     }
@@ -195,7 +195,7 @@ public class Resources {
     public void emptyThreadPoolExecutor() {
         LBQ.clear();
         TPE.shutdownNow();
-        LBQ=new LinkedBlockingQueue<Runnable>();
+        LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
     }
 
@@ -455,8 +455,6 @@ public class Resources {
         if (item == null)
             return("");
         BibTeXRecord BR=new BibTeXRecord(item.get("bibtex"));
-        if (BR == null)
-            return("");
         String tag,gtag;
         String tmp1=journalLinks.get(BR.get("journal"));
         if (tmp1 == null)
@@ -626,7 +624,7 @@ public class Resources {
     // guarantees tab and turns it into one with given description
     public CelsiusTable guaranteeTableAvailable(int tableType, String title, String icon) {
         CelsiusTable celsiusTable;
-        if (!guiStates.getState("mainFrame", "tabAvailable")) {
+        if (!guiStates.getState("mainFrame", "tabAvailable") || (!getCurrentTable().celsiusTableModel.tableview)) {
             celsiusTable=new CelsiusTable(MF,getCurrentlySelectedLibrary(),title,tableType);
             celsiusTable.setHeader(title);
             celsiusTables.add(celsiusTable);

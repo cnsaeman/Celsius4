@@ -17,7 +17,6 @@ import celsius3.LibraryIterator3;
 import celsius.gui.CelsiusTable;
 import celsius.gui.MainFrame;
 import celsius.gui.SafeMessage;
-import celsius.gui.RulesNode;
 import celsius.data.BibTeXRecord;
 import celsius.Resources;
 import celsius.data.BibTeXRecord;
@@ -575,7 +574,8 @@ public final class Library3 implements Iterable<Item3> {
             String dbsname=folder+ToolBox.filesep+"CelsiusSearchIndex.sql";
             FileTools.deleteIfExists(dbfname);
             FileTools.deleteIfExists(dbsname);
-            FileTools.makeDir(folder+ToolBox.filesep+"thumbnails");
+            FileTools.makeDir(folder+ToolBox.filesep+"item-thumbnails");
+            FileTools.makeDir(folder+ToolBox.filesep+"person-thumbnails");
             /*if ((new File(dbfname)).exists()) {
                 toolbox.Warning(RSC.getMF(), "Library3 seems to be in SQLite format.", "Can't convert:");
                 return;
@@ -949,7 +949,7 @@ public final class Library3 implements Iterable<Item3> {
                 if (!item.isEmpty("thumbnail")) {
                     String thumbName=item3.completeDir(item3.get("thumbnail"));
                     try {
-                        FileTools.copyFile(thumbName, folder+ToolBox.filesep+"thumbnails"+ToolBox.filesep+item.id+item.get("thumbnail"));
+                        FileTools.copyFile(thumbName, item.getThumbnailPath());
                     } catch (Exception e) {
                         RSC.out(">>E>> Couldn't copy thumbnail: "+thumbName);
                     }

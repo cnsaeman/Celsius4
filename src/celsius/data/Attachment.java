@@ -7,15 +7,9 @@ package celsius.data;
 
 import celsius.tools.FileTools;
 import celsius.tools.Parser;
-import celsius.tools.TextFile;
 import celsius.tools.ToolBox;
 import java.io.File;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -46,6 +40,7 @@ public class Attachment extends TableRow {
         parent=item;
     }
     
+    @Override
     public void save() throws Exception {
         if (dirtyFields.contains("path")) {
             put("md5",FileTools.md5checksum(parent.getCompletedDir(get("path"))));
@@ -109,6 +104,7 @@ public class Attachment extends TableRow {
     
     /**
      * Moves attachment to standard location, finding a free file name
+     * @param save
      * @return 2 : standard folder could not be created, 1 : problem copying, 0 : all good.
      */
     public int moveToStandardLocation(boolean save) {

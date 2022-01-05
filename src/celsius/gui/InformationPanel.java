@@ -1,15 +1,8 @@
-//
-// Celsius Library System
-// (w) by C. Saemann
-//
-// jInfoPanel.java
-//
-// This class represents the InfoPanel
-//
-// typesafe
-//
-// checked: 16.09.2007
-//
+/*
+ *   InformationPanel.java
+ *
+ *   Main GUI component 
+ */
 
 package celsius.gui;
 
@@ -17,19 +10,14 @@ import celsius.data.Library;
 import celsius.data.BibTeXRecord;
 import celsius.Resources;
 import celsius.SwingWorkers.SWApplyPlugin;
-import celsius.SwingWorkers.SWFinalizer;
 import celsius.SwingWorkers.SWShowCited;
 import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.data.Category;
-import celsius.data.LibraryChangeListener;
 import celsius.data.Person;
-import celsius.data.StructureNode;
-import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -49,15 +37,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -68,15 +51,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.ProgressMonitor;
-import javax.swing.TransferHandler;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
+
 
 /**
  *
@@ -121,7 +98,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPanel12.setBorder(RSC.stdBordermW());
         
         List<String> list = Arrays.asList(addBibFields);
-        Vector<String> vec = new Vector<String>( list );
+        Vector<String> vec = new Vector<>( list );
         DefaultComboBoxModel addModel=new DefaultComboBoxModel(vec);
         addModel.setSelectedItem(addModel.getElementAt(0));
         jCBAddProperty.setModel(addModel);
@@ -1096,7 +1073,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 bg.drawImage(image, 0, 0, null);
                 bg.dispose();
                 if (ImageIO.write(bufferedImage, "jpeg", new File(target))) {
-                    currentItem.put("thumbnail", ".jpg");
                     currentItem.save();
                 } else {
                     RSC.out("Saving jpge failed!");
@@ -1121,7 +1097,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 if (oldThumb!=null) {
                     FileTools.deleteIfExists(oldThumb);
                 }
-                currentItem.put("thumbnail", filetype);
                 FileTools.moveFile(filename, currentItem.getThumbnailPath());
                 currentItem.save();
                 updateGUI();
@@ -1139,7 +1114,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private void jBtnResizeThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnResizeThumbActionPerformed
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
         try {
-            String target = currentItem.getCompletedDirKey("thumbnail");
+            String target = currentItem.getThumbnailPath();
             BufferedImage bf = ImageIO.read(new File(target));
             System.out.println(bf.getWidth());
             int w = bf.getWidth();
@@ -1162,7 +1137,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                targetname+=".png";
             System.out.println(targetname);
             ImageIO.write(img, "png", new File(targetname));
-            currentItem.putS("thumbnail", library.compressFilePath(targetname));
             if (!target.equals(targetname))
                 FileTools.deleteIfExists(target);
             updateGUI();
@@ -1174,7 +1148,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private void jBtnRemoveThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRemoveThumbActionPerformed
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
         FileTools.deleteIfExists(currentItem.getThumbnailPath());
-        currentItem.put("thumbnail",null);
         currentItem.save();
         updateGUI();
     }//GEN-LAST:event_jBtnRemoveThumbActionPerformed
@@ -1230,7 +1203,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             fn=currentItem.get("source")+ToolBox.filesep+fn;
             CelsiusTable IT=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Cited in " + jLFiles2.getSelectedValue(),"search");
             RSC.guiStates.adjustState("mainFrame","itemSelected", false);
-            ProgressMonitor progressMonitor = new ProgressMonitor(this, "Looking for papers ...", "", 0, RSC.getCurrentlySelectedLibrary().getSize());
             SWShowCited swAP = new SWShowCited(IT,0,fn);
             swAP.execute();
         }
@@ -1429,26 +1401,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jBtnDown.setEnabled((jLAttachments.getSelectedIndex() > -1) && (jLAttachments.getSelectedIndex() < getItem().linkedAttachments.size() - 1));        
     }
     
-    /* TODEL public void setStdHTML() {
-        kit = new HTMLEditorKit();
-        kit.setStyleSheet(null);
-        kit.getStyleSheet().addRule("body {color:#000; font-family:sans; margin: 4px; }");
-        jHTMLview.setEditorKit(kit);
-        jHTMLview.setContentType("text/html");
-        jHTMLview.setText(RSC.stdHTMLstring);
-        jHTMLview.setCaretPosition(0);
-        RSC.MF.jMIEditDS.setEnabled(false);
-        jMIEditDS1.setEnabled(false);
-    }*/
-
     public void updateLinks() {
         if (celsiusTable==null) return;
         if (celsiusTable.getTableType()>=10) return;
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
         if (tabMode==-1) return;
         if (currentItem==null) return;
-        DefaultTreeModel DTM=library.createLinksTree(currentItem);
-        jTLinks.setModel(DTM);
+        //DefaultTreeModel DTM=library.createLinksTree(currentItem);
+        //jTLinks.setModel(DTM);
     }
     
     public void addToPanel(String title, String icon, JComponent panel) {
@@ -1687,48 +1647,28 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             File folder = new File(item.get("source"));
             if (folder.exists()) {
                 File[] listOfFiles;
-                listOfFiles = folder.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".pdf");
-                    }
-                });
-                Arrays.sort(listOfFiles, new Comparator<File>() {
-                    public int compare(File f1, File f2) {
-                        return Long.compare(f2.lastModified(), f1.lastModified());
-                    }
-                });
-                for (int i = 0; i < listOfFiles.length; i++) {
-                    listModel.addElement(listOfFiles[i].getName());
+                listOfFiles = folder.listFiles((File dir, String name1) -> name1.toLowerCase().endsWith(".pdf"));
+                Arrays.sort(listOfFiles, (File f1, File f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+                for (File listOfFile : listOfFiles) {
+                    listModel.addElement(listOfFile.getName());
                 }
                 jLFiles1.setModel(listModel);
                 // tex-files
                 listModel = new DefaultListModel();
                 folder = new File(item.get("source"));
-                listOfFiles = folder.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".tex");
-                    }
-                });
-                Arrays.sort(listOfFiles, new Comparator<File>() {
-                    public int compare(File f1, File f2) {
-                        return Long.compare(f2.lastModified(), f1.lastModified());
-                    }
-                });
-                for (int i = 0; i < listOfFiles.length; i++) {
-                    listModel.addElement(listOfFiles[i].getName());
+                listOfFiles = folder.listFiles((File dir, String name1) -> name1.toLowerCase().endsWith(".tex"));
+                Arrays.sort(listOfFiles, (File f1, File f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+                for (File listOfFile : listOfFiles) {
+                    listModel.addElement(listOfFile.getName());
                 }
                 jLFiles2.setModel(listModel);
                 // all files
                 listModel = new DefaultListModel();
                 folder = new File(item.get("source"));
                 listOfFiles = folder.listFiles();
-                Arrays.sort(listOfFiles, new Comparator<File>() {
-                    public int compare(File f1, File f2) {
-                        return Long.compare(f2.lastModified(), f1.lastModified());
-                    }
-                });
-                for (int i = 0; i < listOfFiles.length; i++) {
-                    listModel.addElement(listOfFiles[i].getName());
+                Arrays.sort(listOfFiles, (File f1, File f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+                for (File listOfFile : listOfFiles) {
+                    listModel.addElement(listOfFile.getName());
                 }
                 jLFiles3.setModel(listModel);
             }
@@ -1764,7 +1704,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             dtde.acceptDrop(dtde.getDropAction());
             try {
                 Item currentItem = (Item) celsiusTable.getCurrentlySelectedRow();
-                String target = currentItem.library.baseFolder + "thumbnails" + ToolBox.filesep + currentItem.id + ".jpg";
+                String target = currentItem.getThumbnailPath();
                 if (dtde.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     System.out.println("Drop3:"+dtde.getTransferable().getTransferData(DataFlavor.imageFlavor).toString());
                     Image image = (Image) dtde.getTransferable().getTransferData(DataFlavor.imageFlavor);
@@ -1775,7 +1715,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     bg.drawImage(image, 0, 0, null);
                     bg.dispose();
                     if (ImageIO.write(bufferedImage, "jpeg", new File(target))) {
-                        currentItem.put("thumbnail", ".jpg");
                         currentItem.save();
                     } else {
                         RSC.out("Saving jpge failed!");
@@ -1786,7 +1725,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     if ((new File(path)).exists()) {
                         System.out.println("Drop42:copy");
                         FileTools.copyFile(path, target);
-                        currentItem.put("thumbnail", ".jpg");
                         currentItem.save();
                     }
                 }
@@ -1800,7 +1738,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private boolean acceptData(Transferable t) {
-        boolean ret = false;
+        boolean ret;
         try {
             if (t == null) {
                 return (false);
@@ -1828,7 +1766,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             String filename = RSC.selectFile("Indicate the file to be associated with the selected record", "associate", "_ALL", "All files");
             if (filename != null) {
                 String name = null;
-                if (item.linkedAttachments.size() == 0) {
+                if (item.linkedAttachments.isEmpty()) {
                     name = "";
                 } else {
                     final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a description for the associated file", "", true);
@@ -1856,7 +1794,5 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         RSC.MF.updateStatusBar(true);
         updateGUI();        
     }
-    
-
 
 }

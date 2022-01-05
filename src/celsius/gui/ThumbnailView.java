@@ -11,14 +11,11 @@
 
 package celsius.gui;
 
-import celsius.gui.CelsiusTable;
-import celsius.data.Item;
 import celsius.data.TableRow;
 import java.awt.FlowLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import javax.swing.JScrollPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -26,12 +23,12 @@ import javax.swing.event.TableModelListener;
  *
  * @author cnsaeman
  */
-public class ThumbNailView extends javax.swing.JPanel implements TableModelListener, KeyListener {
+public class ThumbnailView extends javax.swing.JPanel implements TableModelListener, KeyListener {
 
     public int spx;
     public int spy;
 
-    CelsiusTable DT;
+    CelsiusTable celsiusTable;
 
     boolean updating;
 
@@ -40,14 +37,14 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
     public int tx;
     public int ty;
 
-    private final ArrayList<ThumbNail> Thumbs;
+    private final ArrayList<Thumbnail> thumbnails;
 
     /** Creates new form ThumbNailView */
-    public ThumbNailView(CelsiusTable dt) {
+    public ThumbnailView(CelsiusTable ct) {
         initComponents();
         jTNVPanel.setLayout(new WrapLayout(FlowLayout.LEFT));
-        Thumbs=new ArrayList<ThumbNail>();
-        DT=dt;
+        thumbnails=new ArrayList<>();
+        celsiusTable=ct;
         addKeyListener(this);
     }
 
@@ -88,11 +85,11 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
     public void updateView() {
         updating=true; // #### is beeing called four times when changing categories?
         jTNVPanel.removeAll();
-        Thumbs.clear();
-        for (TableRow tableRow : DT.celsiusTableModel.tableRows) {
-            if (Thumbs.size()<100) { // #### Temp restriction until threadexecutorpool really working
-                ThumbNail TN=new ThumbNail(tableRow,DT);
-                Thumbs.add(TN);
+        thumbnails.clear();
+        for (TableRow tableRow : celsiusTable.celsiusTableModel.tableRows) {
+            if (thumbnails.size()<100) { // #### Temp restriction until threadexecutorpool really working
+                Thumbnail TN=new Thumbnail(tableRow,celsiusTable);
+                thumbnails.add(TN);
                 jTNVPanel.add(TN);
             }
         }
@@ -100,15 +97,15 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
     }
 
     public void addItem(int i) {
-        ThumbNail TN=new ThumbNail(DT.getRow(i),DT);
-        Thumbs.add(i,TN);
-        System.out.println("Adding "+DT.getRow(i));
+        Thumbnail TN=new Thumbnail(celsiusTable.getRow(i),celsiusTable);
+        thumbnails.add(i,TN);
+        System.out.println("Adding "+celsiusTable.getRow(i));
         jTNVPanel.add(TN,i);
     }
 
     @Override
     public void remove(int i) {
-        if (Thumbs.size()>i) Thumbs.remove(i);
+        if (thumbnails.size()>i) thumbnails.remove(i);
         if (this.getComponentCount()>i) jTNVPanel.remove(i);
     }
 
@@ -116,7 +113,7 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
         if (updating) return;
         if (!Thread.currentThread().getName().startsWith("AWT-Event")) return;
         updateView();
-        /*if (!DT.tableview) {
+        if (!celsiusTable.celsiusTableModel.tableview) {
             if (e.getType()==TableModelEvent.DELETE) {
                 for (int i=e.getLastRow();i>=e.getFirstRow();i--) {
                     jTNVPanel.remove(i);
@@ -130,45 +127,50 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
                     updateView();
                 } else {
                     for (int i=e.getFirstRow();i<e.getLastRow()+1;i++) {
-                        Thumbs.get(i).updateDoc(DT.getItem(i));
+                        thumbnails.get(i).updateTableRow();
                     }
                 }
             }
-        }*/
+        }
     }
 
     public void modifySelection(int i,boolean extend) {
         boolean mod=false;
-        if ((i==0) && (DT.selectedlast!=0)) {
-            DT.selectedlast=0; mod=true;
+        if ((i==0) && (celsiusTable.selectedlast!=0)) {
+            celsiusTable.selectedlast=0; mod=true;
         }
-        if ((i==1000) && (DT.selectedlast!=DT.celsiusTableModel.tableRows.size()-1)) {
-            DT.selectedlast=DT.celsiusTableModel.tableRows.size()-1; mod=true;
+        if ((i==1000) && (celsiusTable.selectedlast!=celsiusTable.celsiusTableModel.tableRows.size()-1)) {
+            celsiusTable.selectedlast=celsiusTable.celsiusTableModel.tableRows.size()-1; mod=true;
         }
-        if ((i>0) && (i<999) && (DT.selectedlast<DT.celsiusTableModel.tableRows.size() - i+1)) {
-            DT.selectedlast+=i; mod=true;
+        if ((i>0) && (i<999) && (celsiusTable.selectedlast<celsiusTable.celsiusTableModel.tableRows.size() - i+1)) {
+            celsiusTable.selectedlast+=i; mod=true;
         }
-        if ((i<0) && (DT.selectedlast>i-1)) {
-            DT.selectedlast+=i; mod=true;
+        if ((i<0) && (celsiusTable.selectedlast>i-1)) {
+            celsiusTable.selectedlast+=i; mod=true;
         }
         if (mod) {
-            if (!extend) DT.selectedfirst = DT.selectedlast;
-            if (DT.selectedlast > DT.selectedfirst) {
-                DT.jtable.getSelectionModel().setSelectionInterval(DT.selectedfirst, DT.selectedlast);
+            if (!extend) celsiusTable.selectedfirst = celsiusTable.selectedlast;
+            if (celsiusTable.selectedlast > celsiusTable.selectedfirst) {
+                celsiusTable.jtable.getSelectionModel().setSelectionInterval(celsiusTable.selectedfirst, celsiusTable.selectedlast);
             } else {
-                DT.jtable.getSelectionModel().setSelectionInterval(DT.selectedlast, DT.selectedfirst);
+                celsiusTable.jtable.getSelectionModel().setSelectionInterval(celsiusTable.selectedlast, celsiusTable.selectedfirst);
             }
             adjustSelection();
         }
     }
 
+    @Override
     public void keyTyped(KeyEvent e) {
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
+        // TODO: needs to be optimized for lines that are partially filled
+        int tx=(thumbnails.size()>0 ? jTNVPanel.getWidth()/(thumbnails.get(0).getWidth()) : 0);
         if (e.getKeyCode() == 36)
             modifySelection(0, e.isShiftDown());
         if (e.getKeyCode() == 37)
@@ -184,25 +186,25 @@ public class ThumbNailView extends javax.swing.JPanel implements TableModelListe
     }
 
     public void adjustSelection() {
-        scrollRectToVisible(Thumbs.get(DT.selectedlast).getBounds());
+        scrollRectToVisible(thumbnails.get(celsiusTable.selectedlast).getBounds());
         boolean mode=false;
-        int b=DT.selectedfirst;
-        int e=DT.selectedlast;
+        int b=celsiusTable.selectedfirst;
+        int e=celsiusTable.selectedlast;
         if (b>e) {
-            b=DT.selectedlast;
-            e=DT.selectedfirst;
+            b=celsiusTable.selectedlast;
+            e=celsiusTable.selectedfirst;
         }
-        for (int i=0;i<Thumbs.size();i++) {
+        for (int i=0;i<thumbnails.size();i++) {
             if (i==b) mode=!mode;
-            if (mode) Thumbs.get(i).setGrey();
-            else Thumbs.get(i).setWhite();
+            if (mode) thumbnails.get(i).setGrey();
+            else thumbnails.get(i).setWhite();
             if (i==e) mode=!mode;
         }
     }
 
-    public void update(Item doc) {
-        int i=DT.celsiusTableModel.IDs.indexOf(doc.id);
-        Thumbs.get(i).updateDoc(doc);
+    public void update(TableRow row) {
+        int i=celsiusTable.celsiusTableModel.IDs.indexOf(row.id);
+        thumbnails.get(i).updateTableRow();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;

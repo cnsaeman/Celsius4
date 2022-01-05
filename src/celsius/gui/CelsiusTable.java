@@ -4,10 +4,8 @@ package celsius.gui;
 import celsius.data.Library;
 import celsius.Resources;
 import celsius.data.Item;
-import celsius.data.Category;
 import celsius.data.CelsiusTableModel;
 import celsius.data.LibraryChangeListener;
-import celsius.data.Person;
 import celsius.data.TableRow;
 import celsius.tools.ExecutionShell;
 import celsius.tools.Parser;
@@ -19,8 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,7 +24,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -56,7 +51,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     public final static int TABLETYPE_ITEMS_OF_PERSON=4;
     public final static int TABLETYPE_ITEMS_OF_PERSONS=5;
 
-    private Resources RSC;
+    private final Resources RSC;
 
     public HashMap<String,String> properties;
 
@@ -65,7 +60,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     public Library library;
     
     public final JTable jtable;
-    public final ThumbNailView TNV;
+    public final ThumbnailView thumbnailView;
     public MainFrame MF;
     public CelsiusTableModel celsiusTableModel;
     private ArrayList<Integer> sizes;
@@ -98,7 +93,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         tableType=tt;
         LBQ=new LinkedBlockingQueue<Runnable>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
-        TNV=new ThumbNailView(this);
+        thumbnailView=new ThumbnailView(this);
         resizable=false;
         int objectType=-1;
         if ((tableType>=0) && (tableType<10)) objectType=CelsiusTable.ITEM_TABLE;
@@ -127,13 +122,13 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         properties=new HashMap<>();
         resizable=false;
         tableType=celsiusTable.tableType;
-        LBQ=new LinkedBlockingQueue<Runnable>();
+        LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
-        TNV=new ThumbNailView(this);
+        thumbnailView=new ThumbnailView(this);
         RSC=celsiusTable.RSC;
         MF=celsiusTable.MF;
         jtable=new JTable();
-        celsiusTableModel.addTableModelListener(TNV);
+        celsiusTableModel.addTableModelListener(thumbnailView);
         celsiusTableModel.tableview=true;
         jtable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         jtable.setDragEnabled(true);
@@ -148,7 +143,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         setTableType(celsiusTable.getTableType());
         jtable.setDefaultRenderer(Object.class, new CellRenderer());
         resetTableProperties();
-        sizes=new ArrayList<Integer>();
+        sizes=new ArrayList<>();
         for (Integer i : celsiusTable.sizes)
             sizes.add(i);
         resizeTable(false);
@@ -173,7 +168,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         setSizes(library.itemTableColumnSizes);
         if (jtable.getColumnCount()<sizes.size()) return;
         jtable.setGridColor(Color.LIGHT_GRAY);
-        if (!celsiusTableModel.tableview) TNV.updateView();
+        if (!celsiusTableModel.tableview) thumbnailView.updateView();
     }
 
     public synchronized void close() {
@@ -198,29 +193,20 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     public void switchToThumbnails() {
         if (!celsiusTableModel.tableview) return;
         int i=MF.jTPTabList.indexOfComponent(jtable.getParent().getParent());
-        final JScrollPane scrollpane = new JScrollPane(TNV);
+        final JScrollPane scrollpane = new JScrollPane(thumbnailView);
         scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         MF.jTPTabList.setComponentAt(i,scrollpane);
-        TNV.updateView();
+        thumbnailView.updateView();
         celsiusTableModel.tableview=false;
     }
 
     public void switchToTable() {
         if (celsiusTableModel.tableview) return;
-        int i=MF.jTPTabList.indexOfComponent(TNV.getParent().getParent());
+        int i=MF.jTPTabList.indexOfComponent(thumbnailView.getParent().getParent());
         final JScrollPane scrollpane = new JScrollPane(jtable);
         MF.jTPTabList.setComponentAt(i,scrollpane);
         celsiusTableModel.tableview=true;
     }
-
-    /* TODEL public void setLibrary(Library l) {
-        clear();
-        library=l;
-        setSizes(library.itemTableColumnSizes);
-        celsiusTableModel.setLibrary(library);
-        celsiusTableModel.tableview=true;
-        celsiusTableModel.clear();
-    }*/
 
     public void setLibraryAndTableType(Library l, int tt) {
         tableType=tt;
@@ -263,7 +249,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     }
 
     public synchronized void removeAllRows() {
-        TNV.clear();
+        thumbnailView.clear();
         properties.clear();
         celsiusTableModel.clear();
     }
@@ -444,7 +430,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
             }
             jtable.setRowHeight(RSC.guiScale(24));
             if (updateView) {
-                //if (!tableview) TNV.updateView(); //#### test to exclude
+                if (!celsiusTableModel.tableview) thumbnailView.updateView(); //#### test to exclude
                 MF.guiInfoPanel.updateGUI();
             }
         }
@@ -499,11 +485,12 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     @Override
     public synchronized void mouseClicked(MouseEvent e) {
         if ((e.getSource().getClass() == JLabel.class) || (e.getSource().getClass() == JTextField.class)) {
-            TNV.requestFocus();
-            int selectedRow = celsiusTableModel.IDs.indexOf(Integer.valueOf(((JComponent) e.getSource()).getName()));
+            thumbnailView.requestFocus();
+            String name=((JComponent)e.getSource()).getName();
+            int selectedRow = celsiusTableModel.IDs.indexOf(((JComponent) e.getSource()).getName());
             selectedfirst=selectedRow;
             selectedlast=selectedRow;
-            TNV.adjustSelection();
+            thumbnailView.adjustSelection();
             jtable.getSelectionModel().setSelectionInterval(selectedRow, selectedRow);
             if (e.getClickCount() == 2) {
                 MF.guiInfoPanel.updateGUI();
@@ -565,11 +552,11 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     @Override
     public synchronized void columnMarginChanged(ChangeEvent e) {
         if (resizable) {
-            sizes=new ArrayList<Integer>();
+            sizes=new ArrayList<>();
             for (int i=0;i<jtable.getColumnCount();i++) {
                 int w=jtable.getColumnModel().getColumn(i).getWidth();
                 if (library.itemTableColumnSizes.get(i)<0) w=-w;
-                sizes.add(Integer.valueOf(w));
+                sizes.add(w);
             }
         }
     }
@@ -579,7 +566,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     }
 
     public synchronized void setSizes(ArrayList<Integer> prefsizes) {
-        sizes=new ArrayList<Integer>();
+        sizes=new ArrayList<>();
         for (Integer i : prefsizes) sizes.add(i);
     }
 

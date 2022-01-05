@@ -7,10 +7,10 @@ package celsius.data;
 
 import celsius.gui.Editable;
 import celsius.tools.Parser;
+import java.io.File;
 import java.sql.ResultSet;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -19,13 +19,11 @@ import java.util.HashMap;
  */
 public class Person extends TableRow implements Editable {
 
-    public final Library library;
     public String collaborators;
     public String collaboratorsID;
 
     public Person(Library lib,String id) {
         super(lib,"persons",id,lib.personPropertyKeys);
-        library=lib;
         orderedStandardKeys=library.orderedPersonPropertyKeys;
         tableHeaders=library.personPropertyKeys;
         linkedItems=new HashMap<>();
@@ -39,6 +37,7 @@ public class Person extends TableRow implements Editable {
         linkedItems=new HashMap<>();
     }
 
+    @Override
     public void save() {
         try {
             library.RSC.out("Saving Person");
@@ -78,7 +77,7 @@ public class Person extends TableRow implements Editable {
             while (rs.next()) {
                 Integer itemLinkType=rs.getInt(3);
                 Item item=new Item(library,rs);
-                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<Item>());
+                if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<>());
                 linkedItems.get(itemLinkType).add(item);
             }
         } catch (Exception e) {
@@ -88,7 +87,7 @@ public class Person extends TableRow implements Editable {
     
     public String getShortName(String field) {
         String person=getS(field);
-        if (person.indexOf(",")==-1) return(person.replaceAll("\\|",", "));
+        if (!person.contains(",")) return(person.replaceAll("\\|",", "));
        return(Parser.cutUntilLast(person.replaceAll(", .*?\\|", ", "),",").trim());
     }
 
@@ -121,7 +120,6 @@ public class Person extends TableRow implements Editable {
 
     public ArrayList<String> getEditableFields() {
         ArrayList<String> fields=new ArrayList<>();
-        fields=new ArrayList<>();
         for (String field : getFields()) {
             if (!fields.contains(field) && !field.startsWith("$")) fields.add(field);
         }
@@ -133,13 +131,13 @@ public class Person extends TableRow implements Editable {
         return(fields);
     }
 
+    @Override
     public KeyValueTableModel getEditModel() {
         KeyValueTableModel KVTM=new KeyValueTableModel("Tag", "Value");
         ArrayList<String> tags=getEditableFields();
         for (String key : tags) {
             if (!KVTM.keys.contains(key)) {
-                String t = null;
-                t = get(key);
+                String t = get(key);
                 if (t == null) {
                     t = "<unknown>";
                 }
@@ -169,6 +167,7 @@ public class Person extends TableRow implements Editable {
         library.personChanged(id);        
     }
     
+    @Override
     public String getExtended(String tag) {
         int i = tag.indexOf("&");
         if (i > -1) {
@@ -181,5 +180,16 @@ public class Person extends TableRow implements Editable {
         }
         return (getS(tag));
     }
+    
+    @Override
+    public boolean hasThumbnail() {
+        return((new File(library.completeDir("LD::person-thumbnails/"+id+".jpg"))).exists());
+    }
+    
+    @Override
+    public String getThumbnailPath() {
+        return(library.completeDir("LD::person-thumbnails/"+id+".jpg"));
+    }
+    
 
 }

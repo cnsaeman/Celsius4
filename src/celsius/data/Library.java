@@ -11,27 +11,20 @@ package celsius.data;
 
 import celsius.Resources;
 import celsius.gui.CelsiusTable;
-import celsius.gui.RulesNode;
 import celsius.gui.SafeMessage;
 import celsius.gui.GUIToolBox;
 import celsius.tools.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
 import javax.swing.text.html.StyleSheet;
-import javax.swing.tree.DefaultTreeModel;
 import java.sql.*;
-import java.util.zip.GZIPInputStream;
 
 public final class Library implements Iterable<Item> {
 
@@ -224,9 +217,9 @@ public final class Library implements Iterable<Item> {
             }
             
             // read in item fields
-            StringBuffer shorts=new StringBuffer(); // create list of shorts
+            StringBuilder shorts=new StringBuilder(); // create list of shorts
             rs=dbConnection.prepareStatement("PRAGMA table_info('items');").executeQuery();
-            itemPropertyKeys=new HashSet<String>();
+            itemPropertyKeys=new HashSet<>();
             StringBuffer tmpKeys=new StringBuffer("id");
             while (rs.next()) {
                 String key=rs.getString(2);
@@ -243,13 +236,11 @@ public final class Library implements Iterable<Item> {
                 }
             }
             orderedItemPropertyKeys=new ArrayList<>();
-            for (String key : ToolBox.stringToArray(tmpKeys.toString())) {
-                orderedItemPropertyKeys.add(key);
-            }
+            orderedItemPropertyKeys.addAll(Arrays.asList(ToolBox.stringToArray(tmpKeys.toString())));
             shortKeys=ToolBox.stringToArray(shorts.substring(1));
             
             rs=dbConnection.prepareStatement("PRAGMA table_info('persons');").executeQuery();
-            personPropertyKeys=new HashSet<String>();
+            personPropertyKeys=new HashSet<>();
             tmpKeys=new StringBuffer("id");
             while (rs.next()) {
                 String key=rs.getString(2);
@@ -264,9 +255,7 @@ public final class Library implements Iterable<Item> {
                 }
             }
             orderedPersonPropertyKeys=new ArrayList<>();
-            for (String key : ToolBox.stringToArray(tmpKeys.toString())) {
-                orderedPersonPropertyKeys.add(key);
-            }
+            orderedPersonPropertyKeys.addAll(Arrays.asList(ToolBox.stringToArray(tmpKeys.toString())));
 
             if ((name.length()==0) || (baseFolder.length()==0)) {
                 (new SafeMessage("The library file seems to be corrupt. Cancelling...","Warning:",0)).showMsg();
@@ -304,15 +293,6 @@ public final class Library implements Iterable<Item> {
             itemFolder=new CelsiusTemplate(RSC,itemFolderTemplate);
 
             getFieldsFromConfig();
-            /* Old code to correct stuff...
-             String[] files = (new File(basedir + "/information")).list();
-            for (int i = 0; i < files.length; i++) {
-                String r = Parser.CutTill(files[i], ".");
-                if (r.length() == 7) {
-                    TextFile.moveFile(basedir + "/information/" + files[i], basedir + "/information/1" + files[i].substring(1));
-                }
-            }*/
-
         } catch (Exception ex) {
             RSC.outEx(ex);
             name="??##Error"+ex.toString();
@@ -325,72 +305,6 @@ public final class Library implements Iterable<Item> {
         if ("items".equals(table)) return(itemPropertyKeys);
         return(personPropertyKeys);
     }
-    
-    // TODO
-    private RulesNode createNode(int i,String s,String l) {
-        RulesNode SN;
-        if (i>-1) {
-            SN=new RulesNode((new Item(this,i)).toText(false));
-            //SN.getData().put("id",Index.get(i,"id"));
-        } else {
-            SN=new RulesNode("Item not in Library: "+s);
-            SN.getData().put("id","?");
-        }
-        SN.representation="/name/";
-        SN.getData().put("pos",Integer.toString(i));
-        SN.getData().put("ref",s);
-        SN.getData().put("link",l);
-        return(SN);
-    }
-
-    // TODO
-    private RulesNode resRef(String s,String l) {
-        String field=Parser.cutUntil(s, ":");
-        String value=Parser.cutFrom(s, ":");
-        int i=0;
-        /*int k=Index.XMLTags.indexOf(field);
-        if (k>-1) {
-            while (i<Index.getSize()) {
-                if (value.equals(Index.getDataElement(i,k)))
-                    return(createNode(i,s,l));
-                i++;
-            }
-        }*/
-        return(createNode(-1,s,l));
-    }
-
-    public DefaultTreeModel createLinksTree(Item item) {
-        Links=new HashMap<String,ArrayList<String>>();
-        LinksRef=new HashMap<String,ArrayList<String>>();
-        RulesNode root=new RulesNode("Available Links");
-        if (item.get("links")!=null) {
-            String[] links=item.get("links").split("\\|");
-            if (links[0].length()!=0) {
-                ArrayList<String> types=new ArrayList<String>();
-                String type,target;
-                for (int i=0;i<links.length;i++) {
-                    type=Parser.cutUntil(links[i],":");
-                    target=Parser.cutFrom(links[i],":");
-                    RulesNode SNT;
-                    if (!Links.containsKey(type)) {
-                        Links.put(type, new ArrayList<String>());
-                        LinksRef.put(type, new ArrayList<String>());
-                        SNT=new RulesNode(type);
-                        root.add(SNT);
-                    } else {
-                        int n=0;
-                        while (!root.getChildAt(n).getLabel().equals(type)) n++;
-                        SNT=root.getChildAt(n);
-                    }
-                    RulesNode SN=resRef(target,links[i]);
-                    Links.get(type).add(SN.get("id"));
-                    LinksRef.get(type).add(SN.getLabel());
-                    SNT.add(SN);
-                }
-            }
-        }
-        return(new DefaultTreeModel(root));
-    }
 
     public void getFieldsFromConfig() {
         name=config.get("name");
@@ -400,7 +314,7 @@ public final class Library implements Iterable<Item> {
 
         hideFunctionality=configToArrayList("hide");
         
-        usbdrives=new LinkedHashMap<String,ArrayList<String>>();
+        usbdrives=new LinkedHashMap<>();
         if (config.get("usbdrives")!=null) {
             String[] usbfields=configToArray("usbdrives");
             for (String usbfield : usbfields) {
@@ -410,7 +324,7 @@ public final class Library implements Iterable<Item> {
                 usbdrives.put(Parser.cutUntil(usbfield, ":"), list);
             }
         }
-        choiceFields=new HashMap<String,ArrayList<String>>();
+        choiceFields=new HashMap<>();
         if (config.get("choice-fields")!=null) {
             String[] choicefields=configToArray("choice-fields");
             for (String choicefield : choicefields) {
@@ -421,7 +335,7 @@ public final class Library implements Iterable<Item> {
                 choiceFields.put(field, poss);
             }
         }
-        iconDictionary=new HashMap<String,String>();
+        iconDictionary=new HashMap<>();
         if (config.get("icon-dictionary")!=null) {
             String[] iconDictionary=ToolBox.stringToArray(config.get("icon-dictionary"));
             for (String icon : iconDictionary) {
@@ -614,31 +528,11 @@ public final class Library implements Iterable<Item> {
                 RSC.out(TI + "failed!");
                 return (8);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            RSC.out(TI + "failed!");
+        } catch (Exception ex) {
+            RSC.outEx(ex);
             return (8);
         }
         return (0);
-    }
-
-    /**
-     * Save the whole library
-     * @throws IOException
-     * 
-     * TODO adjust if necessary. Create a copy of the library at startup!
-     * 
-     */
-    public void writeBack() throws IOException {
-        /*TextFile.Delete(Index.source+".bck");
-        TextFile.moveFile(Index.source, Index.source+".bck");
-        Index.writeBack();*/
-        /*TextFile.Delete(Rules.source+".bck");
-        TextFile.moveFile(Rules.source, Rules.source+".bck");
-        Rules.writeBack();*/
-        /*TextFile.Delete(Structure.source+".bck");
-        TextFile.moveFile(Structure.source, Structure.source+".bck");
-        Structure.writeBack();*/
     }
     
     public void updateSizeInfo() {
@@ -756,29 +650,6 @@ public final class Library implements Iterable<Item> {
         return(new DoubletteResult(0,null));
     }
     
-    /**
-     * Inserts an empty record into the Index and returns a doc object refering there
-     * @return the document object
-     * 
-     * TODO remove altogether
-     * 
-     */
-    public Item createEmptyItem() {
-        Item item;
-        String id;
-        // synchronize Library, such that a taken slot is not overwritten.
-        /*synchronized(Index) {
-            int k=Index.position;
-            // Get free registration space and look for already existing papers
-            // File does not exists yet, make entry
-            id=String.valueOf(Index.addEmptyElement());
-            item=new Item(this,id);
-            Index.position=k;
-        }
-        item.put("id",id);*/
-        return(null);
-    }
-
     public void acquireCopyOfItem(Item sourceItem) {
         String TI="LIB"+name+">";
         String[] essentialFields=configToArray("essential-fields");

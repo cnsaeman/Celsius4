@@ -5,7 +5,7 @@
 package celsius.SwingWorkers;
 
 import celsius.Resources;
-import celsius.gui.ThumbNail;
+import celsius.gui.Thumbnail;
 import celsius.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.Image;
@@ -28,11 +28,11 @@ public class ThreadLoadThumbnail extends Thread {
     public int spx;
     public int spy;
 
-    public ThumbNail TN;
-    private Resources RSC;
+    public final Thumbnail thumbnail;
+    private final Resources RSC;
 
-    public ThreadLoadThumbnail(ThumbNail tn, Resources rsc) {
-        TN = tn;
+    public ThreadLoadThumbnail(Thumbnail tn, Resources rsc) {
+        thumbnail = tn;
         RSC=rsc;
         spx=RSC.guiScale(140);
         spy=RSC.guiScale(160);
@@ -41,11 +41,10 @@ public class ThreadLoadThumbnail extends Thread {
 
     @Override
     public void run() {
-        String tn = TN.tableRow.get("thumbnail");
-        final String es1 = TN.tableRow.toText(false);
-        if (tn != null) {
+        final String es1 = thumbnail.tableRow.toText(false);
+        if (thumbnail.tableRow.hasThumbnail()) {
             try {
-                BufferedImage bf = ImageIO.read(new File(TN.tableRow.getCompletedDirKey("thumbnail")));
+                BufferedImage bf = ImageIO.read(new File(thumbnail.tableRow.getThumbnailPath()));
                 int w = bf.getWidth();
                 int h = bf.getHeight();
                 double rx = (spx - 13.001) / w;
@@ -60,54 +59,38 @@ public class ThreadLoadThumbnail extends Thread {
                   new RenderingHints(RenderingHints.KEY_INTERPOLATION,
                                      RenderingHints.VALUE_INTERPOLATION_BICUBIC));
                 final ImageIcon scaled=new ImageIcon(op.filter(bf, null));
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        TN.jLIcon.setToolTipText(es1);
-                        TN.jLIcon.setIcon(scaled);
-                        TN.remove(TN.jTFDesc);
-                        TN.repaint();
-                        TN.revalidate();
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    thumbnail.jLIcon.setToolTipText(es1);
+                    thumbnail.jLIcon.setIcon(scaled);
+                    thumbnail.remove(thumbnail.jTFDesc);
+                    thumbnail.repaint();
+                    thumbnail.revalidate();
                 });
             } catch (Exception ex) {
-                final Image scaled = TN.DT.MF.RSC.getImage("notavailable").getScaledInstance((spx - 3) / 2, (spx - 3) / 2, Image.SCALE_FAST);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        TN.jLIcon.setIcon(new ImageIcon(scaled));
-                        TN.jTFDesc.setText("<html><center>" + Parser.replace(ToolBox.wrap(es1,25), "\n", "<br>") + "</center></html>"); // size is here still 0
-                        TN.jLIcon.setToolTipText(es1);
-                        TN.jTFDesc.setToolTipText(es1);
-                    }
+                final Image scaledImage=RSC.getImage("notavailable").getScaledInstance((spx - 3) / 2, (spx - 3) / 2, Image.SCALE_FAST);
+                SwingUtilities.invokeLater(() -> {
+                    thumbnail.jLIcon.setIcon(new ImageIcon(scaledImage));
+                    thumbnail.jTFDesc.setText("<html><center>" + Parser.replace(ToolBox.wrap(es1,25), "\n", "<br>") + "</center></html>"); // size is here still 0
+                    thumbnail.jLIcon.setToolTipText(es1);
+                    thumbnail.jTFDesc.setToolTipText(es1);
                 });
             }
         } else {
-            if (TN.tableRow.get("type") != null && !TN.tableRow.get("type").isBlank()) {
-                final Image scaled = TN.DT.MF.RSC.icons.get(TN.tableRow.getIconField("type")).getImage().getScaledInstance((spx - 3) / 2, (spy - 3) / 2, Image.SCALE_FAST);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        TN.jLIcon.setIcon(new ImageIcon(scaled));
-                    }
-                });
+            Image image;
+            if (thumbnail.tableRow.get("type") != null && !thumbnail.tableRow.get("type").isBlank()) {
+                image=RSC.icons.get(thumbnail.tableRow.getIconField("type")).getImage();
             } else {
-                final Image scaled = TN.DT.MF.RSC.getImage("default").getScaledInstance((spx - 3) / 2, (spy - 3) / 2, Image.SCALE_FAST);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        TN.jLIcon.setIcon(new ImageIcon(scaled));
-                    }
-                });
+                image=RSC.getImage("default");
             }
+            final Image scaledImage=image.getScaledInstance((spx - 3) / 2, (spy - 3) / 2, Image.SCALE_FAST);
+                SwingUtilities.invokeLater(() -> {
+                    thumbnail.jLIcon.setIcon(new ImageIcon(scaledImage));
+            });
 
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    TN.jTFDesc.setText("<html><center>" + Parser.replace(ToolBox.wrap(es1,25), "\n", "<br>") + "</center></html>"); // size is here still 0
-                    TN.jLIcon.setToolTipText(es1);
-                    TN.jTFDesc.setToolTipText(es1);
-                }
+            SwingUtilities.invokeLater(() -> {
+                thumbnail.jTFDesc.setText("<html><center>" + Parser.replace(ToolBox.wrap(es1,25), "\n", "<br>") + "</center></html>"); // size is here still 0
+                thumbnail.jLIcon.setToolTipText(es1);
+                thumbnail.jTFDesc.setToolTipText(es1);
             });
         }
     }

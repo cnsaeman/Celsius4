@@ -14,7 +14,6 @@
 package celsius3;
 
 import celsius.tools.Parser;
-import celsius.gui.RulesNode;
 import celsius.tools.Parser;
 import celsius.tools.TextFile;
 import java.io.IOException;

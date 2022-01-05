@@ -174,15 +174,11 @@ public class TableRow {
     }
     
     public boolean needsSaving() {
-        if (dirtyFields.size()==0) return(false);
+        if (dirtyFields.isEmpty()) return(false);
         for (String key : dirtyFields) {
             if (!key.startsWith("$")) return(true);
         }
         return(false);
-    }
-    
-    public void markForSaving() {
-        
     }
     
     /**
@@ -345,8 +341,12 @@ public class TableRow {
         // do nothing as a default
     }
     
-    public String getCompletedDirKey(String s) {
-        return(null);
+    public String getCompletedDir(String k) {
+        return(library.completeDir(k));
+    }
+
+    public String getCompletedDirKey(String k) {
+        return(library.completeDir(getS(k)));
     }
     
     public String toText(boolean renew) {
@@ -389,5 +389,12 @@ public class TableRow {
         return(out.toString());
     }
     
+    public boolean hasThumbnail() {
+        return(false);
+    }
+    
+    public String getThumbnailPath() {
+        return(null);
+    }
     
 }

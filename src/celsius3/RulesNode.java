@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package celsius.gui;
+package celsius3;
 
 import java.util.*;
 import javax.swing.tree.MutableTreeNode;

@@ -490,14 +490,6 @@
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
             </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="jMISaveLib">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Save current library"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMISaveLibActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMICloseLib">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Close current library"/>
