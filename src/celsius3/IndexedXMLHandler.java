@@ -11,9 +11,10 @@
 // checked 15.09.2007
 //
 
-package celsius.tools;
+package celsius3;
 
-import celsius.tools.Parser;
+import atlantis.tools.TextFile;
+import atlantis.tools.Parser;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -15,7 +15,7 @@
 package celsius.data;
 
 import java.util.LinkedHashMap;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 
 /**

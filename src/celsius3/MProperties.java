@@ -16,7 +16,7 @@ package celsius3;
 
 import celsius.data.BibTeXRecord;
 import celsius.tools.FileTools;
-import celsius.tools.TextFile;
+import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
 import static celsius.tools.ToolBox.getFirstPage;
 import java.util.ArrayList;

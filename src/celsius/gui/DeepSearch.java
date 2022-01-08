@@ -15,7 +15,7 @@ import celsius.data.Library;
 import celsius.Resources;
 import celsius.*;
 import celsius.SwingWorkers.ThreadSearchDetail;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.GridLayout;
 import java.awt.Image;

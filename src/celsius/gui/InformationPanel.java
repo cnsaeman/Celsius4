@@ -6,6 +6,7 @@
 
 package celsius.gui;
 
+import atlantis.tools.Parser;
 import celsius.data.Library;
 import celsius.data.BibTeXRecord;
 import celsius.Resources;
@@ -15,8 +16,10 @@ import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.data.Category;
 import celsius.data.Person;
+import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -40,6 +43,7 @@ import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +83,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     public int tabMode;
     
+    public String removeLinkSQL;
+    public String addLinkSQL;
+    
     public int currentTemplate;
     
     public static final String[] addBibFields = {"add property       ", "author", "editor", "publisher", "title", "journal", "volume", "number", "series", "year", "pages", "note", "doi", "eprint", "archiveprefix", "primaryclass", "slaccitation"};
@@ -92,6 +99,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public InformationPanel(Resources rsc) {
         RSC=rsc;
         initComponents();
+        jCBLinkType.setMinimumSize(new Dimension(RSC.guiScale(300),RSC.guiScale(25)));
         jPanel7.setBorder(RSC.stdBordermW());
         jPanel8.setBorder(RSC.stdBordermW());
         jPanel9.setBorder(RSC.stdBordermW());
@@ -111,7 +119,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         renderer3.setLeafIcon(RSC.icons.getIcon("arrow_right"));
         renderer3.setClosedIcon(RSC.icons.getIcon("folder"));
         renderer3.setOpenIcon(RSC.icons.getIcon("folder_link"));
-        jTLinks.setCellRenderer(renderer3);
         jLFiles1.setModel(new DefaultListModel());
         jLFiles2.setModel(new DefaultListModel());
         jLFiles3.setModel(new DefaultListModel());
@@ -218,16 +225,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jBtnChooseSourceFolder = new javax.swing.JButton();
         jBtnShowCited = new javax.swing.JButton();
         jPLinks = new javax.swing.JPanel();
-        jScrollPane14 = new javax.swing.JScrollPane();
-        jTLinks = new javax.swing.JTree();
-        jTFLinkType = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jTFLinkTarget = new javax.swing.JTextField();
-        jBtnAddLink = new javax.swing.JButton();
-        jBtnRemoveLink = new javax.swing.JButton();
-        jBtnLinkHelp = new javax.swing.JButton();
-        jBtnCompressLinks = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jLLinkedItems = new javax.swing.JList<>();
+        jPanel6 = new javax.swing.JPanel();
+        jCBLinkType = new javax.swing.JComboBox<>();
+        jBtnAdd1 = new javax.swing.JButton();
+        jBtnRemove = new javax.swing.JButton();
+        jBtnView1 = new javax.swing.JButton();
         jPThumb = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -511,127 +516,57 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
         jTPItem.addTab("Sources", new javax.swing.ImageIcon(getClass().getResource("/celsius/images/star.png")), jPSources, "Sources"); // NOI18N
 
-        jPLinks.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        jPLinks.setName("Links"); // NOI18N
-        jPLinks.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentShown(java.awt.event.ComponentEvent evt) {
-                jPLinksComponentShown(evt);
-            }
-        });
-        jPLinks.setLayout(new java.awt.GridBagLayout());
+        jPLinks.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("JTree");
-        jTLinks.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jTLinks.addMouseListener(new java.awt.event.MouseAdapter() {
+        jPanel5.setLayout(new java.awt.GridLayout());
+
+        jLLinkedItems.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTLinksMouseClicked(evt);
+                jLLinkedItemsMouseClicked(evt);
             }
         });
-        jScrollPane14.setViewportView(jTLinks);
+        jScrollPane4.setViewportView(jLLinkedItems);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.ipadx = 643;
-        gridBagConstraints.ipady = 169;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        jPLinks.add(jScrollPane14, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 5, 5, 0);
-        jPLinks.add(jTFLinkType, gridBagConstraints);
+        jPanel5.add(jScrollPane4);
 
-        jLabel7.setText("Link type:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        jPLinks.add(jLabel7, gridBagConstraints);
+        jPLinks.add(jPanel5, java.awt.BorderLayout.CENTER);
 
-        jLabel10.setText("Link target:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        jPLinks.add(jLabel10, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 5, 5, 0);
-        jPLinks.add(jTFLinkTarget, gridBagConstraints);
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jBtnAddLink.setText("Add Link");
-        jBtnAddLink.addActionListener(new java.awt.event.ActionListener() {
+        jCBLinkType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnAddLinkActionPerformed(evt);
+                jCBLinkTypeActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 4, 5, 0);
-        jPLinks.add(jBtnAddLink, gridBagConstraints);
+        jPanel6.add(jCBLinkType);
 
-        jBtnRemoveLink.setText("Remove Link");
-        jBtnRemoveLink.addActionListener(new java.awt.event.ActionListener() {
+        jBtnAdd1.setText("Add last selection");
+        jBtnAdd1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnRemoveLinkActionPerformed(evt);
+                jBtnAdd1ActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 5, 0);
-        jPLinks.add(jBtnRemoveLink, gridBagConstraints);
+        jPanel6.add(jBtnAdd1);
 
-        jBtnLinkHelp.setText("Help");
-        jBtnLinkHelp.addActionListener(new java.awt.event.ActionListener() {
+        jBtnRemove.setText("Remove");
+        jBtnRemove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnLinkHelpActionPerformed(evt);
+                jBtnRemoveActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
-        jPLinks.add(jBtnLinkHelp, gridBagConstraints);
+        jPanel6.add(jBtnRemove);
 
-        jBtnCompressLinks.setText("Compress Links");
-        jBtnCompressLinks.addActionListener(new java.awt.event.ActionListener() {
+        jBtnView1.setText("View");
+        jBtnView1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnCompressLinksActionPerformed(evt);
+                jBtnView1ActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 13;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 4, 0, 0);
-        jPLinks.add(jBtnCompressLinks, gridBagConstraints);
+        jPanel6.add(jBtnView1);
 
-        jTPItem.addTab("Links", jPLinks);
+        jPLinks.add(jPanel6, java.awt.BorderLayout.SOUTH);
+
+        jTPItem.addTab("tab8", jPLinks);
 
         jPThumb.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPThumb.setName(""); // NOI18N
@@ -657,7 +592,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 833, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -666,7 +601,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -734,7 +669,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addContainerGap(615, Short.MAX_VALUE))
+                .addContainerGap(767, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -753,11 +688,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -803,7 +738,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             }
             if (cmd.startsWith("http://$$links")) {
                 String type=Parser.cutFromLast(cmd, "-");
-                updateLinks();
+                //updateLinks();
                 //TODO
                 //RSC.showLinksOfType(type);
                 return;
@@ -935,89 +870,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jCBAddProperty.setEnabled(false);
         }
 }//GEN-LAST:event_jCBBibPluginsActionPerformed
-
-    private void jTLinksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTLinksMouseClicked
-        /* TODO if (evt.getClickCount() == 2) {
-            RulesNode SN=(RulesNode)jTLinks.getSelectionPath().getLastPathComponent();
-            if (SN==null) return;
-            if ((!SN.isRoot()) && (SN.isLeaf())) {
-                int i=Integer.valueOf(SN.get("pos"));
-                if (i>-1) {
-                    String id=SN.get("id");
-                    celsiusTable.currentItem=new Item(library,id);
-                    RSC.configuration.view(celsiusTable.currentItem,0);
-                }
-            } else {
-                String type=SN.getLabel();
-                //TODO
-                //RSC.showLinksOfType(type);
-            }
-        }*/
-}//GEN-LAST:event_jTLinksMouseClicked
-
-    private void jBtnAddLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddLinkActionPerformed
-        /* TODO String type=jTFLinkType.getText();
-        String target=jTFLinkTarget.getText();
-        if ((target.length()<2) || (type.length()<2)) {
-            RSC.showWarning("Both type and target must be specified", "Aborting...");
-            return;
-        }
-        String links=celsiusTable.currentItem.getS("links");
-        links+="|"+type+":"+target;
-        if (links.startsWith("|")) links=links.substring(1);
-        celsiusTable.currentItem.put("links", links);
-        celsiusTable.currentItem.save();*/
-}//GEN-LAST:event_jBtnAddLinkActionPerformed
-
-    private void jBtnRemoveLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRemoveLinkActionPerformed
-        // TODO RulesNode SN=(RulesNode)jTLinks.getSelectionPath().getLastPathComponent();
-        /*if (SN==null) return;
-        if ((SN!=null) && (SN.isLeaf())) {
-            String l=SN.get("link");
-            String links=celsiusTable.currentItem.getS("links");
-            links=Parser.replace(Parser.replace(links,l,""),"||","|");
-            if (links.startsWith("|")) links=links.substring(1);
-            celsiusTable.currentItem.put("links", links);
-            celsiusTable.currentItem.save();
-            if (celsiusTable.currentItem.error==6) RSC.showWarning("Error writing information file.", "Warning:");
-        } else {
-            RSC.showWarning("You selected no proper link to be deleted.","Cancelling...");
-        }
-        updateLinks();*/
-}//GEN-LAST:event_jBtnRemoveLinkActionPerformed
-
-    private void jBtnLinkHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnLinkHelpActionPerformed
-        RSC.showInformation("Links are used to connect related items to each other.\nStandard types are \"citation\" and \"refers to\", while links\ncan be entered as field:value.", "Quick Help on Links");
-}//GEN-LAST:event_jBtnLinkHelpActionPerformed
-
-    private void jBtnCompressLinksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCompressLinksActionPerformed
-        /*TODO RulesNode root=(RulesNode)jTLinks.getModel().getRoot();
-        if (root.isLeaf()) return;
-        String links="";
-        for (Enumeration<RulesNode> e=root.children();e.hasMoreElements();) {
-            RulesNode SN=e.nextElement();
-            String type=SN.getLabel();
-            for (Enumeration<RulesNode> f=SN.children();f.hasMoreElements();) {
-                RulesNode sn=f.nextElement();
-                if (sn.get("pos").equals("-1")) {
-                    links+="|"+sn.get("link");
-                } else {
-                    links+="|"+type+":id:"+sn.get("id");
-                }
-            }
-        }
-        links=links.substring(1);
-        if (!links.equals(celsiusTable.currentItem.get("links"))) {
-            celsiusTable.currentItem.put("links", links);
-            celsiusTable.currentItem.save();
-            if (celsiusTable.currentItem.error==6) RSC.showWarning("Error writing information file.", "Warning:");
-        }
-        updateGUI();*/
-}//GEN-LAST:event_jBtnCompressLinksActionPerformed
-
-    private void jPLinksComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPLinksComponentShown
-        updateLinks();
-}//GEN-LAST:event_jPLinksComponentShown
 
     private void jBtnApplyRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApplyRemActionPerformed
         if (tabMode == InformationPanel.TabMode_ITEM) {
@@ -1320,40 +1172,83 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         associateFileToCurrentItem();
     }//GEN-LAST:event_jBtnAddActionPerformed
 
+    private void jLLinkedItemsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLLinkedItemsMouseClicked
+        if (evt.getClickCount() == 2) {
+            viewSelectedItem();
+        }
+    }//GEN-LAST:event_jLLinkedItemsMouseClicked
+
+    private void jCBLinkTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBLinkTypeActionPerformed
+        adjustLinkedItemsList();
+    }//GEN-LAST:event_jCBLinkTypeActionPerformed
+
+    private void jBtnAdd1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAdd1ActionPerformed
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        if (tableRow.linkedItems.get(jCBLinkType.getSelectedIndex())==null) {
+            tableRow.linkedItems.put(jCBLinkType.getSelectedIndex(),new ArrayList<Item>());
+        }
+        for (Item item : RSC.lastItemSelection.itemList) {
+            tableRow.linkedItems.get(jCBLinkType.getSelectedIndex()).add(item);
+            tableRow.library.executeEX(addLinkSQL, new String[]{tableRow.id,item.id});
+        }
+        tableRow.notifyChanged();
+        adjustLinkedItemsList();
+    }//GEN-LAST:event_jBtnAdd1ActionPerformed
+
+    private void jBtnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRemoveActionPerformed
+        ArrayList<Item> itemsToRemove=new ArrayList<>();
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        for (Integer i : jLLinkedItems.getSelectedIndices()) {
+            itemsToRemove.add(tableRow.linkedItems.get(jCBLinkType.getSelectedIndex()).get(i));
+        }
+        StringBuffer idList=new StringBuffer();
+        for (Item item : itemsToRemove) {
+            idList.append(",");
+            idList.append(item.id);
+            tableRow.linkedItems.get(jCBLinkType.getSelectedIndex()).remove(item);
+        }
+        tableRow.library.executeEX(removeLinkSQL,new String[]{tableRow.id,idList.substring(1)});
+        adjustLinkedItemsList();
+        tableRow.notifyChanged();
+    }//GEN-LAST:event_jBtnRemoveActionPerformed
+
+    private void jBtnView1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnView1ActionPerformed
+        viewSelectedItem();
+    }//GEN-LAST:event_jBtnView1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAdd;
-    private javax.swing.JButton jBtnAddLink;
+    private javax.swing.JButton jBtnAdd1;
     private javax.swing.JButton jBtnAddThumb;
     private javax.swing.JButton jBtnApplyBibTeX;
     private javax.swing.JButton jBtnApplyRem;
     private javax.swing.JButton jBtnChooseSourceFolder;
-    private javax.swing.JButton jBtnCompressLinks;
     private javax.swing.JButton jBtnCreateBibTeX;
     private javax.swing.JButton jBtnDelete;
     private javax.swing.JButton jBtnDown;
-    private javax.swing.JButton jBtnLinkHelp;
     private javax.swing.JButton jBtnNormalizeBibTeX;
     private javax.swing.JButton jBtnPath;
-    private javax.swing.JButton jBtnRemoveLink;
+    private javax.swing.JButton jBtnRemove;
     private javax.swing.JButton jBtnRemoveThumb;
     private javax.swing.JButton jBtnRename;
     private javax.swing.JButton jBtnResizeThumb;
     private javax.swing.JButton jBtnShowCited;
     private javax.swing.JButton jBtnUp;
     private javax.swing.JButton jBtnView;
+    private javax.swing.JButton jBtnView1;
     private javax.swing.JComboBox jCBAddProperty;
     public javax.swing.JComboBox jCBBibPlugins;
+    private javax.swing.JComboBox<String> jCBLinkType;
     private javax.swing.JEditorPane jHTMLview;
     private javax.swing.JList<String> jLAttachments;
     private javax.swing.JList<String> jLFiles1;
     private javax.swing.JList<String> jLFiles2;
     private javax.swing.JList<String> jLFiles3;
     private javax.swing.JLabel jLIcon;
+    private javax.swing.JList<String> jLLinkedItems;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenuItem jMIAddThumb;
     public javax.swing.JMenuItem jMIEditDS1;
     private javax.swing.JPanel jPAttachments;
@@ -1370,6 +1265,8 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -1377,18 +1274,15 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane13;
-    private javax.swing.JScrollPane jScrollPane14;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTextArea jTABibTeX;
     private javax.swing.JTextArea jTARaw1;
     public javax.swing.JTextArea jTARemarks;
-    private javax.swing.JTextField jTFLinkTarget;
-    private javax.swing.JTextField jTFLinkType;
-    private javax.swing.JTree jTLinks;
     public javax.swing.JTabbedPane jTPItem;
     // End of variables declaration//GEN-END:variables
 
@@ -1401,7 +1295,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jBtnDown.setEnabled((jLAttachments.getSelectedIndex() > -1) && (jLAttachments.getSelectedIndex() < getItem().linkedAttachments.size() - 1));        
     }
     
-    public void updateLinks() {
+    /*public void updateLinks() {
         if (celsiusTable==null) return;
         if (celsiusTable.getTableType()>=10) return;
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
@@ -1409,7 +1303,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (currentItem==null) return;
         //DefaultTreeModel DTM=library.createLinksTree(currentItem);
         //jTLinks.setModel(DTM);
-    }
+    }*/
     
     public void addToPanel(String title, String icon, JComponent panel) {
         jTPItem.add(panel);
@@ -1603,6 +1497,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPEdit.setEditable(person);
         jTARaw1.setText(person.getRawData());
         jTARaw1.setCaretPosition(0);
+        updatePersonLinks();
     }
 
     private void guiToSingleItem() {
@@ -1674,6 +1569,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             }
         }
         updateThumb();
+        updateItemLinks();
         adjustAttachmentButtons();
     }
     
@@ -1794,5 +1690,46 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         RSC.MF.updateStatusBar(true);
         updateGUI();        
     }
+    
+    private void adjustLinkedItemsList() {
+        DefaultListModel DLM=new DefaultListModel();
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        ArrayList<Item> linkedItems=tableRow.linkedItems.get(jCBLinkType.getSelectedIndex());
+        if ((linkedItems!=null) && (linkedItems.size()>0)) DLM.addAll(linkedItems);
+        jLLinkedItems.setModel(DLM);
+    }
+    
+    private void viewSelectedItem() {
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        Item selectedItem=tableRow.linkedItems.get(jCBLinkType.getSelectedIndex()).get(jLLinkedItems.getSelectedIndex());
+        RSC.viewItem(selectedItem);
+    }
+    
+    private void updateItemLinks() {
+        DefaultComboBoxModel DCBM=new DefaultComboBoxModel();
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        DCBM.addAll(tableRow.library.linkTypes);
+        jCBLinkType.setModel(DCBM);
+        jCBLinkType.setSelectedIndex(0);
+        adjustLinkedItemsList();        
+        addLinkSQL = "INSERT INTO item_item_links (item1_id,item2_id) VALUES (?,?)";
+        removeLinkSQL = "DELETE FROM item_item_links WHERE item1_id=? AND item2_id IN (?);";
+        setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
+        jBtnAdd.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
+    }
+
+    private void updatePersonLinks() {
+        DefaultComboBoxModel DCBM=new DefaultComboBoxModel();
+        TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
+        DCBM.addAll(tableRow.library.linkTypes);
+        jCBLinkType.setModel(DCBM);
+        jCBLinkType.setSelectedIndex(0);
+        adjustLinkedItemsList();        
+        addLinkSQL = "INSERT INTO person_item_links (person_id,item_id) VALUES (?,?)";
+        removeLinkSQL = "DELETE FROM person_item_links WHERE person_id=? AND item_id IN (?);";
+        setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
+        jBtnAdd.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
+    }
+    
 
 }

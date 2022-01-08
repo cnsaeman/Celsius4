@@ -42,8 +42,10 @@ public class StructureNode implements MutableTreeNode {
                 String[] children=ToolBox.stringToArray2(childLists.get(id));
                 for (String childID : children) {
                     StructureNode child=structureNodes.get(Integer.valueOf(childID));
-                    child.parent=parent;
-                    parent.childNodes.add(child);
+                    if (child!=null) {
+                        child.parent=parent;
+                        parent.childNodes.add(child);
+                    }
                 }
             }
         } catch (Exception ex) {

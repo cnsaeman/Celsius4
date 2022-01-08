@@ -16,7 +16,7 @@ import celsius.gui.MainFrame;
 import celsius.gui.SingleLineEditor;
 import celsius.tools.FFilter;
 import celsius.tools.InteractiveFileCopy;
-import celsius.tools.TextFile;
+import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
 import java.awt.Image;
 import java.awt.Toolkit;

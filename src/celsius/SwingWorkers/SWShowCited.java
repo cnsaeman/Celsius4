@@ -5,7 +5,7 @@ package celsius.SwingWorkers;
 
 import celsius.data.Item;
 import celsius.gui.CelsiusTable;
-import celsius.tools.TextFile;
+import atlantis.tools.TextFile;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.regex.Matcher;

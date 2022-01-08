@@ -13,6 +13,8 @@
 //
 package celsius.gui;
 
+import atlantis.tools.HasManagedStates;
+import atlantis.tools.TextFile;
 import celsius.SwingWorkers.SWFinalizer;
 import celsius.SwingWorkers.SWApplyPlugin;
 import celsius.SwingWorkers.SWBibTeXIntegrity;
@@ -27,7 +29,7 @@ import celsius.data.Item;
 import celsius.SplashScreen;
 import celsius.SwingWorkers.SWLibraryCheck;
 import celsius.data.Attachment;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.data.Category;
 import celsius.data.DoubletteResult;
 import celsius.data.ItemSelection;
@@ -193,7 +195,7 @@ public class MainFrame extends javax.swing.JFrame implements
         
         // STATEMANAGER TODO: check
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIRememberSelectedItems, jMIRememberSelectedItems1});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems,jMIEditItemLinksForPerson});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems,});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
@@ -392,13 +394,6 @@ public class MainFrame extends javax.swing.JFrame implements
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPMItemTable = new javax.swing.JPopupMenu();
         jMIView1 = new javax.swing.JMenuItem();
-        jMActions = new javax.swing.JMenu();
-        jMShow = new javax.swing.JMenu();
-        jMShowCombined = new javax.swing.JMenuItem();
-        jMShowLinked = new javax.swing.JMenuItem();
-        jSeparator30 = new javax.swing.JPopupMenu.Separator();
-        jMIViewPlain1 = new javax.swing.JMenuItem();
-        jMIReExtract1 = new javax.swing.JMenuItem();
         jMIPeople2 = new javax.swing.JMenuItem();
         jSeparator20 = new javax.swing.JSeparator();
         jMIRemoveFromTab1 = new javax.swing.JMenuItem();
@@ -407,7 +402,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIRemoveHalf1 = new javax.swing.JMenuItem();
         jSeparator24 = new javax.swing.JSeparator();
         jMIJoin1 = new javax.swing.JMenuItem();
-        jMIEditItemLinks1 = new javax.swing.JMenuItem();
         jSeparator26 = new javax.swing.JSeparator();
         jMIRememberSelectedItems1 = new javax.swing.JMenuItem();
         jMCopyToDiff1 = new javax.swing.JMenu();
@@ -420,8 +414,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIMerge = new javax.swing.JMenuItem();
         jMIRemoveFromTable = new javax.swing.JMenuItem();
         jMIShowItems1 = new javax.swing.JMenuItem();
-        jSeparator12 = new javax.swing.JPopupMenu.Separator();
-        jMIEditItemLinksForPerson1 = new javax.swing.JMenuItem();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jCBLibraries = new javax.swing.JComboBox();
@@ -486,15 +478,8 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIMerge1 = new javax.swing.JMenuItem();
         jMIRemoveFromTable2 = new javax.swing.JMenuItem();
         jMIShowItems = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        jMIEditItemLinksForPerson = new javax.swing.JMenuItem();
         jMItems = new javax.swing.JMenu();
         jMIView = new javax.swing.JMenuItem();
-        jMShow1 = new javax.swing.JMenu();
-        jMShowCombined1 = new javax.swing.JMenuItem();
-        jMShowLinked1 = new javax.swing.JMenuItem();
-        jMIViewPlain = new javax.swing.JMenuItem();
-        jMICreateTxt = new javax.swing.JMenuItem();
         jMIPeople = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         jMIRemoveFromTab = new javax.swing.JMenuItem();
@@ -503,7 +488,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIRemoveHalf = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JSeparator();
         jMIJoin = new javax.swing.JMenuItem();
-        jMIEditItemLinks = new javax.swing.JMenuItem();
         jSeparator8 = new javax.swing.JSeparator();
         jMIRememberSelectedItems = new javax.swing.JMenuItem();
         jMCopyToDiff = new javax.swing.JMenu();
@@ -692,46 +676,6 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jPMItemTable.add(jMIView1);
 
-        jMActions.setText("Action");
-        jPMItemTable.add(jMActions);
-
-        jMShow.setText("Show");
-
-        jMShowCombined.setText("Show Combined");
-        jMShowCombined.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMShowCombinedActionPerformed(evt);
-            }
-        });
-        jMShow.add(jMShowCombined);
-
-        jMShowLinked.setText("Show Linked");
-        jMShowLinked.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMShowLinkedActionPerformed(evt);
-            }
-        });
-        jMShow.add(jMShowLinked);
-
-        jPMItemTable.add(jMShow);
-        jPMItemTable.add(jSeparator30);
-
-        jMIViewPlain1.setText("View plain text");
-        jMIViewPlain1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIViewPlainActionPerformed(evt);
-            }
-        });
-        jPMItemTable.add(jMIViewPlain1);
-
-        jMIReExtract1.setText("Re-extract plain text");
-        jMIReExtract1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICreateTxtActionPerformed(evt);
-            }
-        });
-        jPMItemTable.add(jMIReExtract1);
-
         jMIPeople2.setText("Show associated people");
         jMIPeople2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -781,14 +725,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMItemTable.add(jMIJoin1);
-
-        jMIEditItemLinks1.setText("Edit item links");
-        jMIEditItemLinks1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditItemLinks1ActionPerformed(evt);
-            }
-        });
-        jPMItemTable.add(jMIEditItemLinks1);
         jPMItemTable.add(jSeparator26);
 
         jMIRememberSelectedItems1.setText("Remember selected items");
@@ -841,15 +777,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMPeopleTable.add(jMIShowItems1);
-        jPMPeopleTable.add(jSeparator12);
-
-        jMIEditItemLinksForPerson1.setText("Edit item links");
-        jMIEditItemLinksForPerson1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditItemLinksForPersonActionPerformed(evt);
-            }
-        });
-        jPMPeopleTable.add(jMIEditItemLinksForPerson1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Celsius Library System v2.0");
@@ -1279,15 +1206,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMPeople.add(jMIShowItems);
-        jMPeople.add(jSeparator5);
-
-        jMIEditItemLinksForPerson.setText("Edit item links");
-        jMIEditItemLinksForPerson.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditItemLinksForPersonActionPerformed(evt);
-            }
-        });
-        jMPeople.add(jMIEditItemLinksForPerson);
 
         jMainMenu.add(jMPeople);
 
@@ -1300,42 +1218,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMItems.add(jMIView);
-
-        jMShow1.setText("Show");
-
-        jMShowCombined1.setText("Show Combined");
-        jMShowCombined1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMShowCombinedActionPerformed(evt);
-            }
-        });
-        jMShow1.add(jMShowCombined1);
-
-        jMShowLinked1.setText("Show Linked");
-        jMShowLinked1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMShowLinkedActionPerformed(evt);
-            }
-        });
-        jMShow1.add(jMShowLinked1);
-
-        jMItems.add(jMShow1);
-
-        jMIViewPlain.setText("View plain text");
-        jMIViewPlain.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIViewPlainActionPerformed(evt);
-            }
-        });
-        jMItems.add(jMIViewPlain);
-
-        jMICreateTxt.setText("Re-extract plain text ");
-        jMICreateTxt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICreateTxtActionPerformed(evt);
-            }
-        });
-        jMItems.add(jMICreateTxt);
 
         jMIPeople.setText("Show associated people");
         jMIPeople.addActionListener(new java.awt.event.ActionListener() {
@@ -1386,14 +1268,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMItems.add(jMIJoin);
-
-        jMIEditItemLinks.setText("Edit item links");
-        jMIEditItemLinks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIEditItemLinks1ActionPerformed(evt);
-            }
-        });
-        jMItems.add(jMIEditItemLinks);
         jMItems.add(jSeparator8);
 
         jMIRememberSelectedItems.setText("Remember selected items");
@@ -1605,18 +1479,6 @@ public class MainFrame extends javax.swing.JFrame implements
         bufmousey = Integer.valueOf(s2);
     }//GEN-LAST:event_jPMCategoriesPropertyChange
 
-    private void jMICreateTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICreateTxtActionPerformed
-        // plaintxt already existing? TODO!!
-        Library library = RSC.getCurrentlySelectedLibrary();
-        boolean doit=false;
-        int h=0;
-        for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows()) {
-            ((Item)tableRow).redoPlainText();
-        }
-        guiInfoPanel.updateGUI();
-        updateStatusBar(true);
-    }//GEN-LAST:event_jMICreateTxtActionPerformed
-
     private void jMIConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConfigActionPerformed
         dialogConfiguration.open();
     }//GEN-LAST:event_jMIConfigActionPerformed
@@ -1672,7 +1534,7 @@ public class MainFrame extends javax.swing.JFrame implements
     }//GEN-LAST:event_jMIConsistencyCheckActionPerformed
 
     private void jMIEditLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditLibActionPerformed
-        (new EditLibrary(this,RSC.getCurrentlySelectedLibrary())).setVisible(true);
+        (new EditLibrary(RSC,0)).setVisible(true);
     }//GEN-LAST:event_jMIEditLibActionPerformed
 
     private void jMIEditDSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditDSActionPerformed
@@ -1775,8 +1637,8 @@ public class MainFrame extends javax.swing.JFrame implements
             }
             final int i = RSC.askQuestionOC("Click OK to delete subcategory.", "Warning");
             if (i == JOptionPane.YES_OPTION) {
-                StructureTreeModel.removeNodeFromParent(node);
                 RSC.getCurrentlySelectedLibrary().deleteCategoryNode(node);
+                StructureTreeModel.removeNodeFromParent(node);
             }
         }
     }//GEN-LAST:event_jMIDelCatActionPerformed
@@ -1917,12 +1779,6 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.removeSelectedFromCurrentTable();
         guiInfoPanel.updateGUI();
     }//GEN-LAST:event_jMIRemoveFromTabActionPerformed
-
-    private void jMIViewPlainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIViewPlainActionPerformed
-        TableRow tableRow=RSC.getCurrentTable().getSelectedRows().get(0);
-        if (tableRow==null) return;
-        viewPlainText((Item)tableRow);
-    }//GEN-LAST:event_jMIViewPlainActionPerformed
 
     private void jMIFullBibToFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIFullBibToFileActionPerformed
         Library library=RSC.getCurrentlySelectedLibrary();
@@ -2182,10 +2038,6 @@ private void jLSearchKeysValueChanged(javax.swing.event.ListSelectionEvent evt) 
     searchKeysUpdate();
 }//GEN-LAST:event_jLSearchKeysValueChanged
 
-private void jMIEditItemLinks1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditItemLinks1ActionPerformed
-    (new EditItemLinks(RSC,RSC.getCurrentlySelectedItem(),0)).setVisible(true);
-}//GEN-LAST:event_jMIEditItemLinks1ActionPerformed
-
 private void jMIRemoveHalfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRemoveHalfActionPerformed
         if (RSC.guiStates.getState("mainFrame","tabAvailable")) {
             CelsiusTable IT = RSC.celsiusTables.get(jTPTabList.getSelectedIndex());
@@ -2235,14 +2087,6 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
         searchstate=0;
     }*/
 }//GEN-LAST:event_jTFMainSearchKeyTyped
-
-private void jMShowCombinedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMShowCombinedActionPerformed
-        showCombined();
-}//GEN-LAST:event_jMShowCombinedActionPerformed
-
-private void jMShowLinkedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMShowLinkedActionPerformed
-        showLinksOfType("Available Links");
-}//GEN-LAST:event_jMShowLinkedActionPerformed
 
 private void jMIExpandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExpandActionPerformed
     GUIToolBox.expandAll(jTStructureTree, true);
@@ -2316,10 +2160,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         }
     }//GEN-LAST:event_jMIConvertLibraryActionPerformed
 
-    private void jMIEditItemLinksForPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditItemLinksForPersonActionPerformed
-        (new EditItemLinks(RSC, RSC.getCurrentlySelectedPerson(), 1)).setVisible(true);
-    }//GEN-LAST:event_jMIEditItemLinksForPersonActionPerformed
-
     private void jMIRememberSelectedItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRememberSelectedItemsActionPerformed
         ItemSelection itemSelection=new ItemSelection(RSC.getCurrentlySelectedLibrary());
         itemSelection.addAll(RSC.getCurrentTable().getSelectedRows());
@@ -2339,7 +2179,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JLabel jLThreadStatus;
     private javax.swing.JList<String> jLWhenAdded;
     private javax.swing.JLabel jLabel1;
-    public javax.swing.JMenu jMActions;
     private javax.swing.JMenu jMBibTeX;
     private javax.swing.JMenu jMCategories;
     public javax.swing.JMenu jMCopyToDiff;
@@ -2371,17 +2210,12 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMICopyTab;
     private javax.swing.JMenuItem jMICopyTab2;
     private javax.swing.JMenuItem jMICreateLib;
-    private javax.swing.JMenuItem jMICreateTxt;
     private javax.swing.JMenuItem jMIDelCat;
     private javax.swing.JMenuItem jMIDelCat1;
     private javax.swing.JMenuItem jMIDeleteFile;
     private javax.swing.JMenuItem jMIDeleteFile1;
     private javax.swing.JMenuItem jMIDeleteLib;
     public javax.swing.JMenuItem jMIEditDS;
-    private javax.swing.JMenuItem jMIEditItemLinks;
-    private javax.swing.JMenuItem jMIEditItemLinks1;
-    private javax.swing.JMenuItem jMIEditItemLinksForPerson;
-    private javax.swing.JMenuItem jMIEditItemLinksForPerson1;
     private javax.swing.JMenuItem jMIEditLib;
     private javax.swing.JMenuItem jMIEditLibTemplates;
     private javax.swing.JMenuItem jMIEmail;
@@ -2403,7 +2237,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIPeople;
     private javax.swing.JMenuItem jMIPeople2;
     private javax.swing.JMenuItem jMIQuit;
-    private javax.swing.JMenuItem jMIReExtract1;
     private javax.swing.JMenuItem jMIRememberSelectedItems;
     private javax.swing.JMenuItem jMIRememberSelectedItems1;
     private javax.swing.JMenuItem jMIRemoveFromTab;
@@ -2424,18 +2257,10 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIUpdate;
     private javax.swing.JMenuItem jMIView;
     private javax.swing.JMenuItem jMIView1;
-    public javax.swing.JMenuItem jMIViewPlain;
-    public javax.swing.JMenuItem jMIViewPlain1;
     public javax.swing.JMenu jMItems;
     private javax.swing.JMenu jMLibraries;
     private javax.swing.JMenu jMPeople;
     public javax.swing.JMenu jMRecent;
-    private javax.swing.JMenu jMShow;
-    private javax.swing.JMenu jMShow1;
-    private javax.swing.JMenuItem jMShowCombined;
-    private javax.swing.JMenuItem jMShowCombined1;
-    private javax.swing.JMenuItem jMShowLinked;
-    private javax.swing.JMenuItem jMShowLinked1;
     private javax.swing.JMenu jMTabs;
     private javax.swing.JMenuBar jMainMenu;
     public javax.swing.JProgressBar jPBSearch;
@@ -2468,7 +2293,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
-    private javax.swing.JPopupMenu.Separator jSeparator12;
     private javax.swing.JSeparator jSeparator14;
     private javax.swing.JSeparator jSeparator15;
     private javax.swing.JSeparator jSeparator16;
@@ -2478,11 +2302,9 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator26;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator30;
     private javax.swing.JPopupMenu.Separator jSeparator31;
     private javax.swing.JPopupMenu.Separator jSeparator33;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JSeparator jSeparator8;

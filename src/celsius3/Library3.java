@@ -13,6 +13,8 @@
 
 package celsius3;
 
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import celsius3.LibraryIterator3;
 import celsius.gui.CelsiusTable;
 import celsius.gui.MainFrame;
@@ -696,7 +698,8 @@ public final class Library3 implements Iterable<Item3> {
             configDictionary.put("plugins-import", "Basic Import");
             configDictionary.put("plugins-people", "");
             configDictionary.put("css-style", TextFile.ReadOutFile(Lib.completeDir(Lib.MainFile.get("style"),"")));
-            
+            if (configDictionary.get("item-folder").startsWith("LD::documents")) configDictionary.put("item-folder","LD::items");
+            configDictionary.put("item-naming-convention", Parser.replace(configDictionary.get("item-naming-convention"), "#filetype#", "#$$filetype#"));
             // Write HashMap To File, sorted by keys.
             sql = "INSERT INTO configuration (key,value) VALUES(?,?)";
             ArrayList<String> keys=new ArrayList<>(configDictionary.keySet());
@@ -789,7 +792,7 @@ public final class Library3 implements Iterable<Item3> {
             sql+= "    pages integer,\n";
             sql+= "    source text,\n";
             sql+= "    md5 text,\n";
-            sql+= "    created integer);";
+            sql+= "    createdTS integer);";
             stmt = Lib.conn.createStatement();
             RSC.out(sql);
             stmt.execute(sql);
@@ -956,11 +959,13 @@ public final class Library3 implements Iterable<Item3> {
                 }
                 
                 if (!item3.getS("location").isBlank()) {
-                    PreparedStatement statement = library.dbConnection.prepareStatement("INSERT INTO attachments (name,path,filetype,pages) VALUES(?,?,?,?);");
+                    PreparedStatement statement = library.dbConnection.prepareStatement("INSERT INTO attachments (name,path,filetype,pages,md5,createdTS) VALUES(?,?,?,?,?,?);");
                     statement.setString(1, "Main file");
                     statement.setString(2, Parser.replace(Parser.replace(item3.getS("location"), "LD::documents/", "LD::items/"), "LD::/documents/", "LD::items/"));
                     statement.setString(3, item3.getS("filetype"));
                     statement.setInt(4, intV(item3.getS("pages")));
+                    statement.setString(5,FileTools.md5checksum(item3.completeDir(item3.getS("location"))));
+                    statement.setString(6,lastUpdated);
                     statement.executeUpdate();
                     ResultSet rs = statement.getGeneratedKeys();
                     rs.next();
@@ -985,11 +990,13 @@ public final class Library3 implements Iterable<Item3> {
                     int ord = 0;
                     while (!item3.getS("altversion-location-" + formatInt3(ord)).isBlank()) {
                         String nmb = formatInt3(ord);
-                        statement = library.dbConnection.prepareStatement("INSERT INTO attachments (name,path,filetype,pages) VALUES(?,?,?,?);");
+                        statement = library.dbConnection.prepareStatement("INSERT INTO attachments (name,path,filetype,pages,md5,createdTS) VALUES(?,?,?,?,?,?);");
                         statement.setString(1, item3.getS("altversion-label-" + nmb));
                         statement.setString(2, Parser.replace(Parser.replace(item3.getS("altversion-location-" + nmb), "LD::documents/", "LD::items/"), "LD::/documents/", "LD::items/"));
                         statement.setString(3, item3.getS("altversion-filetype-" + nmb));
                         statement.setInt(4, intV(item3.getS("altversion-pages-" + nmb)));
+                        statement.setString(5, FileTools.md5checksum(item3.completeDir(item3.getS("altversion-location-" + nmb))));
+                        statement.setString(6, lastUpdated);
                         statement.executeUpdate();
                         rs = statement.getGeneratedKeys();
                         rs.next();
@@ -1118,7 +1125,7 @@ public final class Library3 implements Iterable<Item3> {
         }*/
     }
 
-    private void addKey(int docID, String key) throws SQLException {
+    /*private void addKey(int docID, String key) throws SQLException {
         // get id of category
         if ((key==null) || (key.isEmpty())) return;
         String sql="Select id from keywords where label=?;";
@@ -1143,7 +1150,7 @@ public final class Library3 implements Iterable<Item3> {
         statement.setInt(1,docID);
         statement.setInt(2,keyWordID);
         statement.executeUpdate();
-    }
+    }*/
     
     class CompTable implements Comparator<Item> {
 

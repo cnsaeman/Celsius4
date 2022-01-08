@@ -5,7 +5,7 @@
  */
 package celsius.data;
 
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

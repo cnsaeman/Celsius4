@@ -10,7 +10,7 @@ import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.data.Library;
 import celsius.gui.AddItems;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.Plugin;
 import celsius.tools.ToolBox;
 import java.io.File;

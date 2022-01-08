@@ -5,6 +5,7 @@
 
 package celsius.tools;
 
+import atlantis.tools.Parser;
 import celsius.Resources;
 import celsius.gui.SafeMessage;
 import celsius.gui.MainFrame;
@@ -138,37 +139,6 @@ public class Plugins extends HashMap<String,Plugin> {
 
     public String getParams(String name) {
         return(parameters.get(name));
-    }
-
-    /**
-     * This procedure tries to add the plugin with name s and type type and returns true if successful.
-     */
-    public boolean add(Plugin p) throws Exception {
-        boolean added=false;
-        boolean exists=false;
-        String title=p.metaData.get("title");
-        if (containsKey(title))
-            exists=true;
-        if (!exists) {
-            put(title,p);
-            parameters.put(title, "");
-            added=true;
-            save();
-        }
-        return(added);
-    }
-
-    public void save() throws IOException {
-        XMLHandler out=new XMLHandler("plugins/configuration.plugins.xml");
-        out.clear();
-        for (String t : keySet()) {
-            out.addEmptyElement();
-            out.put("name", get(t).className);
-            String p=parameters.get(t);
-            if ((p!=null) && (p.trim().length()>0))
-                out.put("parameters", p);
-        }
-        out.writeBack();
     }
 
     public void updateExportPlugins() {

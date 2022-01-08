@@ -13,9 +13,9 @@
 
 package celsius3;
 
-import celsius.tools.Parser;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.Parser;
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;

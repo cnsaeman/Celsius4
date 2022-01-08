@@ -13,9 +13,15 @@ package celsius.gui;
 
 import celsius.data.TableRow;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -42,7 +48,7 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
     /** Creates new form ThumbNailView */
     public ThumbnailView(CelsiusTable ct) {
         initComponents();
-        jTNVPanel.setLayout(new WrapLayout(FlowLayout.LEFT));
+        setLayout(new WrapLayout(FlowLayout.LEFT));
         thumbnails=new ArrayList<>();
         celsiusTable=ct;
         addKeyListener(this);
@@ -57,40 +63,30 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTNVPanel = new javax.swing.JPanel();
-
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        jTNVPanel.setBackground(new java.awt.Color(255, 255, 255));
-        jScrollPane1.setViewportView(jTNVPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 390, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 290, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     public void updateView() {
         updating=true; // #### is beeing called four times when changing categories?
-        jTNVPanel.removeAll();
+        removeAll();
         thumbnails.clear();
         for (TableRow tableRow : celsiusTable.celsiusTableModel.tableRows) {
             if (thumbnails.size()<100) { // #### Temp restriction until threadexecutorpool really working
                 Thumbnail TN=new Thumbnail(tableRow,celsiusTable);
                 thumbnails.add(TN);
-                jTNVPanel.add(TN);
+                add(TN);
             }
         }
         updating=false;
@@ -100,13 +96,13 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
         Thumbnail TN=new Thumbnail(celsiusTable.getRow(i),celsiusTable);
         thumbnails.add(i,TN);
         System.out.println("Adding "+celsiusTable.getRow(i));
-        jTNVPanel.add(TN,i);
+        add(TN,i);
     }
 
     @Override
     public void remove(int i) {
         if (thumbnails.size()>i) thumbnails.remove(i);
-        if (this.getComponentCount()>i) jTNVPanel.remove(i);
+        if (this.getComponentCount()>i) super.remove(i);
     }
 
     public void tableChanged(TableModelEvent e) {
@@ -116,7 +112,7 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
         if (!celsiusTable.celsiusTableModel.tableview) {
             if (e.getType()==TableModelEvent.DELETE) {
                 for (int i=e.getLastRow();i>=e.getFirstRow();i--) {
-                    jTNVPanel.remove(i);
+                    remove(i);
                 }
             }
             if (e.getType()==TableModelEvent.INSERT) {
@@ -170,7 +166,7 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
     @Override
     public void keyReleased(KeyEvent e) {
         // TODO: needs to be optimized for lines that are partially filled
-        int tx=(thumbnails.size()>0 ? jTNVPanel.getWidth()/(thumbnails.get(0).getWidth()) : 0);
+        int tx=(thumbnails.size()>0 ? getWidth()/(thumbnails.get(0).getWidth()) : 0);
         if (e.getKeyCode() == 36)
             modifySelection(0, e.isShiftDown());
         if (e.getKeyCode() == 37)
@@ -184,9 +180,8 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
         if (e.getKeyCode()==35) 
             modifySelection(1000,e.isShiftDown());
     }
-
+    
     public void adjustSelection() {
-        scrollRectToVisible(thumbnails.get(celsiusTable.selectedlast).getBounds());
         boolean mode=false;
         int b=celsiusTable.selectedfirst;
         int e=celsiusTable.selectedlast;
@@ -200,6 +195,7 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
             else thumbnails.get(i).setWhite();
             if (i==e) mode=!mode;
         }
+        scrollRectToVisible(thumbnails.get(celsiusTable.selectedlast).getBounds());
     }
 
     public void update(TableRow row) {
@@ -207,12 +203,10 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
         thumbnails.get(i).updateTableRow();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JPanel jTNVPanel;
     // End of variables declaration//GEN-END:variables
 
     public void clear() {
-        jTNVPanel.removeAll();
+        removeAll();
     }
 
 }

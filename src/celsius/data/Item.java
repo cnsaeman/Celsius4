@@ -2,8 +2,8 @@ package celsius.data;
 
 import celsius.gui.Editable;
 import celsius.tools.FileTools;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
 import java.io.File;
 import java.io.IOException;
@@ -304,6 +304,8 @@ public final class Item extends TableRow implements Editable {
                     }
                 }
             }
+
+            String thumbnailPath=get("$$thumbnail");
             
             updateShorts();
             super.save();
@@ -414,6 +416,16 @@ public final class Item extends TableRow implements Editable {
                     }
                 }
             }
+            
+            // save thumbnail
+            if (thumbnailPath!=null) {
+                try {
+                    FileTools.moveFile(thumbnailPath, getThumbnailPath());
+                } catch (Exception ex) {
+                    library.RSC.outEx(ex);
+                }
+            }
+            
             library.itemChanged(id);
             
         } catch (Exception ex) {
@@ -745,6 +757,7 @@ public final class Item extends TableRow implements Editable {
     @Override
     public void destroy(boolean deleteFilesOfAttachments) {
         if (deleteFilesOfAttachments) deleteFilesOfAttachments();
+        FileTools.deleteIfExists(getThumbnailPath());
         library.executeEX("DELETE FROM items where id="+id+";");
         // delete all links and remove Keywords/authors if no longer used, integrate into saving mechanism
         try {

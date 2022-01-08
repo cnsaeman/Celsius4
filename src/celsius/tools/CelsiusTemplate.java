@@ -5,6 +5,7 @@
  */
 package celsius.tools;
 
+import atlantis.tools.Parser;
 import celsius.Resources;
 import celsius.data.BibTeXRecord;
 import celsius.data.Item;

@@ -12,7 +12,7 @@
 package celsius.gui;
 
 import celsius.Resources;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import javax.swing.DefaultListModel;
 
 /**

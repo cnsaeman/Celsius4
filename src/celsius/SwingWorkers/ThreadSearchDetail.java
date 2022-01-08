@@ -21,7 +21,7 @@ import celsius.Resources;
 import celsius.data.Item;
 import celsius.*;
 import celsius.gui.DeepSearch;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.io.*;
 import java.text.ParseException;

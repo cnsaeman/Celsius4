@@ -6,7 +6,8 @@
 package celsius.data;
 
 import celsius.gui.Editable;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
+import celsius.tools.FileTools;
 import java.io.File;
 import java.sql.ResultSet;
 import java.text.Normalizer;
@@ -41,11 +42,28 @@ public class Person extends TableRow implements Editable {
     public void save() {
         try {
             library.RSC.out("Saving Person");
+            
+            String thumbnailPath=get("$$thumbnail");
+            
             updateShorts();
             super.save();
+            
+            // save thumbnail
+            if (thumbnailPath!=null) {
+                try {
+                    FileTools.moveFile(thumbnailPath, getThumbnailPath());
+                } catch (Exception ex) {
+                    library.RSC.outEx(ex);
+                }
+            }
+            
         } catch (Exception ex) {
             library.RSC.outEx(ex);
         }
+    }
+    
+    public void destroy() {
+        FileTools.deleteIfExists(getThumbnailPath());
     }
     
     public void loadCollaborators() {

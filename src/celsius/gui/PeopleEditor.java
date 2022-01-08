@@ -8,7 +8,7 @@ package celsius.gui;
 import celsius.Resources;
 import celsius.data.PeopleListModelDetailed;
 import celsius.data.Person;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import java.util.ArrayList;
 
 /**

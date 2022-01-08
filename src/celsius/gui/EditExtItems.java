@@ -13,7 +13,7 @@ package celsius.gui;
 
 import celsius.data.Item;
 import celsius.Resources;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.util.ArrayList;
 import javax.swing.JDialog;

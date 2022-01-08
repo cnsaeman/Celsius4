@@ -7,6 +7,9 @@
 
 package celsius;
 
+import atlantis.tools.GuiStates;
+import atlantis.tools.TextFile;
+import atlantis.tools.Parser;
 import celsius.images.Icons;
 import celsius.gui.CelsiusTable;
 import celsius.gui.MainFrame;
@@ -68,7 +71,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  */
 public class Resources {
 
-    public final String VersionNumber = "v3.99.1";
+    public final String VersionNumber = "v4.0.0";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
     public final String stdHTMLstring;
     public String HomeDirectory;
@@ -884,28 +887,24 @@ public class Resources {
         if (item == null) {
             return;
         }
-        if (!item.getS("combine").isBlank()) {
-            MF.showCombined();
+        if (item.linkedAttachments.size() > 0) {
+            configuration.view(item, 0);
         } else {
-            if (item.linkedAttachments.size()>0) {
-                configuration.view(item,0);
+            String cmdln = getJournalLinkCmd(item);
+            if (cmdln.length() > 0) {
+                out("JM>Journal link command: " + cmdln);
+                (new ExecutionShell(cmdln, 0, true)).start();
             } else {
-                String cmdln = getJournalLinkCmd(item);
-                if (cmdln.length() > 0) {
-                    out("JM>Journal link command: " + cmdln);
-                    (new ExecutionShell(cmdln, 0, true)).start();
+                if (!item.getS("url").isBlank()) {
+                    configuration.viewHTML(item.get("url"));
                 } else {
-                    if (!item.getS("url").isBlank()) {
-                        configuration.viewHTML(item.get("url"));
-                    } else {
-                        if (item.getS("links").length() > 0) {
-                            if (item.getS("links").indexOf("combines") > -1) {
-                                MF.showLinksOfType("combines");
-                            }
-                            MF.showLinksOfType("Available Links");
-                        } else {
-                            showWarning("No file or journal link associated with this entry.", "Warning");
+                    if (item.getS("links").length() > 0) {
+                        if (item.getS("links").indexOf("combines") > -1) {
+                            MF.showLinksOfType("combines");
                         }
+                        MF.showLinksOfType("Available Links");
+                    } else {
+                        showWarning("No file or journal link associated with this entry.", "Warning");
                     }
                 }
             }

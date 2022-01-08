@@ -9,6 +9,7 @@
 
 package celsius.data;
 
+import atlantis.tools.Parser;
 import celsius.Resources;
 import celsius.gui.CelsiusTable;
 import celsius.gui.SafeMessage;
@@ -465,6 +466,7 @@ public final class Library implements Iterable<Item> {
             personTableSQLTags += "," + tag;
         }
         linkTypes=configToArrayList("link-types");
+        if (linkTypes.size()==0) linkTypes.add("Links");
     }
     
     public void setStyleSheet() {
@@ -1281,9 +1283,13 @@ public final class Library implements Iterable<Item> {
 
     public void deleteCategoryNode(StructureNode node) {
         try {
+            StructureNode parent=node.parent;
             PreparedStatement statement=dbConnection.prepareStatement("DELETE FROM category_tree WHERE id = ?;");
             statement.setInt(1,node.id);
             statement.execute();
+            statement=dbConnection.prepareStatement("UPDATE category_tree SET children=? WHERE id = ?;");
+            statement.setString(1,parent.getChildListString());
+            statement.setInt(2,parent.id);
         } catch (Exception e) {
             RSC.outEx(e);
         }
@@ -1336,7 +1342,8 @@ public final class Library implements Iterable<Item> {
             if (rs.next()) {
                 int i=RSC.askQuestionYN( "Re-use existing category?", "Category name exists");
                 if (i==0) {
-                    child=new StructureNode(this,null,0); //rs.getInt(1),0);
+                    Category category=new Category(this,rs.getString(1),cat);
+                    child=new StructureNode(this,category,0);
                 }
             }
             if (child==null) {

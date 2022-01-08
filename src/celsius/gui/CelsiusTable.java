@@ -8,7 +8,7 @@ import celsius.data.CelsiusTableModel;
 import celsius.data.LibraryChangeListener;
 import celsius.data.TableRow;
 import celsius.tools.ExecutionShell;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -453,7 +453,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         if (!lsm.isSelectionEmpty()) {
             // TODO this is not correct
             String ft=getRow(getSelectedRow()).get("filetype");
-            MF.jMActions.removeAll();
+            /* TODO secondary viewers MF.jMActions.removeAll();
             MF.jMActions.setEnabled(false);
             if (ft!=null) {
                 String secondary=RSC.configuration.getSecondaryViewers(ft);
@@ -473,7 +473,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
                         MF.jMActions.add(jMI);
                     }
                 }
-            }
+            }*/
 
             updateStats();
             MF.guiInfoPanel.updateGUI();

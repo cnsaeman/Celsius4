@@ -2,9 +2,8 @@ package celsius3;
 
 import celsius.Resources;
 import celsius.tools.FileTools;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
-import celsius.tools.XMLHandler;
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
 import java.io.File;
 import java.io.FileInputStream;

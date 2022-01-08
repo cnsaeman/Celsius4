@@ -19,14 +19,14 @@ public class EditLibraryPluginPanel extends javax.swing.JPanel {
     public final Resources RSC;
     public DefaultListModel DLM;
     public final String type;
-    public final EditLibraryPlugins ELP;
+    public final EditLibrary EL;
 
     /**
      * Creates new form EditLibraryPluginPanel
      */
-    public EditLibraryPluginPanel(Resources rsc,EditLibraryPlugins elp, String t, Plugins plugins) {
+    public EditLibraryPluginPanel(Resources rsc,EditLibrary el, String t, Plugins plugins) {
         RSC=rsc;
-        ELP=elp;
+        EL=el;
         type=t;
         initComponents();
         jLTitle.setText(type);
@@ -161,7 +161,7 @@ public class EditLibraryPluginPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        String entry=ELP.getCurrentlySelectedPlugin();
+        String entry=EL.getCurrentlySelectedPlugin();
         DLM.addElement(entry);
     }//GEN-LAST:event_jBtnAddActionPerformed
 

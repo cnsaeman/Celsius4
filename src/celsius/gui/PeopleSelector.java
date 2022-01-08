@@ -8,7 +8,7 @@ package celsius.gui;
 import celsius.Resources;
 import celsius.data.Library;
 import celsius.data.PeopleListModel;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

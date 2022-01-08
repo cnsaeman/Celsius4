@@ -14,8 +14,9 @@ package celsius.gui;
 import celsius.data.KeyValueTableModel;
 import celsius.data.Library;
 import celsius.Resources;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
+import celsius.tools.Plugins;
 import celsius.tools.ToolBox;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import javax.swing.DefaultComboBoxModel;
 
 /**
@@ -35,17 +37,23 @@ public class EditLibrary extends javax.swing.JDialog {
     private final MainFrame MF;
     private final Resources RSC;
     private final KeyValueTableModel KVTM;
+    
+    private final Plugins plugins;
+    private final HashMap<String,EditLibraryPluginPanel> panels;
+    
 
     /** Creates new form DialogEditLibrary */
-    public EditLibrary(MainFrame mf, Library lib) {
-        super(mf, true);
-        MF=mf;
-        RSC=MF.RSC;
-        library=lib;
+    public EditLibrary(Resources rsc, int initiallySelected) {
+        super(rsc.MF, true);
+        RSC=rsc;
+        MF=RSC.MF;
+        plugins = RSC.plugins;
+        library=RSC.getCurrentlySelectedLibrary();
         initComponents();
         jTPEditMode.setTabComponentAt(0,new TabLabel("General settings",Resources.editTabIcon2,RSC,null,false));
         jTPEditMode.setTabComponentAt(1,new TabLabel("Templates",Resources.templateTabIcon,RSC,null,false));
         jTPEditMode.setTabComponentAt(2,new TabLabel("CSS style sheet",Resources.styleSheetTabIcon,RSC,null,false));
+        jTPEditMode.setTabComponentAt(3,new TabLabel("Plugins",Resources.pluginSetupIcon,RSC,null,false));
         KVTM=new KeyValueTableModel("Property","Value");
         for (String t : Library.LibraryEditableFields) {
             KVTM.addRow(Parser.lowerEndOfWords(t), library.config.get(t));
@@ -61,11 +69,31 @@ public class EditLibrary extends javax.swing.JDialog {
         jTATemplate.setText(library.getHTMLTemplate(0).templateString);
         jTATemplate.setFont(RSC.stdFontMono());
         jTAStyleSheet.setCaretPosition(0);
-        setPreferredSize(new Dimension(RSC.guiScale(700),RSC.guiScale(600)));
+        panels=new HashMap<>();
+        for(String type : Plugins.types) {
+            EditLibraryPluginPanel ELPP=new EditLibraryPluginPanel(MF.RSC,this,type,plugins);
+            panels.put(type,ELPP);
+            jPanel15.add(ELPP);
+        }
+        jLPlugins.setModel(plugins.getPluginsDLM());
+        
+        setPreferredSize(new Dimension(RSC.guiScale(700),RSC.guiScale(700)));
         pack();
 
-        GUIToolBox.centerDialog(this,mf);
+        GUIToolBox.centerDialog(this,MF);
+        jTPEditMode.setSelectedIndex(initiallySelected);
     }
+    
+    public String getCurrentlySelectedPlugin() {
+        return((String)jLPlugins.getSelectedValue());
+    }
+
+    public void saveModels() {
+        for (String type : Plugins.types) {
+            library.putConfig("plugins-"+type, panels.get(type).getStringList());
+        }
+    }
+    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -92,6 +120,20 @@ public class EditLibrary extends javax.swing.JDialog {
         jTAStyleSheet = new javax.swing.JTextArea();
         jPanel6 = new javax.swing.JPanel();
         jBtnApply3 = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jLPlugins = new javax.swing.JList();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTAPlugin = new javax.swing.JEditorPane();
+        jPanel17 = new javax.swing.JPanel();
+        jBtnReload = new javax.swing.JButton();
+        jBtnSave = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jBtnDone = new javax.swing.JButton();
 
@@ -101,7 +143,7 @@ public class EditLibrary extends javax.swing.JDialog {
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.setLayout(new java.awt.GridLayout());
 
         jTMain.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -118,7 +160,7 @@ public class EditLibrary extends javax.swing.JDialog {
         });
         jScrollPane1.setViewportView(jTMain);
 
-        jPanel3.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jScrollPane1);
         jScrollPane1.getAccessibleContext().setAccessibleDescription("");
 
         jTPEditMode.addTab("tab1", jPanel3);
@@ -175,6 +217,100 @@ public class EditLibrary extends javax.swing.JDialog {
 
         jTPEditMode.addTab("tab3", jPanel5);
 
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jLabel2.setText("Available Plugins:");
+
+        jLPlugins.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jLPluginsValueChanged(evt);
+            }
+        });
+        jScrollPane4.setViewportView(jLPlugins);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel8.add(jPanel9, java.awt.BorderLayout.CENTER);
+
+        jPanel14.setLayout(new java.awt.BorderLayout());
+
+        jPanel15.setLayout(new java.awt.GridLayout(3, 2, 5, 5));
+        jPanel14.add(jPanel15, java.awt.BorderLayout.NORTH);
+
+        jLabel6.setText("Selected Plugin:");
+
+        jScrollPane5.setViewportView(jTAPlugin);
+
+        javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
+        jPanel16.setLayout(jPanel16Layout);
+        jPanel16Layout.setHorizontalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel16Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel16Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel16Layout.setVerticalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel16Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel14.add(jPanel16, java.awt.BorderLayout.CENTER);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jBtnReload.setText("Reload all Plugins");
+        jBtnReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnReloadActionPerformed(evt);
+            }
+        });
+        jPanel17.add(jBtnReload);
+
+        jBtnSave.setText("Save Changes");
+        jBtnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSaveActionPerformed(evt);
+            }
+        });
+        jPanel17.add(jBtnSave);
+
+        jPanel14.add(jPanel17, java.awt.BorderLayout.SOUTH);
+
+        jPanel8.add(jPanel14, java.awt.BorderLayout.EAST);
+
+        jTPEditMode.addTab("tab4", jPanel8);
+
         jPanel1.add(jTPEditMode, java.awt.BorderLayout.CENTER);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
@@ -193,7 +329,7 @@ public class EditLibrary extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -230,6 +366,27 @@ public class EditLibrary extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jTMainMouseClicked
 
+    private void jLPluginsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLPluginsValueChanged
+        String name=(String)jLPlugins.getSelectedValue();
+        jTAPlugin.setContentType("text/html");
+        jTAPlugin.setText(plugins.getText(name));
+        jTAPlugin.setCaretPosition(0);
+        String ptype=plugins.get(name).metaData.get("type");
+        for (String type : Plugins.types) {
+            panels.get(type).jBtnAdd.setEnabled(Parser.listContains(ptype, Parser.cutUntil(type,"-")) || Parser.listContains(ptype, type));
+        }
+        if (Parser.listContains(ptype, "interactive")) panels.get("manual-items").jBtnAdd.setEnabled(true);
+    }//GEN-LAST:event_jLPluginsValueChanged
+
+    private void jBtnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnReloadActionPerformed
+        MF.reloadPlugins();
+        jLPlugins.setModel(plugins.getPluginsDLM());
+    }//GEN-LAST:event_jBtnReloadActionPerformed
+
+    private void jBtnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSaveActionPerformed
+        saveModels();
+    }//GEN-LAST:event_jBtnSaveActionPerformed
+
     public void editCurrentlySelectedKey() {
         String key = ((String) jTMain.getModel().getValueAt(jTMain.getSelectedRow(), 0));
         // standard text editor
@@ -252,17 +409,31 @@ public class EditLibrary extends javax.swing.JDialog {
     private javax.swing.JButton jBtnApply2;
     private javax.swing.JButton jBtnApply3;
     private javax.swing.JButton jBtnDone;
+    private javax.swing.JButton jBtnReload;
+    private javax.swing.JButton jBtnSave;
     private javax.swing.JComboBox jCBHTMLtemplate;
+    private javax.swing.JList jLPlugins;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JEditorPane jTAPlugin;
     private javax.swing.JTextArea jTAStyleSheet;
     private javax.swing.JTextArea jTATemplate;
     private javax.swing.JTable jTMain;

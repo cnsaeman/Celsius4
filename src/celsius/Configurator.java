@@ -6,11 +6,12 @@
 
 package celsius;
 
+import atlantis.tools.TextFile;
 import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.data.Library;
 import celsius.data.RecentLibraryCache;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.*;
 import java.io.File;
 import java.io.FileInputStream;

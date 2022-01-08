@@ -13,11 +13,12 @@
 
 package celsius.gui;
 
+import atlantis.tools.TextFile;
 import celsius.tools.Plugins;
 import celsius.tools.Plugin;
 import celsius.images.Icons;
 import celsius.Resources;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.*;
 import celsius.tools.*;
 import java.awt.event.WindowAdapter;

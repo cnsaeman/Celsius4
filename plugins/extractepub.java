@@ -1,5 +1,5 @@
 import java.io.IOException;
-import celsius.tools.*;
+import atlantis.tools.*;
 
 /*
  * tester.java
@@ -33,26 +33,19 @@ public class extractepub {
      */
     public static void main(String[] args) {
         try {
-            epubfile ef=new epubfile(args[0]);
+            EPUBFile ef=new EPUBFile(args[0]);
             out = new TextFile(args[1], false);
-            if (ef.MetaData.size()>0) {
+            if (ef.metaData.size()>0) {
                 out.putString("$$metadata");
                 out.putString("type:eBook");
-                for(epubfile.XMLentry ent : ef.MetaData) {
-                    if (ent.tag.equals("dc:title")) safeWrite("title",ent.value);
-                    if (ent.tag.equals("dc:date")) safeWrite("date",ent.value);
-                    if (ent.tag.equals("dc:publisher")) safeWrite("publisher",ent.value);
-                    if (ent.tag.equals("dc:language")) safeWrite("language",ent.value);
-                    if (ent.tag.equals("dc:subject")) safeWrite("subject",ent.value);
-                    if (ent.tag.equals("dc:abstract")) safeWrite("abstract",ent.value);
-                    if (ent.tag.equals("dc:identifier")) safeWrite("identifier",ent.value);
-                    if (ent.tag.equals("dc:description")) safeWrite("abstract",ent.value);
-                    if (ent.tag.equals("dc:creator")) {
-                        String aut=ent.getProperty("file-as");
-                        if ((aut==null) || (aut.equals(""))) aut=ent.value;
-                        safeWrite("authors",aut);
-                    }
-                }
+                safeWrite("title",ef.metaData.get("dc:title").get("value"));
+                safeWrite("date",ef.metaData.get("dc:date").get("value"));
+                safeWrite("publisher",ef.metaData.get("dc:publisher").get("value"));
+                safeWrite("language",ef.metaData.get("dc:language").get("value"));
+                safeWrite("subject",ef.metaData.get("dc:subject").get("value"));
+                safeWrite("abstract",ef.metaData.get("dc:description").get("value"));
+                safeWrite("identifier",ef.metaData.get("dc:identifier").get("value"));
+                safeWrite("authors",ef.metaData.get("dc:creator").get("value"));
                 out.putString("metadata$$");
             }
             out.putString(ef.containedText());

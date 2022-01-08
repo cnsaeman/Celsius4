@@ -11,7 +11,7 @@
 // checked: 16.09.2007
 //
 
-package celsius.tools;
+package atlantis.tools;
 
 import java.text.Normalizer;
 import java.util.regex.Pattern;

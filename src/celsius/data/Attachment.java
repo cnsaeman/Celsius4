@@ -6,7 +6,7 @@
 package celsius.data;
 
 import celsius.tools.FileTools;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.io.File;
 import java.sql.ResultSet;

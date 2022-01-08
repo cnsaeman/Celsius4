@@ -12,7 +12,7 @@
 // checked 15.09.2007
 //
 
-package celsius.tools;
+package atlantis.tools;
 
 import java.net.*;
 import java.util.Properties;

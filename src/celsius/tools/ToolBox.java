@@ -13,6 +13,8 @@
 
 package celsius.tools;
 
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import celsius.Resources;
 import celsius.data.Item;
 import java.io.*;

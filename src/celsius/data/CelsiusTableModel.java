@@ -7,7 +7,7 @@ package celsius.data;
 
 import celsius.Resources;
 import celsius.gui.CelsiusTable;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

@@ -209,58 +209,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIViewActionPerformed"/>
           </Events>
         </MenuItem>
-        <Menu class="javax.swing.JMenu" name="jMActions">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Action"/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
-          </AuxValues>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="jMShow">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Show"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMShowCombined">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Show Combined"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMShowCombinedActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMShowLinked">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Show Linked"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMShowLinkedActionPerformed"/>
-              </Events>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
-        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator30">
-        </Component>
-        <MenuItem class="javax.swing.JMenuItem" name="jMIViewPlain1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="View plain text"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIViewPlainActionPerformed"/>
-          </Events>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
-          </AuxValues>
-        </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="jMIReExtract1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Re-extract plain text"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMICreateTxtActionPerformed"/>
-          </Events>
-        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="jMIPeople2">
           <Properties>
             <Property name="text" type="java.lang.String" value="Show associated people"/>
@@ -311,14 +259,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIJoinActionPerformed"/>
-          </Events>
-        </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="jMIEditItemLinks1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Edit item links"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIEditItemLinks1ActionPerformed"/>
           </Events>
         </MenuItem>
         <Component class="javax.swing.JSeparator" name="jSeparator26">
@@ -394,16 +334,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIShowItemsActionPerformed"/>
-          </Events>
-        </MenuItem>
-        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator12">
-        </Component>
-        <MenuItem class="javax.swing.JMenuItem" name="jMIEditItemLinksForPerson1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Edit item links"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIEditItemLinksForPersonActionPerformed"/>
           </Events>
         </MenuItem>
       </SubComponents>
@@ -625,16 +555,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIShowItemsActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMIEditItemLinksForPerson">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Edit item links"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIEditItemLinksForPersonActionPerformed"/>
-              </Events>
-            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMItems">
@@ -651,48 +571,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIViewActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <Menu class="javax.swing.JMenu" name="jMShow1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Show"/>
-              </Properties>
-              <SubComponents>
-                <MenuItem class="javax.swing.JMenuItem" name="jMShowCombined1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Show Combined"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMShowCombinedActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="jMShowLinked1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Show Linked"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMShowLinkedActionPerformed"/>
-                  </Events>
-                </MenuItem>
-              </SubComponents>
-            </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="jMIViewPlain">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="View plain text"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIViewPlainActionPerformed"/>
-              </Events>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
-              </AuxValues>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMICreateTxt">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Re-extract plain text "/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMICreateTxtActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMIPeople">
@@ -745,14 +623,6 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIJoinActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMIEditItemLinks">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Edit item links"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIEditItemLinks1ActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator8">

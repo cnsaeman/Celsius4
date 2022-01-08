@@ -13,7 +13,8 @@
 
 package celsius.tools;
 
-import celsius.tools.Parser;
+import atlantis.tools.TextFile;
+import atlantis.tools.Parser;
 import java.util.ArrayList;
 
 public class ExecutionShell extends Thread {

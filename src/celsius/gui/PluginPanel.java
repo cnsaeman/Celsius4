@@ -5,7 +5,7 @@ import celsius.SwingWorkers.SWApplyPlugin;
 import celsius.SwingWorkers.SWFinalizer;
 import celsius.data.Library;
 import celsius.data.TableRow;
-import celsius.tools.HasManagedStates;
+import atlantis.tools.HasManagedStates;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
@@ -164,7 +164,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBMPluginsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMPluginsActionPerformed
-        (new EditLibraryPlugins(RSC.MF,RSC.getCurrentlySelectedLibrary())).setVisible(true);
+        (new EditLibrary(RSC,3)).setVisible(true);
     }//GEN-LAST:event_jBMPluginsActionPerformed
 
     private void jLPluginsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLPluginsValueChanged

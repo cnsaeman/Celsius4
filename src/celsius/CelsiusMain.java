@@ -13,8 +13,8 @@ import celsius.data.TableRow;
 import celsius.tools.FileTools;
 import celsius.tools.JSONParser;
 import celsius3.Library3;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,16 +75,18 @@ public class CelsiusMain {
         }*/
         
         /*try {
-            Library library=new Library("/home/cnsaeman/Celsius4/Libraries/MathsPhys",RSC);
+            Library library=new Library("/home/cnsaeman/Celsius4/Libraries/Sheet Music",RSC);
             library.dbConnection.setAutoCommit(false);
             ResultSet rs=library.executeResEX("SELECT id,path FROM attachments;");
             while (rs.next()) {
-                String fn=Parser.replace(rs.getString(2),"LD::","/home/cnsaeman/Celsius4/Libraries/MathsPhys/");
+                String fn=Parser.replace(rs.getString(2),"LD::","/home/cnsaeman/Celsius4/Libraries/Sheet Music/");
                 try {
-                    String md5=TextFile.md5checksum(fn);
+                    String md5=FileTools.md5checksum(fn);
+                    String lastUpdated=String.valueOf((Files.getLastModifiedTime(Paths.get(fn))).toMillis()/1000);
                     System.out.println(md5);
+                    System.out.println(lastUpdated);
                     if (md5!=null) {
-                        library.executeEX("UPDATE attachments SET md5=? WHERE id=?;",new String[]{md5,rs.getString(1)});
+                        library.executeEX("UPDATE attachments SET md5=?, createdTS=? WHERE id=?;",new String[]{md5,lastUpdated,rs.getString(1)});
                     }
                 } catch (Exception ex) {
                     RSC.outEx(ex);

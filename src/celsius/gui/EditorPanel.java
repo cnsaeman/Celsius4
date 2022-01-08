@@ -11,7 +11,7 @@ import celsius.data.KeyValueTableModel;
 import celsius.data.Library;
 import celsius.data.PeopleListModelDetailed;
 import celsius.data.Person;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;

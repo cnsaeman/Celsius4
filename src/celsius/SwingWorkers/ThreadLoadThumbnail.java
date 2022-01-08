@@ -6,7 +6,7 @@ package celsius.SwingWorkers;
 
 import celsius.Resources;
 import celsius.gui.Thumbnail;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.Image;
 import java.awt.RenderingHints;

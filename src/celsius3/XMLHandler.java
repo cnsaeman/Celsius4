@@ -11,8 +11,10 @@
 // checked 15.09.2007
 //
 
-package celsius.tools;
+package celsius3;
 
+import atlantis.tools.Parser;
+import atlantis.tools.TextFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -8,7 +8,7 @@ package celsius.SwingWorkers;
 import celsius.Resources;
 import celsius.data.Library;
 import celsius.tools.FileTools;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;

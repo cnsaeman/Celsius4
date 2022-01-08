@@ -6,7 +6,7 @@ package celsius.images;
 
 import celsius.CelsiusMain;
 import celsius.gui.MainFrame;
-import celsius.tools.Parser;
+import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.awt.Toolkit;
 import java.io.File;
