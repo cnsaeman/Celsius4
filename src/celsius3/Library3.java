@@ -13,6 +13,7 @@
 
 package celsius3;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius3.LibraryIterator3;

@@ -15,7 +15,7 @@ import celsius.data.KeyValueTableModel;
 import celsius.data.Library;
 import celsius.Resources;
 import celsius.data.LibraryTemplate;
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;

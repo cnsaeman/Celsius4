@@ -1,7 +1,7 @@
 package celsius.data;
 
 import celsius.gui.Editable;
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
@@ -661,37 +661,6 @@ public final class Item extends TableRow implements Editable {
                     if (!id.equals("?")) items.add(new Item(library,id));
                 }
             }
-        }
-        Collections.sort(items, new CompareItems());
-        return(items);
-    }
-
-    public ArrayList<Item> getCombined() {
-        ArrayList<Item> items = new ArrayList<>();
-        String combine=get("combine");
-        if (combine==null) return(items);
-        String[] test=combine.split("\\|");
-        String[] tag=new String[test.length];
-        String[] cond=new String[test.length];
-        for (int i=0;i<test.length;i++) {
-            tag[i]=Parser.cutUntil(test[i], ":");
-            cond[i]=Parser.cutFrom(test[i], ":");
-        }
-        for (Item item : library) {
-            boolean ok=true;
-            if (item.id==id) ok=false;
-            for (int i=0;(i<test.length) && ok;i++) {
-                String a=item.get(tag[i]);
-                if (a==null) ok=false;
-                else {
-                    if (cond[i].charAt(cond[i].length()-1)=='*') {
-                        ok=item.get(tag[i]).startsWith(cond[i].substring(0,cond[i].length()-1));
-                    } else {
-                        ok=item.get(tag[i]).equals(cond[i]);
-                    }
-                }
-            }
-            if (ok) items.add(item);
         }
         Collections.sort(items, new CompareItems());
         return(items);

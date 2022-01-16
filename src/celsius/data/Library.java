@@ -9,6 +9,7 @@
 
 package celsius.data;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import celsius.Resources;
 import celsius.gui.CelsiusTable;
@@ -27,7 +28,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.text.html.StyleSheet;
 import java.sql.*;
 
-public final class Library implements Iterable<Item> {
+public final class Library { //implements Iterable<Item> {
 
     // Library property strings
     public static final String[] LibraryFields={"name","standard-item-fields","item-table-column-fields","item-table-column-headers","item-table-column-types","item-table-column-sizes","item-autosortcolumn","person-fields","plugins-manual-items","plugins-manual-people","plugins-auto-items","plugins-import","plugins-export","filetypes","item-search-fields","person-search-fields","hide","essential-fields","item-representation","item-sort-representation","item-naming-convention","item-unique-fields","choice-fields","icon-fields","icon-dictionary","css-style","default-add-method", "item-folder"};
@@ -137,19 +138,6 @@ public final class Library implements Iterable<Item> {
         
         (new File(baseFolder)).mkdir();
         (new File(baseFolder+"information")).mkdir();
-        /*
-        XMLHandler.Create("celsiusv2.1.library", mainfile);
-        MainFile=new XMLHandler(mainfile);
-        MainFile.addEmptyElement();
-        String p=Parser.CutTill((new File(mainfile)).getCanonicalPath(),(new File(mainfile)).getName());
-        if (bd.startsWith(p)) bd=Parser.CutFrom(bd, p);
-        MainFile.put("directory",bd);
-        for (String field : RSC.LibraryFields) {
-            MainFile.put(field,RSC.LibraryTemplates.get(template).get(field));
-        }
-        MainFile.put("name",name);
-        MainFile.put("style", "LD::style.css");
-        MainFile.writeBack();*/
 
         getFieldsFromConfig();
 
@@ -1054,9 +1042,9 @@ public final class Library implements Iterable<Item> {
     }
 
 
-    public Iterator<Item> iterator() {
+    /*public Iterator<Item> iterator() {
         return(new LibraryIterator(this));
-    }
+    }*/
 
     private void fillItemTableTagsWithDefaults() {
         itemTableTags.add("type");
@@ -1440,7 +1428,7 @@ public final class Library implements Iterable<Item> {
     }
     
     public String executeInsertEX(String sql,String[] data) {
-        RSC.out("DB::"+sql);
+        RSC.out(10,"DB::"+sql);
         notifyDBInteraction();
         String out=null;
         try {

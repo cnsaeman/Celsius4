@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package celsius.tools;
+package atlantis.tools;
 
 import java.util.ArrayList;
 
@@ -47,6 +47,18 @@ public class JSONParser {
         markers.remove(markers.size()-1);
     }
     
+    public String extractStringFromTag(String tag) {
+        int i=content.indexOf("\""+tag+"\":\"");
+        if ((i>-1) && (i<upperBound)) {
+           pos=i+4+tag.length();
+           i=content.indexOf("\"",pos);
+           if (i==-1) return(null);
+           return(content.substring(pos, i));
+        } else {
+           return(null);
+        }
+    }
+
     public String extractStringFromNextTag(String tag) {
         int i=content.indexOf("\""+tag+"\":\"",pos);
         if ((i>-1) && (i<upperBound)) {

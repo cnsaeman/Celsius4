@@ -85,15 +85,19 @@ public class SWSearch extends SWListItems {
         //System.out.println("--");
         //System.out.println("Starting search with string "+search[0]);
         while (!isCancelled() && count==batchSize) {
-            String sql="SELECT "+sqlTags+" from "+sqlTable+" WHERE ("+sqlColumn+" LIKE ?)";
-            RSC.out(sql);
+            StringBuilder sql=new StringBuilder("SELECT items.*,filetype,pages from items INNER JOIN item_attachment_links ON items.id=item_id INNER JOIN attachments ON attachments.id=attachment_id WHERE (");
+            sql.append(sqlColumn);
+            sql.append(" LIKE ?)");
+            RSC.out(10,sql.toString());
             for (int i=1;i<search.length;i++) {
-                sql+=" AND ("+sqlColumn+" LIKE ?)";
+                sql.append(" AND (").append(sqlColumn).append(" LIKE ?)");
             }
-            sql+="AND id>? COLLATE NOCASE ORDER BY id LIMIT "+String.valueOf(batchSize)+";";
+            sql.append("AND items.id>? AND item_attachment_links.ord=0 COLLATE NOCASE ORDER BY id LIMIT ");
+            sql.append(String.valueOf(batchSize));
+            sql.append(";");
             count=0;
             try {
-                PreparedStatement statement= library.dbConnection.prepareStatement(sql);
+                PreparedStatement statement= library.dbConnection.prepareStatement(sql.toString());
                 statement.setString(1,"%"+search[0]+"%");
                 for (int i=1;i<search.length;i++) {
                     statement.setString(i+1,"%"+search[i]+"%");

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package celsius.tools;
+package atlantis.tools;
 
 import atlantis.tools.Parser;
 import java.io.File;

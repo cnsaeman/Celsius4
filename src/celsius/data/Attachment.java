@@ -5,7 +5,7 @@
  */
 package celsius.data;
 
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.io.File;

@@ -18,7 +18,7 @@ import celsius.data.Library;
 import celsius.Resources;
 import celsius.data.LibraryTemplate;
 import celsius.tools.FFilter;
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;
@@ -52,7 +52,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
         setIconImage(RSC.celsiusIcon);
         MF=parent;
         initComponents();
-        jTFLibDir.setText(RSC.HomeDirectory+"/Libraries/NewLibrary");
+        jTFLibDir.setText(RSC.celsiusBaseFolder+"/Libraries/NewLibrary");
         Lib=null;
         DCBM=new DefaultComboBoxModel();
         for (LibraryTemplate template : RSC.libraryTemplates)
@@ -64,7 +64,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
             public void change() {
                 if (!changed) {
                     String tmp=jTFName.getText();
-                    jTFLibDir.setText(RSC.HomeDirectory+"/Libraries/"+tmp);
+                    jTFLibDir.setText(RSC.celsiusBaseFolder+"/Libraries/"+tmp);
                 }
             }
 
@@ -195,7 +195,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
     private void jBtnselLibDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnselLibDirActionPerformed
         JFileChooser FC=new JFileChooser();
         FC.setDialogTitle("Select the directory in which the library will be located.");
-        FC.setCurrentDirectory(new File(RSC.HomeDirectory+"/Libraries"));
+        FC.setCurrentDirectory(new File(RSC.celsiusBaseFolder+"/Libraries"));
         FC.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         FC.setDialogType(JFileChooser.SAVE_DIALOG);
         FC.setFileFilter(new FFilter("_DIR","Folders"));

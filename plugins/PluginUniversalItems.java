@@ -5,7 +5,8 @@ import java.util.regex.Pattern;
 import java.net.*;
 import java.io.*;
 import celsius.data.*;
-import celsius.tools.*;
+import atlantis.tools.*;
+import celsius.tools.ToolBox;
 
 /**
  * @author cnsaeman
@@ -337,15 +338,8 @@ public class PluginUniversalItems extends Thread {
                     Msgs.add("Inspire key missing, identified as "+inspirekey);
                     item.put("inspirekey",inspirekey);
                 }
-                Msgs.add("XXI1");
-                
-                JSONParser jp=new JSONParser(inspireRecord);
-                
-                Msgs.add("XXI2");
-                
+                JSONParser jp=new JSONParser(inspireRecord);                
                 jp.moveToNextTag("authors");
-                
-                Msgs.add("XXI3");
                 ArrayList<JSONParser> authorsArray=jp.extractArray();
                 Msgs.add("XXF Found "+String.valueOf(authorsArray.size())+" authors");
                 String authors = "";
@@ -357,7 +351,7 @@ public class PluginUniversalItems extends Thread {
                     if (ref!=null) {
                         inspirekey=Parser.cutFrom(ref, "https://inspirehep.net/api/authors/");
                     }
-                    String fullname = author.extractStringFromNextTag("full_name");
+                    String fullname = author.extractStringFromTag("full_name");
                     authors += "|" + fullname;
                     if (bai!=null) {
                         authors += "#inspirebai::" + bai;

@@ -1,8 +1,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.*;
 import celsius.data.*;
 
 

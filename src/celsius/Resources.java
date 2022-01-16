@@ -7,6 +7,7 @@
 
 package celsius;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.GuiStates;
 import atlantis.tools.TextFile;
 import atlantis.tools.Parser;
@@ -71,10 +72,9 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  */
 public class Resources {
 
-    public final String VersionNumber = "v4.0.0";
+    public final String VersionNumber = "v4.0.1";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
     public final String stdHTMLstring;
-    public String HomeDirectory;
     
     public TextFile logFile;
     public int logLevel; // 0 : standard stuff, 10: all database interactions, 20: everything
@@ -116,7 +116,7 @@ public class Resources {
     public final ArrayList<CelsiusTable> celsiusTables;
 
     public ArrayList<Library> libraries;
-    public int currentLib;
+    public int currentLibrary;
 
     public HashMap<String, String> shortCuts; // list of shortcuts, implemented in this way to allow for shortcut editor later
     public HashMap<String,String> journalLinks;
@@ -156,10 +156,9 @@ public class Resources {
         guiNotify=true;
         displayHidden=false;
         stdHTMLstring=createstdHTMLstring();
-        HomeDirectory = Parser.cutUntil((new File(".")).getAbsolutePath(), "/.");
         libraryTemplates = new ArrayList<>();
         celsiusTables = new ArrayList<>();
-        currentLib = -1;
+        currentLibrary = -1;
         libraries = new ArrayList<>();
         journalLinks = new HashMap<>();
         guiStates=new GuiStates();
@@ -275,12 +274,12 @@ public class Resources {
     }
 
     public Library getCurrentlySelectedLibrary() {
-        if (currentLib==-1) return(null);
-        return(libraries.get(currentLib));
+        if (currentLibrary==-1) return(null);
+        return(libraries.get(currentLibrary));
     }
 
     public int getCurrentlySelectedLibNo() {
-        return(currentLib);
+        return(currentLibrary);
     }
 
     public CelsiusTable getCurrentTable() {
@@ -334,8 +333,8 @@ public class Resources {
 
     public void close() {
         configuration.writeBackLibraryStatus();
-        for (Library Lib : libraries)
-            Lib.close();
+        for (Library library : libraries)
+            library.close();
         try {
             out();
             out("RES>Application closed at: " + ToolBox.getCurrentDate());
@@ -353,27 +352,27 @@ public class Resources {
     }
 
     public void loadLibrary(String fileName,boolean remember) {
-        final Library NewLib = new Library(fileName, this);
-        if (NewLib.name.equals("??##cancelled")) return;
-        if (NewLib.name.startsWith("??#$")) return;
-        if (NewLib.name.startsWith("??##")) {
-            if (NewLib.currentStatus==20) {
+        final Library library = new Library(fileName, this);
+        if (library.name.equals("??##cancelled")) return;
+        if (library.name.startsWith("??#$")) return;
+        if (library.name.startsWith("??##")) {
+            if (library.currentStatus==20) {
                 (new SafeMessage("Error loading library, library " + fileName + " is locked. Library has not been opened.", "Error", 0)).showMsg();
             } else {
-                (new SafeMessage("Error loading library, library " + fileName + " has not been loaded:\n" + ToolBox.stripError(NewLib.name), "Warning:", 0)).showMsg();
+                (new SafeMessage("Error loading library, library " + fileName + " has not been loaded:\n" + ToolBox.stripError(library.name), "Warning:", 0)).showMsg();
             }
         } else {
-            if (NewLib.currentStatus==10) {
-                (new SafeMessage("The library "+NewLib.name+" may be out of synch. Please sychnronize it as soon as possible.", "Warning:", 0)).showMsg();
+            if (library.currentStatus==10) {
+                (new SafeMessage("The library "+library.name+" may be out of synch. Please sychnronize it as soon as possible.", "Warning:", 0)).showMsg();
             }
-            libraries.add(NewLib);
-            if (remember) configuration.libraryOpened(NewLib);
+            libraries.add(library);
+            if (remember) configuration.libraryOpened(library);
             for (Component cmp : MF.jMRecent.getMenuComponents()) {
-                if (((JMenuItem) cmp).getText().equals(NewLib.name)) {
+                if (((JMenuItem) cmp).getText().equals(library.name)) {
                     MF.jMRecent.remove(cmp);
                 }
             }
-            MF.addLib(NewLib);
+            MF.addLib(library);
             out("RSC>Library " + getCurrentlySelectedLibrary().name + " loaded.");
         }
     }

@@ -13,6 +13,7 @@
 
 package celsius.gui;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.TextFile;
 import celsius.tools.Plugins;
 import celsius.tools.Plugin;

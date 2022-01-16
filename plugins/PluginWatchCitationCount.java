@@ -8,8 +8,7 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import celsius.tools.Parser;
-import celsius.tools.TextFile;
+import atlantis.tools.*;
 import celsius.tools.ToolBox;
 import celsius.data.*;
 

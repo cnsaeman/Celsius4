@@ -20,7 +20,7 @@ import celsius.data.Attachment;
 import celsius.data.DoubletteResult;
 import celsius.data.LibraryChangeListener;
 import celsius.tools.FFilter;
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.HasManagedStates;
 import atlantis.tools.Parser;
 import celsius.tools.Plugin;
@@ -178,7 +178,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         preparedItems.add(item);
         if (jTPane.getSelectedIndex()==0) {
             if (fileName.length() > 52) {
-                fileName = fileName.substring(0, 20) + "..." + fileName.substring(fileName.length() - 29);
+                fileName = fileName.substring(0, 20) + "..." + fileName.substring(fileName.length() - 49);
             }
             ((DefaultListModel) jLstFileList.getModel()).addElement(fileName);
         }
@@ -1439,7 +1439,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     }
                 }
                 if (doubletteResult.type == 100) {
-                    int j = RSC.askQuestionYNC("File with exactly the same size found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
+                    int j = RSC.askQuestionYNC("Item with overlapping unique fields found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
                     if (j == JOptionPane.YES_OPTION) toDelete.add(item);
                     if (j == JOptionPane.CANCEL_OPTION) return;
                 }

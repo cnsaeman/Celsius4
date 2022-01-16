@@ -6,6 +6,7 @@
 
 package celsius.gui;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import celsius.data.Library;
 import celsius.data.BibTeXRecord;
@@ -180,7 +181,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jPMHTML = new javax.swing.JPopupMenu();
         jMIEditDS1 = new javax.swing.JMenuItem();
@@ -518,7 +518,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
         jPLinks.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout());
+        jPanel5.setLayout(new java.awt.GridLayout(1, 0));
 
         jLLinkedItems.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -592,7 +592,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 833, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -669,7 +669,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addContainerGap(767, Short.MAX_VALUE))
+                .addContainerGap(569, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -688,7 +688,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 871, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1715,7 +1715,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         addLinkSQL = "INSERT INTO item_item_links (item1_id,item2_id) VALUES (?,?)";
         removeLinkSQL = "DELETE FROM item_item_links WHERE item1_id=? AND item2_id IN (?);";
         setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
-        jBtnAdd.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
+        jBtnAdd1.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
     }
 
     private void updatePersonLinks() {
@@ -1728,7 +1728,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         addLinkSQL = "INSERT INTO person_item_links (person_id,item_id) VALUES (?,?)";
         removeLinkSQL = "DELETE FROM person_item_links WHERE person_id=? AND item_id IN (?);";
         setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
-        jBtnAdd.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
+        jBtnAdd1.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
     }
     
 

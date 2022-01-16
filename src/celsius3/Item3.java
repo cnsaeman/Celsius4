@@ -1,7 +1,7 @@
 package celsius3;
 
 import celsius.Resources;
-import celsius.tools.FileTools;
+import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;

@@ -13,6 +13,7 @@
 //
 package celsius.gui;
 
+import atlantis.tools.FileTools;
 import atlantis.tools.HasManagedStates;
 import atlantis.tools.TextFile;
 import celsius.SwingWorkers.SWFinalizer;
@@ -283,16 +284,16 @@ public class MainFrame extends javax.swing.JFrame implements
         }
         
         // switch to currently selected or other library
-        if (Lib==null) RSC.currentLib=jCBLibraries.getSelectedIndex();
-        else RSC.currentLib=RSC.libraries.indexOf(Lib);
+        if (Lib==null) RSC.currentLibrary=jCBLibraries.getSelectedIndex();
+        else RSC.currentLibrary=RSC.libraries.indexOf(Lib);
         
-        if (RSC.currentLib==-1) {
+        if (RSC.currentLibrary==-1) {
             RSC.guiStates.adjustState("mainFrame","librarySelected", false);
             return;
         }
         RSC.guiStates.adjustState("mainFrame", "librarySelected", true);
-        if (RSC.currentLib!=jCBLibraries.getSelectedIndex())
-            jCBLibraries.setSelectedIndex(RSC.currentLib);
+        if (RSC.currentLibrary!=jCBLibraries.getSelectedIndex())
+            jCBLibraries.setSelectedIndex(RSC.currentLibrary);
         StructureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         updateStatusBar(true);
         RSC.plugins.updateExportPlugins();
@@ -2628,7 +2629,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
     
     public boolean closeCurrentLibrary(boolean rememberLib) {
-        if (RSC.currentLib==-1) return(false);
+        if (RSC.currentLibrary==-1) return(false);
         final Library library=RSC.getCurrentlySelectedLibrary();
         int CSL=RSC.getCurrentlySelectedLibNo();
         // Remove all RSC.DocumentTables corresponding to library library
@@ -2718,7 +2719,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
      * content should be analyzed.
      */
     public void updateStatusBar(final boolean pagenumber) {
-        if (RSC.currentLib==-1) {
+        if (RSC.currentLibrary==-1) {
             jLStatusBar.setText("No Library loaded.");
             return;
         }
