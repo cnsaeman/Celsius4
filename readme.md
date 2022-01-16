@@ -1,22 +1,18 @@
-## Note
+## Installation
 
-This is still an alpha version (3.99.1), it is not fully functional yet.
-
-In the dist/ folder, you find a compiled, standalone version (the .jar file). It runs on Java 15. 
-
-After installing java and downloading the .jar file, you can start it with java -jar Celsius.jar.
-
-The source code is set up to be edited with Netbeans version >12 and OpenJDK 15.
+Please download the latest release from GitHub and unpack it in a folder. After installing java, you can start Celsius it with java -jar Celsius4.jar.
 
 ## Introduction
 
-Celsius is an open source bibliographic tool and document manager. It can handle all kinds of electronic documents, from scientific papers to eBooks. Via extendible plugins, it can interface with online databases and automatically retrieve metadata. Its speciality, however, remain papers and interfacing with the bibliographic databases in the area of high-energy physics and mathematics. The standard plugins it comes with interface with arXiv.org and inspirehep.net.
+Celsius is an open source bibliographic tool and document manager. It can handle all kinds of electronic documents, from scientific papers to eBooks. Via extendable plugins, it can interface with online databases and automatically retrieve metadata. Its specialty, however, remain papers and interfacing with the bibliographic databases in the area of high-energy physics and mathematics. The standard plugins it comes with interface with arXiv.org and inspirehep.net.
 
 Celsius is written in JAVA 15 and runs on any modern operating system. It is released under the GPL, and you're welcome to download the source and adjust it to your needs. Feedback, code improvements and additional plugins are highly welcome! 
 
 Celsius 4 is a rewrite of Celsius 3, moving the underlying database structure from something homegrown to sqlite. This brings vast improvements in speed and allows for many new features. People/authors are now treated fully separately from items/papers, and they are identified by various properties beyond their name. 
 
 Celsius 3 had grown rather organically from very old sources, some more than 15 years old. The code here has been comprehensively refactored to be more uniform and to adhere to reasonable coding standards. Comments are still scarce, but I hope the situation improves with time. If you need help with implementing an interesting feature, just send me an email.
+
+The source code is set up to be edited with Netbeans version >12 and OpenJDK 15.
 
 ![Alt text](http://www.christiansaemann.de/celsius/screenshot1.png "Optional title")
 
@@ -48,11 +44,9 @@ The software comes with all the essential features of a bibliographic data manag
 
 ## Downloads
 
-Android version: http://www.christiansaemann.de/celsius/TCelsius.apk
-Manual: see the file manual.pdf in the root folder on GitHub.
-Precompiled: see the dist/ folder on GitHub for now.
-
-For more details, have a look at the manual that can be downloaded above.
+Precompiled: see the releases on GitHub for now.
+Manual: see the file manual.pdf in the root folder on GitHub. This still needs considerable work.
+A compatible Android version is being tested at the moment and will be released very soon.
 
 ## Credits
 
