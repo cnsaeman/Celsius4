@@ -85,16 +85,13 @@ public class SWSearch extends SWListItems {
         //System.out.println("--");
         //System.out.println("Starting search with string "+search[0]);
         while (!isCancelled() && count==batchSize) {
-            StringBuilder sql=new StringBuilder("SELECT items.*,filetype,pages from items INNER JOIN item_attachment_links ON items.id=item_id INNER JOIN attachments ON attachments.id=attachment_id WHERE (");
-            sql.append(sqlColumn);
-            sql.append(" LIKE ?)");
-            RSC.out(10,sql.toString());
-            for (int i=1;i<search.length;i++) {
+            StringBuilder sql=new StringBuilder();
+            sql.append("SELECT ").append(sqlTags).append(" from ").append(sqlTable).append(" WHERE (").append(sqlColumn).append(" LIKE ?)");
+            RSC.out(sql.toString());
+            for (int i = 1; i < search.length; i++) {
                 sql.append(" AND (").append(sqlColumn).append(" LIKE ?)");
             }
-            sql.append("AND items.id>? AND item_attachment_links.ord=0 COLLATE NOCASE ORDER BY id LIMIT ");
-            sql.append(String.valueOf(batchSize));
-            sql.append(";");
+            sql.append("AND id>? COLLATE NOCASE ORDER BY id LIMIT ").append(String.valueOf(batchSize)).append(";");
             count=0;
             try {
                 PreparedStatement statement= library.dbConnection.prepareStatement(sql.toString());

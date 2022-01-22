@@ -130,6 +130,7 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
     }
     
     public void startSearch(String srch,int mode) {
+        RSC.MF.clearCategorySelection();
         CelsiusTable cels=RSC.getCurrentTable();
         int tableType=CelsiusTable.TABLETYPE_ITEM_SEARCH;
         if (mode==2) tableType=CelsiusTable.TABLETYPE_PERSON_SEARCH;

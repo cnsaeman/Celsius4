@@ -374,9 +374,11 @@ public class PluginUniversalItems extends Thread {
                     String ref=jp.extractStringFromNextTag("$ref");
                     refs+="|inspirekey:"+ref.substring(38);
                 }
-                refs=refs.substring(1);
+                if (refs.length()>1) {
+                    refs=refs.substring(1);
+                    putS("references",refs);
+                }
                 jp.releaseLevel();
-                putS("references",refs);
 
                 jp.moveToFirstTag("keywords");
                 jp.restrictLevel();

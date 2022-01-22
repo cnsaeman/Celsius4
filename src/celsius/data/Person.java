@@ -12,6 +12,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -138,6 +139,7 @@ public class Person extends TableRow implements Editable {
 
     public ArrayList<String> getEditableFields() {
         ArrayList<String> fields=new ArrayList<>();
+        fields.addAll(Arrays.asList(library.personEditFields));
         for (String field : getFields()) {
             if (!fields.contains(field) && !field.startsWith("$")) fields.add(field);
         }

@@ -72,7 +72,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  */
 public class Resources {
 
-    public final String VersionNumber = "v4.0.1";
+    public final String VersionNumber = "v4.0.2";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
     public final String stdHTMLstring;
     

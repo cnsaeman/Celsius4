@@ -70,6 +70,8 @@ public final class Library { //implements Iterable<Item> {
     public String baseFolder;
     public String[] itemSearchFields;
     public String[] personSearchFields;
+    public String[] itemEditFields;
+    public String[] personEditFields;
     public ArrayList<String> hideFunctionality;
     public ArrayList<String> linkedFields;
     public ArrayList<String> linkTypes;
@@ -335,6 +337,8 @@ public final class Library { //implements Iterable<Item> {
         }
         itemSearchFields=ToolBox.stringToArray(config.get("item-search-fields"));
         personSearchFields=ToolBox.stringToArray(config.get("person-search-fields"));
+        itemEditFields=ToolBox.stringToArray(config.get("item-edit-fields"));
+        personEditFields=ToolBox.stringToArray(config.get("person-edit-fields"));
         initTablePresets();
     }
 

@@ -2865,6 +2865,10 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             //
         }
     }
+
+    public void clearCategorySelection() {
+        jTStructureTree.clearSelection();
+    }
     
 }
 

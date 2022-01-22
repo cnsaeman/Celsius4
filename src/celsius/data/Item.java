@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -834,8 +835,9 @@ public final class Item extends TableRow implements Editable {
     
     public ArrayList<String> getEditableFields() {
         ArrayList<String> fields=new ArrayList<>();
+        fields.addAll(Arrays.asList(library.itemEditFields));
         for (String key : library.itemPropertyKeys) {
-            fields.add(key);
+            if (!fields.contains(key)) fields.add(key);
         }
         for (String key : library.configToArray("standard-item-fields")) {
             if (!fields.contains(key)) fields.add(key);
