@@ -44,9 +44,9 @@ The software comes with all the essential features of a bibliographic data manag
 
 ## Downloads
 
-Precompiled: see the releases on GitHub for now.
-Manual: see the file manual.pdf in the root folder on GitHub. This still needs considerable work.
-A compatible Android version is being tested at the moment and will be released very soon.
+* Precompiled: see the releases on GitHub for now.
+* Manual: see the file manual.pdf in the root folder on GitHub. This still needs considerable work.
+* A compatible Android version is available [here](https://github.com/cnsaeman/Celsius4forAndroid)
 
 ## Credits
 
