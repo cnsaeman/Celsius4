@@ -21,7 +21,7 @@ import celsius.data.DoubletteResult;
 import celsius.data.LibraryChangeListener;
 import celsius.tools.FFilter;
 import atlantis.tools.FileTools;
-import atlantis.tools.HasManagedStates;
+import atlantis.gui.HasManagedStates;
 import atlantis.tools.Parser;
 import celsius.tools.Plugin;
 import atlantis.tools.TextFile;

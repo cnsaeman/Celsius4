@@ -148,28 +148,25 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public void updateThumb() {
         if (celsiusTable==null) return;
         if (jPThumb.isVisible()) {
-            // TODO Person Thumb
-            Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
-            if (currentItem!=null) {
-                String thumbPath=currentItem.getThumbnailPath();
-                if (thumbPath!=null) {
-                    jBtnResizeThumb.setEnabled(true);
-                    jBtnRemoveThumb.setEnabled(true);
-                    try {
-                        jLIcon.setIcon(new ImageIcon(new URL("file://"+thumbPath)));
-                    } catch (Exception e) {
-                        RSC.outEx(e);
+            TableRow currentRow=celsiusTable.getCurrentlySelectedRow();
+            if (currentRow!=null) {
+                if (currentRow.hasThumbnail()) {
+                    String thumbPath = currentRow.getThumbnailPath();
+                    if (thumbPath != null) {
+                        jBtnResizeThumb.setEnabled(true);
+                        jBtnRemoveThumb.setEnabled(true);
+                        try {
+                            jLIcon.setIcon(new ImageIcon(new URL("file://" + thumbPath)));
+                            return;
+                        } catch (Exception e) {
+                            RSC.outEx(e);
+                        }
                     }
-                } else {
-                    jBtnResizeThumb.setEnabled(false);
-                    jBtnRemoveThumb.setEnabled(false);
-                    jLIcon.setIcon(null);
                 }
-            } else {
-                jBtnResizeThumb.setEnabled(false);
-                jBtnRemoveThumb.setEnabled(false);
-                jLIcon.setIcon(null);
             }
+            jBtnResizeThumb.setEnabled(false);
+            jBtnRemoveThumb.setEnabled(false);
+            jLIcon.setIcon(null);
         }
     }
     
@@ -592,7 +589,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -669,7 +666,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addContainerGap(569, Short.MAX_VALUE))
+                .addContainerGap(606, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -688,7 +685,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -964,15 +961,15 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 }//GEN-LAST:event_jPThumbComponentShown
 
     private void jBtnResizeThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnResizeThumbActionPerformed
-        Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
+        TableRow currentRow=celsiusTable.getCurrentlySelectedRow();
         try {
-            String target = currentItem.getThumbnailPath();
+            String target = currentRow.getThumbnailPath();
             BufferedImage bf = ImageIO.read(new File(target));
-            System.out.println(bf.getWidth());
+            //System.out.println(bf.getWidth());
             int w = bf.getWidth();
             int h = bf.getHeight();
-            System.out.println(w);
-            System.out.println(h);
+            //System.out.println(w);
+            //System.out.println(h);
             double rx = (240+0.001) / w;
             double ry = (240+0.001) / h;
             double r = rx;
@@ -987,7 +984,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             String targetname=target;
             if (!target.endsWith("png"))
                targetname+=".png";
-            System.out.println(targetname);
             ImageIO.write(img, "png", new File(targetname));
             if (!target.equals(targetname))
                 FileTools.deleteIfExists(target);
@@ -1321,14 +1317,15 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 addToPanel("Attachments",Resources.attachmentsTabIcon,jPAttachments);
                 addToPanel("Sources",Resources.sourcesTabIcon,jPSources);
                 addToPanel("Links",Resources.linksTabIcon,jPLinks);
-                if (!library.hideFunctionality.contains("Tab:Thumbnail")) addToPanel("Image", Resources.thumbTabIcon,jPThumb);
                 addToPanel("Edit",Resources.editTabIcon,jPEdit);
+                if (!library.hideFunctionality.contains("Tab:Thumbnail")) addToPanel("Image", Resources.thumbTabIcon,jPThumb);
                 addToPanel("Internal",Resources.internalTabIcon,jPItemRaw);
                 break;
             case InformationPanel.TabMode_PERSON:
                 addToPanel("Summary",Resources.infoTabIcon,jSP3);
                 addToPanel("Remarks",Resources.remarksTabIcon,jPRemarks);
                 addToPanel("Edit",Resources.editTabIcon,jPEdit);
+                if (!library.hideFunctionality.contains("Tab:Thumbnail")) addToPanel("Image", Resources.thumbTabIcon,jPThumb);
                 addToPanel("Internal",Resources.internalTabIcon,jPItemRaw);
                 break;
             case InformationPanel.TabMode_CATEGORY:
@@ -1498,6 +1495,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jTARaw1.setText(person.getRawData());
         jTARaw1.setCaretPosition(0);
         updatePersonLinks();
+        updateThumb();
     }
 
     private void guiToSingleItem() {
@@ -1599,8 +1597,8 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             System.out.println("Drop2");
             dtde.acceptDrop(dtde.getDropAction());
             try {
-                Item currentItem = (Item) celsiusTable.getCurrentlySelectedRow();
-                String target = currentItem.getThumbnailPath();
+                TableRow currentRow = celsiusTable.getCurrentlySelectedRow();
+                String target = currentRow.getThumbnailPath();
                 if (dtde.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     System.out.println("Drop3:"+dtde.getTransferable().getTransferData(DataFlavor.imageFlavor).toString());
                     Image image = (Image) dtde.getTransferable().getTransferData(DataFlavor.imageFlavor);
@@ -1611,9 +1609,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     bg.drawImage(image, 0, 0, null);
                     bg.dispose();
                     if (ImageIO.write(bufferedImage, "jpeg", new File(target))) {
-                        currentItem.save();
+                        currentRow.save();
                     } else {
-                        RSC.out("Saving jpge failed!");
+                        RSC.out("Saving jpeg failed!");
                     }
                 } else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                     System.out.println("Drop4:"+dtde.getTransferable().getTransferData(DataFlavor.stringFlavor).toString());
@@ -1621,13 +1619,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     if ((new File(path)).exists()) {
                         System.out.println("Drop42:copy");
                         FileTools.copyFile(path, target);
-                        currentItem.save();
+                        currentRow.save();
                     }
                 }
                 updateGUI();
-            } catch (UnsupportedFlavorException ex) {
-                RSC.outEx(ex);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 RSC.outEx(ex);
             }
         }
@@ -1639,7 +1635,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             if (t == null) {
                 return (false);
             }
-            if (tabMode != InformationPanel.TabMode_ITEM) {
+            if ((tabMode != InformationPanel.TabMode_ITEM) && (tabMode != InformationPanel.TabMode_PERSON)) {
                 return (false);
             }
             ret=true;

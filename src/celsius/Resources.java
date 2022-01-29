@@ -7,8 +7,9 @@
 
 package celsius;
 
+import atlantis.tools.FillPainter;
 import atlantis.tools.FileTools;
-import atlantis.tools.GuiStates;
+import atlantis.gui.GuiStates;
 import atlantis.tools.TextFile;
 import atlantis.tools.Parser;
 import celsius.images.Icons;
@@ -77,6 +78,7 @@ public class Resources {
     public final String stdHTMLstring;
     
     public TextFile logFile;
+    public static final String logFileName="celsius.log";
     public int logLevel; // 0 : standard stuff, 10: all database interactions, 20: everything
     
     public ScheduledExecutorService executorService;
@@ -106,10 +108,7 @@ public class Resources {
     public static final String styleSheetTabIcon="iconmonstr-construction-35.svg.16";
 
     public static final String pluginSetupIcon="iconmonstr-wrench-10.svg.16";
-    
-    public static final String logFileName="celsius.log";
-
-    
+        
     public MainFrame MF;
     public InformationPanel guiInformationPanel;
 
@@ -527,14 +526,14 @@ public class Resources {
         // Below: Adjust font sizes for menus etc.
         // For some reaons, the ofnt for menu change itself doesn't work, done manually in MainFrame.java
         UIDefaults defaults = UIManager.getDefaults();
-        UIManager.getDefaults().put("MenuBar:Menu[Selected].backgroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("MenuBar:Menu[Selected].backgroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
         UIManager.getDefaults().put("MenuBar:Menu[Enabled].textForeground",new Color(0,0,0));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Finished].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Indeterminate].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Finished].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Indeterminate].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled].foregroundPainter",new celsius.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled+Finished].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled+Indeterminate].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled+Finished].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled+Indeterminate].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
         final FontUIResource fnt11 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(11)));
         final FontUIResource fnt12 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(12)));
         // Set all fonts to 12
@@ -582,7 +581,7 @@ public class Resources {
         final ColorUIResource blue1 = new ColorUIResource(new Color(61,174,233));
         final ColorUIResource blue2 = new ColorUIResource(new Color(115,164,209));
         final ColorUIResource black = new ColorUIResource(new Color(0,0,0));
-        final FillPainter bluePainter = new celsius.tools.FillPainter(blue1);
+        final FillPainter bluePainter = new atlantis.tools.FillPainter(blue1);
         // adjust colors
         String[] grey=new String[] {"nimbusBase","nimbusBlueGrey","control"};
         for (String col : grey) { laf.getDefaults().put(col,baseGrey); }

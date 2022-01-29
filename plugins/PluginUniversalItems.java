@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.net.*;
 import java.io.*;
 import celsius.data.*;
 import atlantis.tools.*;
@@ -569,6 +568,12 @@ public class PluginUniversalItems extends Thread {
             BTR.entrySet().removeIf(e -> blank(e.getValue()));
             // Write, if minimum of information.
             normalizeBTRJournal();
+            // normalize JHEP
+            if ("JHEP".equals(BTR.get("journal"))) {
+                if ((BTR.get("volume").length()==2) && (BTR.get("year").length()==4)) {
+                    BTR.put("volume", BTR.get("year").substring(2,4)+BTR.get("volume"));
+                }
+            }
             Msgs.add("Thinking about writing BTR...");
             if (!blank(BTR.get("author")) && !blank(BTR.get("title"))) {
                 Msgs.add("Entered...");

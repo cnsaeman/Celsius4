@@ -1,16 +1,6 @@
-//
-// Celsius Library System
-// (w) by C. Saemann
-//
-// TextDatei.java
-//
-// This class contains the basic textfile routines used by the XML-engines and
-// Celsius.
-//
-// typesafe
-//
-// checked 15.09.2007
-//
+/*
+ Atlantis Software tools package
+*/
 
 package atlantis.tools;
 
@@ -25,7 +15,7 @@ import java.util.zip.*;
 
 // to be cleaned
 
-public class TextFile {
+public class TextFile implements AutoCloseable {
     private boolean VWrite;               // not (read only)
     private String VName;                 // file name
     private int line;                     // current line in file

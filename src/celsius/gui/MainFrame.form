@@ -320,6 +320,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIMergeActionPerformed"/>
           </Events>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIDeletePerson">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Delete person"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIDeletePersonActionPerformed"/>
+          </Events>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="jMIRemoveFromTable">
           <Properties>
             <Property name="text" type="java.lang.String" value="Remove from current table"/>
@@ -533,10 +541,18 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jMIMerge1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Merge People"/>
+                <Property name="text" type="java.lang.String" value="Merge people"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIMerge1ActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMIDeletePerson1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delete person"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIDeletePersonActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMIRemoveFromTable2">

@@ -1,15 +1,6 @@
-//
-// Celsius Library System
-// (w) by C. Saemann
-//
-// Parser.java
-//
-// This class contains the routines for parsing text.
-//
-// typesafe
-//
-// checked: 16.09.2007
-//
+/*
+ Atlantis Software tools package
+*/
 
 package atlantis.tools;
 

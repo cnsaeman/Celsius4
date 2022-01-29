@@ -14,7 +14,7 @@
 package celsius.gui;
 
 import celsius.Resources;
-import celsius.tools.ToolBox;
+import celsius.gui.GUIToolBox;
 
 /**
  *

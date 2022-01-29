@@ -1,20 +1,13 @@
-//
-// Celsius Library System v2
-// (w) by C. Saemann
-//
-// MainFrame.java
-//
-// This class contains the main frame and the main class of the Celsius Library System
-//
-// typesafe
-//
-// ##checked 15.09.2007
-// adjusted for long authors
-//
+/*
+
+ Celsius MainFrame Class - Atlantis Software 
+
+*/
+
 package celsius.gui;
 
 import atlantis.tools.FileTools;
-import atlantis.tools.HasManagedStates;
+import atlantis.gui.HasManagedStates;
 import atlantis.tools.TextFile;
 import celsius.SwingWorkers.SWFinalizer;
 import celsius.SwingWorkers.SWApplyPlugin;
@@ -413,6 +406,7 @@ public class MainFrame extends javax.swing.JFrame implements
         buttonGroup3 = new javax.swing.ButtonGroup();
         jPMPeopleTable = new javax.swing.JPopupMenu();
         jMIMerge = new javax.swing.JMenuItem();
+        jMIDeletePerson = new javax.swing.JMenuItem();
         jMIRemoveFromTable = new javax.swing.JMenuItem();
         jMIShowItems1 = new javax.swing.JMenuItem();
         jPanel5 = new javax.swing.JPanel();
@@ -477,6 +471,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jMICloseTab = new javax.swing.JMenuItem();
         jMPeople = new javax.swing.JMenu();
         jMIMerge1 = new javax.swing.JMenuItem();
+        jMIDeletePerson1 = new javax.swing.JMenuItem();
         jMIRemoveFromTable2 = new javax.swing.JMenuItem();
         jMIShowItems = new javax.swing.JMenuItem();
         jMItems = new javax.swing.JMenu();
@@ -762,6 +757,14 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMPeopleTable.add(jMIMerge);
+
+        jMIDeletePerson.setText("Delete person");
+        jMIDeletePerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIDeletePersonActionPerformed(evt);
+            }
+        });
+        jPMPeopleTable.add(jMIDeletePerson);
 
         jMIRemoveFromTable.setText("Remove from current table");
         jMIRemoveFromTable.addActionListener(new java.awt.event.ActionListener() {
@@ -1184,13 +1187,21 @@ public class MainFrame extends javax.swing.JFrame implements
 
         jMPeople.setText("People");
 
-        jMIMerge1.setText("Merge People");
+        jMIMerge1.setText("Merge people");
         jMIMerge1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMIMerge1ActionPerformed(evt);
             }
         });
         jMPeople.add(jMIMerge1);
+
+        jMIDeletePerson1.setText("Delete person");
+        jMIDeletePerson1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIDeletePersonActionPerformed(evt);
+            }
+        });
+        jMPeople.add(jMIDeletePerson1);
 
         jMIRemoveFromTable2.setText("Remove from current table");
         jMIRemoveFromTable2.addActionListener(new java.awt.event.ActionListener() {
@@ -2166,6 +2177,20 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         itemSelection.addAll(RSC.getCurrentTable().getSelectedRows());
         RSC.lastItemSelection=itemSelection;
     }//GEN-LAST:event_jMIRememberSelectedItemsActionPerformed
+
+    private void jMIDeletePersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIDeletePersonActionPerformed
+        Person person=RSC.getCurrentlySelectedPerson();
+        if (person.hasLinkedItems()) {
+            RSC.showInformation("Cannot delete person", "The currently selected person still has linked items in the library. Cancelling.");
+        } else {
+            int i=RSC.askQuestionOC("Should the person "+person.toText(false)+" really be deleted?","Confirm");
+            if (i==JOptionPane.YES_OPTION) {
+                String id=person.id;
+                person.destroy();
+                RSC.getCurrentlySelectedLibrary().personChanged(id);
+            }
+        }
+    }//GEN-LAST:event_jMIDeletePersonActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2216,6 +2241,8 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIDeleteFile;
     private javax.swing.JMenuItem jMIDeleteFile1;
     private javax.swing.JMenuItem jMIDeleteLib;
+    private javax.swing.JMenuItem jMIDeletePerson;
+    private javax.swing.JMenuItem jMIDeletePerson1;
     public javax.swing.JMenuItem jMIEditDS;
     private javax.swing.JMenuItem jMIEditLib;
     private javax.swing.JMenuItem jMIEditLibTemplates;

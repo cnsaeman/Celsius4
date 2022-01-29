@@ -1,7 +1,8 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
+ Celsius Main Class - Atlantis Software 
+
+*/
 
 package celsius;
 
@@ -15,6 +16,8 @@ import atlantis.tools.JSONParser;
 import celsius3.Library3;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,8 +27,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JLabel;
 
 /**
  *
@@ -97,6 +102,23 @@ public class CelsiusMain {
         } catch (Exception ex) {
             RSC.outEx(ex);
         }*/
+        /*GraphicsEnvironment ge = GraphicsEnvironment
+                .getLocalGraphicsEnvironment();
+
+        Font[] allFonts = ge.getAllFonts();
+
+        /*for (Font font : allFonts) {
+            System.out.println(font.getFontName(Locale.US));
+        }*/
+        
+        /*Font font=new JLabel().getFont();
+        
+        System.out.print(font.getFontName() + " : ");
+          System.out.print(font.getFamily() + " : ");
+          System.out.println(font.getName());
+          System.out.println(">>"+font.getPSName());
+          System.out.println(">>"+font.toString());
+          System.out.println();*/
         System.exit(0);
     }
 

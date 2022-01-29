@@ -1,3 +1,9 @@
+/*
+
+ Celsius Item Class - Atlantis Software 
+
+*/
+
 package celsius.data;
 
 import celsius.gui.Editable;
@@ -241,7 +247,7 @@ public final class Item extends TableRow implements Editable {
     
     @Override
     public boolean hasThumbnail() {
-        return((new File(library.completeDir("LD::item-thumbnails/"+id+".jpg"))).exists());
+        return((new File(getThumbnailPath())).exists());
     }
     
     @Override
@@ -729,7 +735,7 @@ public final class Item extends TableRow implements Editable {
         if (deleteFilesOfAttachments) deleteFilesOfAttachments();
         FileTools.deleteIfExists(getThumbnailPath());
         library.executeEX("DELETE FROM items where id="+id+";");
-        // delete all links and remove Keywords/authors if no longer used, integrate into saving mechanism
+        // delete all links and remove Keywords/people if no longer used, integrate into saving mechanism
         try {
             ResultSet old=library.executeResEX("SELECT keyword_id FROM item_keyword_links WHERE item_id="+id+";");
             ArrayList<String> oldIDs=new ArrayList<>();

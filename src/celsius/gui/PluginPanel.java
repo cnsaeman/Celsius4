@@ -5,7 +5,7 @@ import celsius.SwingWorkers.SWApplyPlugin;
 import celsius.SwingWorkers.SWFinalizer;
 import celsius.data.Library;
 import celsius.data.TableRow;
-import atlantis.tools.HasManagedStates;
+import atlantis.gui.HasManagedStates;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;

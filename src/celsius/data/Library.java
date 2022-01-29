@@ -1,11 +1,8 @@
-//
-// Celsius Library System v4
-// (w) by C. Saemann
-//
-// Library.java
-//
-// This class combines all necessary data for a library
-//
+/*
+
+ Celsius Person Class - Atlantis Software 
+
+*/
 
 package celsius.data;
 
@@ -139,7 +136,9 @@ public final class Library { //implements Iterable<Item> {
         name=nm;
         
         (new File(baseFolder)).mkdir();
-        (new File(baseFolder+"information")).mkdir();
+        (new File(baseFolder+"items")).mkdir();
+        (new File(baseFolder+"item-thumbnails")).mkdir();
+        (new File(baseFolder+"person-thumbnails")).mkdir();
 
         getFieldsFromConfig();
 
@@ -167,6 +166,10 @@ public final class Library { //implements Iterable<Item> {
             // set base folder and file 
             baseFolder=folderName;
             if (!baseFolder.endsWith(ToolBox.filesep)) baseFolder+=ToolBox.filesep;
+            
+            // ensure thumnail folders
+            if (!(new File(baseFolder+"item-thumbnails")).exists()) (new File(baseFolder+"item-thumbnails")).mkdir();
+            if (!(new File(baseFolder+"person-thumbnails")).exists()) (new File(baseFolder+"person-thumbnails")).mkdir();
 
             // open main database
             mainLibraryFile=baseFolder+"CelsiusLibrary.sql";

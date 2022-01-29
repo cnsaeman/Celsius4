@@ -154,6 +154,11 @@ public class CelsiusTemplate {
     public String fillIn(TableRow tableRow,Boolean fast) {
         if (!fast) tableRow.loadLevel(3);
         String  out=templateString;
+        // setup thumbnail
+        String thumb=tableRow.getThumbnailPath();
+        if (thumb!=null) {
+            tableRow.put("$thumbnail",thumb);
+        }
         for (String ift : ifs) {
             int i=out.indexOf("#if#"+ift+"#");
             while (i>-1) {

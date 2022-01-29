@@ -1,8 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
+ Celsius Person Class - Atlantis Software 
+
+*/
+
 package celsius.data;
 
 import celsius.gui.Editable;
@@ -65,6 +66,8 @@ public class Person extends TableRow implements Editable {
     
     public void destroy() {
         FileTools.deleteIfExists(getThumbnailPath());
+        library.executeEX("DELETE FROM person_item_links where person_id=" + id + ";");
+        library.executeEX("DELETE FROM persons where id=" + id + ";");
     }
     
     public void loadCollaborators() {
@@ -99,8 +102,8 @@ public class Person extends TableRow implements Editable {
                 if (!linkedItems.containsKey(itemLinkType)) linkedItems.put(itemLinkType, new ArrayList<>());
                 linkedItems.get(itemLinkType).add(item);
             }
-        } catch (Exception e) {
-            library.RSC.outEx(e);
+        } catch (Exception ex) {
+            library.RSC.outEx(ex);
         }
     }
     
@@ -119,6 +122,17 @@ public class Person extends TableRow implements Editable {
     
     public String toText(boolean renew) {
         return(getName(0));
+    }
+    
+    public boolean hasLinkedItems() {
+        String sql = "SELECT * FROM item_person_links WHERE person_id="+id+";";
+        try {
+            ResultSet rs = library.executeResEX(sql);
+            if (rs.next()) return(true);
+        } catch (Exception ex) {
+            library.RSC.outEx(ex);
+        }
+        return(false);
     }
     
     /**
