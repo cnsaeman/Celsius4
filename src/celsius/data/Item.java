@@ -111,12 +111,8 @@ public final class Item extends TableRow implements Editable {
             library.RSC.outEx(ex);
         }
     }
-            
-    /**
-     *  Loads all the data, including linked data from other tables
-     */
-    private void loadLinkedData() {
-        // read in people
+    
+    public void loadLinkedPeople() {
         int linkType = 0;
         for (String peopleField : library.peopleFields) {
             String sql = "SELECT persons.* FROM item_person_links INNER JOIN persons on persons.id=person_id  WHERE item_id=" + id + " AND link_type=" + String.valueOf(linkType) + " ORDER BY ord ASC";
@@ -132,6 +128,14 @@ public final class Item extends TableRow implements Editable {
             }
             linkType++;
         }
+    }
+            
+    /**
+     *  Loads all the data, including linked data from other tables
+     */
+    private void loadLinkedData() {
+        // read in people
+        loadLinkedPeople();
 
         // read in keywords
         try {
@@ -799,7 +803,7 @@ public final class Item extends TableRow implements Editable {
                     oldAttachment.put("path", newAttachment.getFullPath());
                     oldAttachment.put("filetype", newAttachment.get("filetype"));
                     oldAttachment.put("pages", newAttachment.get("pages"));
-                    oldAttachment.put("createdTS", newAttachment.get("createdTS"));
+                    oldAttachment.put("createdTS", Long.toString(ToolBox.now()));
                     oldAttachment.put("md5", newAttachment.get("md5"));
                     oldAttachment.moveToStandardLocation(true);
                     oldAttachment.save();

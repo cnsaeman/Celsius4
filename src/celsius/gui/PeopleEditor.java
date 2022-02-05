@@ -313,6 +313,14 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
         if (e.type==peopleSelector.SHOW_ITEMS) {
             String ids=peopleSelector.getSelectedPersonIDs();
             jBtnAdd2.setEnabled((ids!=null) && (ids.length()>0) && (!ids.contains(",")));
+        } else if (e.type==peopleSelector.NAME_SELECTED) {
+            String ids=peopleSelector.getSelectedPersonIDs();
+            if ((ids!=null) && (ids.length()>0) && (!ids.contains(","))) {
+                String id = peopleSelector.getSelectedPersonIDs();
+                Person person = new Person(RSC.getCurrentlySelectedLibrary(), id);
+                PLMD.add(person);
+                modified = true;
+            }
         }
     }
 }

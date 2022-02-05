@@ -1358,9 +1358,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (library!=RSC.getCurrentlySelectedLibrary()) {
             library=RSC.getCurrentlySelectedLibrary();
             updateCSS();
+            RSC.plugins.updateExportPlugins();
         };
         jHTMLview.setContentType("text/html");
-        RSC.plugins.updateExportPlugins();
         if (!RSC.guiStates.getState("mainFrame","librarySelected")) {
             switchToTabMode(InformationPanel.TabMode_EMPTY);
             jHTMLview.setText(RSC.stdHTMLstring);
@@ -1499,6 +1499,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToSingleItem() {
+        System.out.println(jCBBibPlugins.getSelectedIndex());
         switchToTabMode(InformationPanel.TabMode_ITEM);
         Item item = (Item)celsiusTable.getCurrentlySelectedRow();
         item.loadLevel(3);

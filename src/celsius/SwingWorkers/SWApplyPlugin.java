@@ -1,15 +1,8 @@
-//
-// Celsius Library System
-// (w) by C. Saemann
-//
-// ThreadCreateBibTeX.java
-//
-// This class contains the thread for creating a bibtex file
-//
-// typesafe
-//
-// checked 11/2009
-//
+/*
+
+ Celsius Swing Worker to apply a plugin - Atlantis Software 
+
+*/
 
 package celsius.SwingWorkers;
 

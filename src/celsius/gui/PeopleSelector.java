@@ -28,6 +28,7 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
 
     public final int SHOW_ITEMS=1; // even type for need to show items
     public final int ENTER_PRESSED=2; // enter pressed, reaction necessary
+    public final int NAME_SELECTED=3; // enter pressed, reaction necessary
     
     public final Resources RSC;
     private Library library;
@@ -128,6 +129,9 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
     private void jLSearchPeopleFirstNamesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSearchPeopleFirstNamesMouseClicked
         if (!(evt.getButton() == MouseEvent.BUTTON1)) {
             return;
+        }
+        if (evt.getClickCount() == 2) {
+            fireEvent(new GenericCelsiusEvent(this,NAME_SELECTED));
         }
         fireEvent(new GenericCelsiusEvent(this,SHOW_ITEMS));
     }//GEN-LAST:event_jLSearchPeopleFirstNamesMouseClicked
