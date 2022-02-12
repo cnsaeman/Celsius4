@@ -23,12 +23,12 @@ import javax.swing.SwingWorker;
 public class SWLibraryCheck extends SwingWorker<Void,Void> {
 
     private final Resources RSC;
-    private final ProgressMonitor PM;
+    private final ProgressMonitor progressMonitor;
     private final StringBuffer out;
     
-    public SWLibraryCheck(Resources rsc,ProgressMonitor pm) {
-        RSC=rsc;
-        PM=pm;
+    public SWLibraryCheck(Resources RSC,ProgressMonitor progressMonitor) {
+        this.RSC=RSC;
+        this.progressMonitor=progressMonitor;
         out=new StringBuffer();
     }
     

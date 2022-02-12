@@ -47,8 +47,8 @@ public final class Configurator {
     public int selectedLibrary;
     public RecentLibraryCache lastLibraries;
 
-    public Configurator(Resources rsc) throws IOException {
-        RSC=rsc;
+    public Configurator(Resources RSC) throws IOException {
+        this.RSC=RSC;
         configuration = new HashMap<>();
         supportedFileTypes = new HashMap<>();
         selectedLibrary=-1;

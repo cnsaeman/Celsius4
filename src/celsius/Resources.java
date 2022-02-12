@@ -73,7 +73,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  */
 public class Resources {
 
-    public final String VersionNumber = "v4.0.2";
+    public final String VersionNumber = "v4.0.3";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
     public final String stdHTMLstring;
     
@@ -351,7 +351,12 @@ public class Resources {
     }
 
     public void loadLibrary(String fileName,boolean remember) {
-        final Library library = new Library(fileName, this);
+        final Library library;
+        try {
+            library = new Library(fileName, this);
+        } catch (Exception ex) {
+            return;
+        }
         if (library.name.equals("??##cancelled")) return;
         if (library.name.startsWith("??#$")) return;
         if (library.name.startsWith("??##")) {

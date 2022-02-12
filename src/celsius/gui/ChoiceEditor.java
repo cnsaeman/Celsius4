@@ -25,17 +25,17 @@ public class ChoiceEditor extends javax.swing.JDialog {
     /**
      * Creates new form ChoiceEditor
      */
-    public ChoiceEditor(Resources rsc, String title, ArrayList<String> choices, String s) {
-        super(rsc.MF, true);
-        RSC=rsc;
+    public ChoiceEditor(Resources RSC, String title, ArrayList<String> choices, String selection) {
+        super(RSC.MF, true);
+        this.RSC=RSC;
         setIconImage(RSC.celsiusIcon);
         this.setTitle(title);
         DCBM=new DefaultComboBoxModel();
         DCBM.addAll(choices);
         initComponents();
-        jCBChoices.setSelectedItem(s);
-        selection=s;
-        pre=s;
+        jCBChoices.setSelectedItem(selection);
+        this.selection=selection;
+        pre=selection;
         GUIToolBox.centerDialog(this,RSC.MF);
     }
 

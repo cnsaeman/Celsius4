@@ -31,9 +31,9 @@ public class ThreadLoadThumbnail extends Thread {
     public final Thumbnail thumbnail;
     private final Resources RSC;
 
-    public ThreadLoadThumbnail(Thumbnail tn, Resources rsc) {
-        thumbnail = tn;
-        RSC=rsc;
+    public ThreadLoadThumbnail(Thumbnail thumbnail, Resources RSC) {
+        this.thumbnail = thumbnail;
+        this.RSC=RSC;
         spx=RSC.guiScale(140);
         spy=RSC.guiScale(160);
         setPriority(Thread.MIN_PRIORITY);

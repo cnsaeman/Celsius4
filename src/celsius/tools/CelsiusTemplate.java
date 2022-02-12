@@ -9,6 +9,7 @@ import atlantis.tools.Parser;
 import celsius.Resources;
 import celsius.data.BibTeXRecord;
 import celsius.data.Item;
+import celsius.data.Library;
 import celsius.data.Person;
 import celsius.data.TableRow;
 import java.text.SimpleDateFormat;
@@ -28,10 +29,12 @@ public class CelsiusTemplate {
     public final SimpleDateFormat FDF;
     
     public final Resources RSC;
+    public final Library library;
 
 
-    public CelsiusTemplate (Resources rsc,String ts) {
+    public CelsiusTemplate (Resources rsc,String ts,Library lib) {
         RSC=rsc;
+        library=lib;
         FDF=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
         if (ts==null) templateString="EMPTY"; else templateString=ts;
         ifs=new ArrayList<>();
@@ -112,7 +115,7 @@ public class CelsiusTemplate {
                 int modifier = 0;
                 modifier=Integer.valueOf(Parser.cutFrom(key, "&"));
                 field=Parser.cutUntil(key,"&");
-                if (field.equals("authors")) {
+                if (library.isPeopleField(field)) {
                     if (modifier > 0) {
                         switch (modifier) {
                             case 1:

@@ -27,9 +27,9 @@ public class ChooseItemCategory extends javax.swing.JDialog {
     public boolean selected;
     
     /** Creates new form DialogChooseCategory */
-    public ChooseItemCategory(Resources rsc) {
-        super(rsc.MF, true);
-        RSC=rsc;
+    public ChooseItemCategory(Resources RSC) {
+        super(RSC.MF, true);
+        this.RSC=RSC;
         setIconImage(RSC.celsiusIcon);
         initComponents();
         jTreeCategories.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -42,7 +42,7 @@ public class ChooseItemCategory extends javax.swing.JDialog {
         DefaultTreeModel CatTreeModel=new DefaultTreeModel(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         jTreeCategories.setModel(CatTreeModel);
         selected=false;
-        GUIToolBox.centerDialog(this,rsc.MF);
+        GUIToolBox.centerDialog(this,RSC.MF);
     }
     
     /** This method is called from within the constructor to

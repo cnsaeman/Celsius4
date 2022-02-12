@@ -33,13 +33,13 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
     
     private final String TI;
     
-    public SWGetDetails(Resources rsc, Item i, boolean p, AddItems ai) {
-        RSC=rsc;
-        item=i;        
+    public SWGetDetails(Resources RSC, Item item, boolean plugins, AddItems ai) {
+        this.RSC=RSC;
+        this.item=item;        
+        this.plugins=plugins;
         attachment=null;
         if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
         state=-1;
-        plugins=p;
         library=RSC.getCurrentlySelectedLibrary();
         TI="SWGetDetails>";
         addItems=ai;

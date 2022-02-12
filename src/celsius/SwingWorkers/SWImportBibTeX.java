@@ -39,11 +39,11 @@ public class SWImportBibTeX extends SwingWorker<Void,Item> {
     private final String filename;
     private final String TI;
     
-    public SWImportBibTeX(Resources rsc, AddItems ai, String fn, Library lib) {
-        RSC=rsc;
-        addItems=ai;
-        library=lib;
-        filename=fn;
+    public SWImportBibTeX(Resources RSC, AddItems addItems, String filename, Library library) {
+        this.RSC=RSC;
+        this.addItems=addItems;
+        this.library=library;
+        this.filename=filename;
         TI="SWImportBibTeX>";
         state=-1;
     }

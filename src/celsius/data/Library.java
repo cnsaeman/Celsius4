@@ -274,17 +274,17 @@ public final class Library { //implements Iterable<Item> {
 
             // Read html templates
             htmlTemplates=new HashMap<>();
-            htmlTemplates.put("-1",new CelsiusTemplate(RSC, "<html><body><h2>Currently selected library: #library.name#</h2><hr></body></html>"));
+            htmlTemplates.put("-1",new CelsiusTemplate(RSC, "<html><body><h2>Currently selected library: #library.name#</h2><hr></body></html>",this));
             rs=dbConnection.prepareStatement("SELECT * FROM html_templates;").executeQuery();
             while (rs.next()) {
-                htmlTemplates.put(rs.getString(1), new CelsiusTemplate(RSC,rs.getString(2)));
+                htmlTemplates.put(rs.getString(1), new CelsiusTemplate(RSC,rs.getString(2),this));
             }
-            itemRepresentation=new CelsiusTemplate(RSC,config.get("item-representation"));
-            itemSortRepresentation=new CelsiusTemplate(RSC,config.get("item-sort-representation"));
-            itemNamingConvention=new CelsiusTemplate(RSC,config.get("item-naming-convention"));
+            itemRepresentation=new CelsiusTemplate(RSC,config.get("item-representation"),this);
+            itemSortRepresentation=new CelsiusTemplate(RSC,config.get("item-sort-representation"),this);
+            itemNamingConvention=new CelsiusTemplate(RSC,config.get("item-naming-convention"),this);
             String itemFolderTemplate=config.get("item-folder");
             if ((itemFolderTemplate==null) || (itemFolderTemplate.equals(""))) itemFolderTemplate="LD::documents";
-            itemFolder=new CelsiusTemplate(RSC,itemFolderTemplate);
+            itemFolder=new CelsiusTemplate(RSC,itemFolderTemplate,this);
 
             getFieldsFromConfig();
         } catch (Exception ex) {
@@ -999,7 +999,7 @@ public final class Library { //implements Iterable<Item> {
     public void setHTMLTemplate(int infoMode, String template) {
         String mode=String.valueOf(infoMode).trim();
         if (!htmlTemplates.containsKey(mode) || (htmlTemplates.get(mode)==null) || !htmlTemplates.get(mode).equals(template)) {
-            htmlTemplates.put(mode,new CelsiusTemplate(RSC,template));
+            htmlTemplates.put(mode,new CelsiusTemplate(RSC,template,this));
             try {
                 PreparedStatement pstmt=dbConnection.prepareStatement("INSERT OR REPLACE INTO html_templates (mode,template) VALUES(?,?);");
                 pstmt.setString(1,mode);
@@ -1021,7 +1021,7 @@ public final class Library { //implements Iterable<Item> {
             if (RSC.libraryTemplates.get(n)!=null) {
                 return(new CelsiusTemplate(RSC,RSC.libraryTemplates.get("Default").get(n)));
             } else return(new CelsiusTemplate(RSC,"Error loading display strings from HTMLtemplates!"));*/
-            return(new CelsiusTemplate(RSC,"No HTMLtemplate available!"));
+            return(new CelsiusTemplate(RSC,"No HTMLtemplate available!",this));
         }
     }    
 
@@ -1276,100 +1276,6 @@ public final class Library { //implements Iterable<Item> {
         return (new ObjectComparatorText(t, invertSort,ty));
     }
 
-    public void deleteCategoryNode(StructureNode node) {
-        try {
-            StructureNode parent=node.parent;
-            PreparedStatement statement=dbConnection.prepareStatement("DELETE FROM category_tree WHERE id = ?;");
-            statement.setInt(1,node.id);
-            statement.execute();
-            statement=dbConnection.prepareStatement("UPDATE category_tree SET children=? WHERE id = ?;");
-            statement.setString(1,parent.getChildListString());
-            statement.setInt(2,parent.id);
-        } catch (Exception e) {
-            RSC.outEx(e);
-        }
-    }
-
-    public void updateCategoryNodeParent(StructureNode node) {
-        try {
-            PreparedStatement statement=dbConnection.prepareStatement("UPDATE category_tree SET parent = ? where id = ?;");
-            statement.setInt(1,node.getParent().id);
-            statement.setInt(2,node.id);
-            statement.execute();
-        } catch (Exception e) {
-            RSC.outEx(e);
-        }
-    }
-    
-    public void updateCategoryNodeChildren(StructureNode node) {
-        try {
-            PreparedStatement statement=dbConnection.prepareStatement("UPDATE category_tree SET children = ? where id = ?;");
-            statement.setString(1,node.getChildListString());
-            statement.setInt(2,node.id);
-            statement.execute();
-        } catch (Exception e) {
-            RSC.outEx(e);
-        }
-    }
-
-    public void renameCategory(StructureNode node, String newLabel) {
-        // check if update necessary?
-        if (newLabel.equals(node.category.label)) return;
-        // in memory rename
-        node.category.label=newLabel;
-        // save in database
-        try {
-            String sql = "UPDATE item_categories SET label=? where id=?;";
-            PreparedStatement statement = dbConnection.prepareStatement(sql);
-            statement.setString(1, newLabel);
-            statement.setString(2, node.category.id);
-            statement.executeUpdate();
-        } catch (Exception ex) {
-            RSC.outEx(ex);
-        }
-    }
-    
-    // TODO: write: create Category and return corresponding structureNode
-    public StructureNode createCategory(String cat, StructureNode parent) {
-        StructureNode child=null;
-        try {
-            ResultSet rs=executeResEX("SELECT id FROM item_categories where label=? LIMIT 1;",cat);
-            if (rs.next()) {
-                int i=RSC.askQuestionYN( "Re-use existing category?", "Category name exists");
-                if (i==0) {
-                    Category category=new Category(this,rs.getString(1),cat);
-                    child=new StructureNode(this,category,0);
-                }
-            }
-            if (child==null) {
-                PreparedStatement statement=dbConnection.prepareStatement("INSERT INTO item_categories (label) VALUES (?);");
-                statement.setString(1,cat);
-                statement.execute();
-                rs = statement.getGeneratedKeys();
-                rs.next();
-                int id=rs.getInt(1);
-                Category category=new Category(this,String.valueOf(id),cat);
-                itemCategories.put(id, category);
-                //
-                child=new StructureNode(this,category,0);
-            }
-            parent.add(child);
-            PreparedStatement statement=dbConnection.prepareStatement("INSERT INTO category_tree (category,parent) VALUES (?,?);");
-            statement.setString(1,child.category.id);
-            statement.setInt(2,parent.id);
-            statement.execute();
-            rs = statement.getGeneratedKeys();
-            rs.next();
-            int cid=rs.getInt(1);
-            child.id=cid;
-            updateCategoryNodeChildren(parent);
-        } catch (Exception ex) {
-            RSC.outEx(ex);
-        }
-        return(child);
-    }
-    
-    
     public void executeEX(String sql) {
         RSC.out(10,"DB::"+sql);
         notifyDBInteraction();

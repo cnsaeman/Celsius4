@@ -43,9 +43,11 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
     
     
     // Constructor
-    public SWApplyPlugin(Library lib, Resources rsc,ProgressMonitor p, Plugin pl, String para, ArrayList<TableRow> trs) {
+    public SWApplyPlugin(Library library, Resources RSC,ProgressMonitor progressMonitor, Plugin pl, String para, ArrayList<TableRow> trs) {
         TI="ApplyPlugin>";
-        library=lib; progressMonitor=p; RSC=rsc;
+        this.library=library; 
+        this.progressMonitor=progressMonitor; 
+        this.RSC=RSC;
         parameters=para;
         tableRows=trs; plugin=pl;
         tableRow=null;
@@ -53,9 +55,11 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
         communication=new HashMap<>();
     }
 
-    public SWApplyPlugin(Library lib, Resources rsc,ProgressMonitor p, Plugin pl, String para, TableRow tr) {
+    public SWApplyPlugin(Library library, Resources RSC,ProgressMonitor progressMonitor, Plugin pl, String para, TableRow tr) {
         TI="ApplyPlugin>";
-        library=lib; progressMonitor=p; RSC=rsc;
+        this.library=library; 
+        this.progressMonitor=progressMonitor; 
+        this.RSC=RSC;
         parameters=para;
         tableRows=null; plugin=pl;
         tableRow=tr;

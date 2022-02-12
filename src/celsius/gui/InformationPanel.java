@@ -206,8 +206,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jBtnView = new javax.swing.JButton();
         jBtnUp = new javax.swing.JButton();
         jBtnDown = new javax.swing.JButton();
-        jBtnRename = new javax.swing.JButton();
+        jBtnRelabel = new javax.swing.JButton();
         jBtnPath = new javax.swing.JButton();
+        jBtnStandardPath = new javax.swing.JButton();
         jBtnDelete = new javax.swing.JButton();
         jBtnAdd = new javax.swing.JButton();
         jPSources = new javax.swing.JPanel();
@@ -421,13 +422,13 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         });
         jPanel3.add(jBtnDown);
 
-        jBtnRename.setText("Rename");
-        jBtnRename.addActionListener(new java.awt.event.ActionListener() {
+        jBtnRelabel.setText("Relabel");
+        jBtnRelabel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnRenameActionPerformed(evt);
+                jBtnRelabelActionPerformed(evt);
             }
         });
-        jPanel3.add(jBtnRename);
+        jPanel3.add(jBtnRelabel);
 
         jBtnPath.setText("Change File Path");
         jBtnPath.addActionListener(new java.awt.event.ActionListener() {
@@ -436,6 +437,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             }
         });
         jPanel3.add(jBtnPath);
+
+        jBtnStandardPath.setText("To Standard Path");
+        jBtnStandardPath.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnStandardPathActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jBtnStandardPath);
 
         jBtnDelete.setText("Delete");
         jBtnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -589,7 +598,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 651, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -666,7 +675,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addContainerGap(606, Short.MAX_VALUE))
+                .addContainerGap(585, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -685,7 +694,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1106,7 +1115,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jLAttachments.setSelectedIndex(pos+1);
     }//GEN-LAST:event_jBtnDownActionPerformed
 
-    private void jBtnRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRenameActionPerformed
+    private void jBtnRelabelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRelabelActionPerformed
         Item item=getItem();
         Attachment attachment=item.linkedAttachments.get(jLAttachments.getSelectedIndex());
         SingleLineEditor SLE=new SingleLineEditor(RSC,"Enter a new name",attachment.get("name"),true);
@@ -1121,7 +1130,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jLAttachments.setModel(item.getAttachmentListModel());
             updateGUI();
         }
-    }//GEN-LAST:event_jBtnRenameActionPerformed
+    }//GEN-LAST:event_jBtnRelabelActionPerformed
 
     private void jBtnPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPathActionPerformed
         Item item=getItem();
@@ -1140,6 +1149,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             } catch(Exception ex) {
                 RSC.outEx(ex);
             }
+            jLAttachments.setModel(item.getAttachmentListModel());
         }
     }//GEN-LAST:event_jBtnPathActionPerformed
 
@@ -1212,6 +1222,13 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         viewSelectedItem();
     }//GEN-LAST:event_jBtnView1ActionPerformed
 
+    private void jBtnStandardPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStandardPathActionPerformed
+        Item item=getItem();
+        Attachment attachment=item.linkedAttachments.get(jLAttachments.getSelectedIndex());
+        attachment.moveToStandardLocation(true);
+        jLAttachments.setModel(item.getAttachmentListModel());
+    }//GEN-LAST:event_jBtnStandardPathActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAdd;
@@ -1225,11 +1242,12 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private javax.swing.JButton jBtnDown;
     private javax.swing.JButton jBtnNormalizeBibTeX;
     private javax.swing.JButton jBtnPath;
+    private javax.swing.JButton jBtnRelabel;
     private javax.swing.JButton jBtnRemove;
     private javax.swing.JButton jBtnRemoveThumb;
-    private javax.swing.JButton jBtnRename;
     private javax.swing.JButton jBtnResizeThumb;
     private javax.swing.JButton jBtnShowCited;
+    private javax.swing.JButton jBtnStandardPath;
     private javax.swing.JButton jBtnUp;
     private javax.swing.JButton jBtnView;
     private javax.swing.JButton jBtnView1;
@@ -1283,7 +1301,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     // End of variables declaration//GEN-END:variables
 
     public void adjustAttachmentButtons() {
-        Component[] buttons=new Component[] {jBtnView,jBtnUp,jBtnDown,jBtnRename,jBtnPath,jBtnDelete};
+        Component[] buttons=new Component[] {jBtnView,jBtnUp,jBtnDown,jBtnRelabel,jBtnPath,jBtnStandardPath,jBtnDelete};
         for (Component btn : buttons) {
             btn.setEnabled(jLAttachments.getSelectedIndex()>=0);
         }
@@ -1343,10 +1361,12 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public void updateCSS() {
         kit = new HTMLEditorKit();
         kit.setStyleSheet(null);
-        library.styleSheet=kit.getStyleSheet();
-        String[] rules=library.config.get("css-style").split("\n");
-        for (String rule : rules) {
-            library.styleSheet.addRule(rule);
+        if (library!=null) {
+            library.styleSheet = kit.getStyleSheet();
+            String[] rules = library.config.get("css-style").split("\n");
+            for (String rule : rules) {
+                library.styleSheet.addRule(rule);
+            }
         }
         jHTMLview.setEditorKit(kit);        
     }
@@ -1499,7 +1519,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToSingleItem() {
-        System.out.println(jCBBibPlugins.getSelectedIndex());
         switchToTabMode(InformationPanel.TabMode_ITEM);
         Item item = (Item)celsiusTable.getCurrentlySelectedRow();
         item.loadLevel(3);

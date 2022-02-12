@@ -78,16 +78,16 @@ public class MainFrame extends javax.swing.JFrame implements
 
     public Resources RSC;
     public SplashScreen StartUp;   // splash screen
-    public DefaultTreeModel StructureTreeModel;         // libraries structure tree model
 
     public EditConfiguration dialogConfiguration;     // Configuration dialog
     public ExportBibliography dialogExportBibliography;
     public DeepSearch deepSearch;
+    public CategoryTreePanel categoryTreePanel;
     public InformationPanel guiInfoPanel;
     public SearchPanel guiSearchPanel;
     public PluginPanel guiPluginPanel;
     
-    private int bufmousex,  bufmousey;                    // buffers for popup menu over categories
+    public int bufmousex,  bufmousey;                    // buffers for popup menu over categories
 
     // GUI flags
     public boolean buildingNewTab;
@@ -99,7 +99,6 @@ public class MainFrame extends javax.swing.JFrame implements
     
     public int searchState;
     
-    public ClearEdit jCE1;
     public ClearEdit jCE3;
     
     /** Creates new form MainFrame */
@@ -124,14 +123,15 @@ public class MainFrame extends javax.swing.JFrame implements
         jPanel5.add(guiSearchPanel,BorderLayout.CENTER);
         guiPluginPanel=new PluginPanel(RSC);
         jSPMain3.setBottomComponent(guiPluginPanel);
+        categoryTreePanel=new CategoryTreePanel(RSC);
+        jTPSearches.add(categoryTreePanel, 0);
 
         jTPSearches.setTabComponentAt(0, new TabLabel("",Resources.categoriesSearchTabIcon,RSC,null,false));
         jTPSearches.setTabComponentAt(1, new TabLabel("",Resources.keyTabIcon,RSC,null,false));
         jTPSearches.setTabComponentAt(2, new TabLabel("",Resources.historyTabIcon,RSC,null,false));
         
-        jPanel3.setBorder(RSC.stdBorder());
-        jCE1=new ClearEdit(RSC,"Enter a category (CTRL+C)");
-        jPanel3.add(jCE1, java.awt.BorderLayout.NORTH);
+        jTPSearches.setSelectedIndex(0);
+        
         jPanel7.setBorder(RSC.stdBorder());
         jPanel9.setBorder(RSC.stdBorder());
         jCE3=new ClearEdit(RSC,"Enter a keyword (CTRL+C)");
@@ -143,7 +143,6 @@ public class MainFrame extends javax.swing.JFrame implements
 
     public void gui2() {
         this.setLocationByPlatform(true);
-        jCE1.getDocument().addDocumentListener(this);
         jCE3.getDocument().addDocumentListener(this);
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(this);
@@ -173,24 +172,11 @@ public class MainFrame extends javax.swing.JFrame implements
      * Remaining initialization
      */
     private void initFurther() {
-
-        // Init Structuretree
-        jTStructureTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTStructureTree.setShowsRootHandles(true);
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        renderer.setLeafIcon(RSC.icons.getIcon("folder"));
-        renderer.setClosedIcon(RSC.icons.getIcon("folder"));
-        renderer.setOpenIcon(RSC.icons.getIcon("folder_table"));
-        jTStructureTree.setCellRenderer(renderer);
-        StructureTreeModel = new DefaultTreeModel(null);
-        jTStructureTree.setModel(StructureTreeModel);
-        @SuppressWarnings("unused")
-        DropTarget dt = (new DropTarget(jTStructureTree, this));
         
         // STATEMANAGER TODO: check
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIRememberSelectedItems, jMIRememberSelectedItems1});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems,});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jCE1, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography, categoryTreePanel.searchCategories});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
@@ -266,10 +252,10 @@ public class MainFrame extends javax.swing.JFrame implements
      * Switch to library Lib, if Lib==null, then to the currently selected one.
      * @param i
      */
-    public void switchToLibrary(Library Lib) {
+    public void switchToLibrary(Library library) {
         // Library already selected
         if ((RSC.getCurrentlySelectedLibNo()>-1) && (RSC.getCurrentlySelectedLibNo()<RSC.libraries.size()))
-            if (RSC.getCurrentlySelectedLibrary()==Lib) return;
+            if (RSC.getCurrentlySelectedLibrary()==library) return;
         // No library remaining
         if (RSC.libraries.isEmpty()) {
             RSC.guiStates.adjustState("mainFrame", "librarySelected", false);
@@ -277,8 +263,8 @@ public class MainFrame extends javax.swing.JFrame implements
         }
         
         // switch to currently selected or other library
-        if (Lib==null) RSC.currentLibrary=jCBLibraries.getSelectedIndex();
-        else RSC.currentLibrary=RSC.libraries.indexOf(Lib);
+        if (library==null) RSC.currentLibrary=jCBLibraries.getSelectedIndex();
+        else RSC.currentLibrary=RSC.libraries.indexOf(library);
         
         if (RSC.currentLibrary==-1) {
             RSC.guiStates.adjustState("mainFrame","librarySelected", false);
@@ -287,7 +273,7 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.guiStates.adjustState("mainFrame", "librarySelected", true);
         if (RSC.currentLibrary!=jCBLibraries.getSelectedIndex())
             jCBLibraries.setSelectedIndex(RSC.currentLibrary);
-        StructureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
+        categoryTreePanel.structureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         updateStatusBar(true);
         RSC.plugins.updateExportPlugins();
     }
@@ -335,12 +321,12 @@ public class MainFrame extends javax.swing.JFrame implements
             } else {
                 jMBibTeX.setVisible(true);
             }
-            jTStructureTree.setComponentPopupMenu(jPMCategories);
-            if (StructureTreeModel.getRoot()!=RSC.getCurrentlySelectedLibrary().structureTreeRoot)
-                StructureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
+            categoryTreePanel.structureTree.setComponentPopupMenu(categoryTreePanel.pmCategories);
+            if (categoryTreePanel.structureTreeModel.getRoot()!=RSC.getCurrentlySelectedLibrary().structureTreeRoot)
+                categoryTreePanel.structureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         } else {
-            jTStructureTree.setComponentPopupMenu(null);
-            StructureTreeModel.setRoot(null);
+            categoryTreePanel.structureTree.setComponentPopupMenu(null);
+            categoryTreePanel.structureTreeModel.setRoot(null);
             updateStatusBar(false);
         }
         if (!RSC.guiStates.getState("mainFrame","tabAvailable")) {
@@ -371,20 +357,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jMICopyTab2 = new javax.swing.JMenuItem();
         jMITab2Cat2 = new javax.swing.JMenuItem();
         jMICloseTab2 = new javax.swing.JMenuItem();
-        jPMCategories = new javax.swing.JPopupMenu();
-        jMIOpenNewTab = new javax.swing.JMenuItem();
-        jSeparator16 = new javax.swing.JSeparator();
-        jMIInsertCat1 = new javax.swing.JMenuItem();
-        jMIRenameCat1 = new javax.swing.JMenuItem();
-        jMIDelCat1 = new javax.swing.JMenuItem();
-        jSeparator15 = new javax.swing.JSeparator();
-        jMICatUp1 = new javax.swing.JMenuItem();
-        jMICatDown1 = new javax.swing.JMenuItem();
-        jMICatSub1 = new javax.swing.JMenuItem();
-        jMICatSuper1 = new javax.swing.JMenuItem();
-        jSeparator31 = new javax.swing.JPopupMenu.Separator();
-        jMIExpand = new javax.swing.JMenuItem();
-        jMICollapse = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPMItemTable = new javax.swing.JPopupMenu();
         jMIView1 = new javax.swing.JMenuItem();
@@ -429,9 +401,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jSPMain3 = new javax.swing.JSplitPane();
         jPanel8 = new javax.swing.JPanel();
         jTPSearches = new javax.swing.JTabbedPane();
-        jPanel3 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTStructureTree = new javax.swing.JTree();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         jLSearchKeys = new javax.swing.JList();
@@ -494,10 +463,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIRenameCat = new javax.swing.JMenuItem();
         jMIDelCat = new javax.swing.JMenuItem();
         jSeparator14 = new javax.swing.JSeparator();
-        jMICatUp = new javax.swing.JMenuItem();
-        jMICatDown = new javax.swing.JMenuItem();
-        jMICatSub = new javax.swing.JMenuItem();
-        jMICatSuper = new javax.swing.JMenuItem();
+        jMICatDragDrop = new javax.swing.JCheckBoxMenuItem();
         jMBibTeX = new javax.swing.JMenu();
         jMICitationTagClipboard = new javax.swing.JMenuItem();
         jMIBibClipboard = new javax.swing.JMenuItem();
@@ -574,95 +540,6 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jPMItemList.add(jMICloseTab2);
-
-        jPMCategories.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jPMCategoriesPropertyChange(evt);
-            }
-        });
-
-        jMIOpenNewTab.setText("Open Category in New Tab");
-        jMIOpenNewTab.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIOpenNewTabActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMIOpenNewTab);
-        jPMCategories.add(jSeparator16);
-
-        jMIInsertCat1.setText("Insert Subcategory");
-        jMIInsertCat1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIInsertCatActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMIInsertCat1);
-
-        jMIRenameCat1.setText("Rename Category");
-        jMIRenameCat1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIRenameCatActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMIRenameCat1);
-
-        jMIDelCat1.setText("Delete Category");
-        jMIDelCat1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIDelCatActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMIDelCat1);
-        jPMCategories.add(jSeparator15);
-
-        jMICatUp1.setText("Move up");
-        jMICatUp1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatUpActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMICatUp1);
-
-        jMICatDown1.setText("Move down");
-        jMICatDown1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatDownActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMICatDown1);
-
-        jMICatSub1.setText("Turn into subcategory of above");
-        jMICatSub1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatSubActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMICatSub1);
-
-        jMICatSuper1.setText("Turn into supercategory");
-        jMICatSuper1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatSuperActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMICatSuper1);
-        jPMCategories.add(jSeparator31);
-
-        jMIExpand.setText("Expand tree");
-        jMIExpand.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIExpandActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMIExpand);
-
-        jMICollapse.setText("Collapse tree");
-        jMICollapse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICollapseActionPerformed(evt);
-            }
-        });
-        jPMCategories.add(jMICollapse);
 
         jMIView1.setText("Open selected item");
         jMIView1.addActionListener(new java.awt.event.ActionListener() {
@@ -914,38 +791,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jPanel8.setLayout(new java.awt.GridLayout(1, 0));
 
         jTPSearches.setPreferredSize(new java.awt.Dimension(204, 186));
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        jPanel3.setPreferredSize(new java.awt.Dimension(RSC.guiScale(200), RSC.guiScale(600)));
-        jPanel3.setLayout(new java.awt.BorderLayout());
-
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("JTree");
-        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("colors");
-        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("blue");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("violet");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("red");
-        treeNode2.add(treeNode3);
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("yellow");
-        treeNode2.add(treeNode3);
-        treeNode1.add(treeNode2);
-        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("sports");
-        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("basketball");
-        treeNode2.add(treeNode3);
-        treeNode1.add(treeNode2);
-        jTStructureTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jTStructureTree.setComponentPopupMenu(jPMCategories);
-        jTStructureTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
-            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                jTStructureTreeValueChanged(evt);
-            }
-        });
-        jScrollPane3.setViewportView(jTStructureTree);
-
-        jPanel3.add(jScrollPane3, java.awt.BorderLayout.CENTER);
-
-        jTPSearches.addTab("", new javax.swing.ImageIcon(getClass().getResource("/celsius/images/iconmonstr-folder-30.svg.24.png")), jPanel3); // NOI18N
 
         jPanel9.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel9.setPreferredSize(new java.awt.Dimension(200, 157));
@@ -1338,37 +1183,13 @@ public class MainFrame extends javax.swing.JFrame implements
         jMCategories.add(jMIDelCat);
         jMCategories.add(jSeparator14);
 
-        jMICatUp.setText("Move up");
-        jMICatUp.addActionListener(new java.awt.event.ActionListener() {
+        jMICatDragDrop.setText("Allow drag and drop of categories");
+        jMICatDragDrop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatUpActionPerformed(evt);
+                jMICatDragDropActionPerformed(evt);
             }
         });
-        jMCategories.add(jMICatUp);
-
-        jMICatDown.setText("Move down");
-        jMICatDown.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatDownActionPerformed(evt);
-            }
-        });
-        jMCategories.add(jMICatDown);
-
-        jMICatSub.setText("Turn into subcategory of above");
-        jMICatSub.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatSubActionPerformed(evt);
-            }
-        });
-        jMCategories.add(jMICatSub);
-
-        jMICatSuper.setText("Turn into supercategory");
-        jMICatSuper.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMICatSuperActionPerformed(evt);
-            }
-        });
-        jMCategories.add(jMICatSuper);
+        jMCategories.add(jMICatDragDrop);
 
         jMainMenu.add(jMCategories);
 
@@ -1478,43 +1299,18 @@ public class MainFrame extends javax.swing.JFrame implements
         DT.title=TL.title + "'";
         jTPTabList.setSelectedComponent(scrollpane);
         jTPTabList.setSelectedIndex(jTPTabList.getTabCount() - 1);
-        int cordx = bufmousex - jTStructureTree.getLocationOnScreen().x;
-        int cordy = bufmousey - jTStructureTree.getLocationOnScreen().y;
-        jTStructureTree.setSelectionPath(null);
-        jTStructureTree.setSelectionPath(jTStructureTree.getPathForLocation(cordx, cordy));
+        int cordx = bufmousex - categoryTreePanel.structureTree.getLocationOnScreen().x;
+        int cordy = bufmousey - categoryTreePanel.structureTree.getLocationOnScreen().y;
+        categoryTreePanel.structureTree.setSelectionPath(null);
+        categoryTreePanel.structureTree.setSelectionPath(categoryTreePanel.structureTree.getPathForLocation(cordx, cordy));
     }//GEN-LAST:event_jMICopyTabActionPerformed
-
-    private void jPMCategoriesPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jPMCategoriesPropertyChange
-        String s1 = Parser.cutUntil(Parser.cutFrom(evt.toString(), "desiredLocationX="), ",");
-        String s2 = Parser.cutUntil(Parser.cutFrom(evt.toString(), "desiredLocationY="), ",");
-        bufmousex = Integer.valueOf(s1);
-        bufmousey = Integer.valueOf(s2);
-    }//GEN-LAST:event_jPMCategoriesPropertyChange
 
     private void jMIConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConfigActionPerformed
         dialogConfiguration.open();
     }//GEN-LAST:event_jMIConfigActionPerformed
 
     private void jMIRenameCatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRenameCatActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node == null) {
-            return;
-        }
-        final Library library = RSC.getCurrentlySelectedLibrary();
-        if (node==library.structureTreeRoot) return;
-        final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a new name for the category", node.toString(),true);
-        DSLE.setVisible(true);
-        if (!DSLE.cancel) {
-            jPBSearch.setIndeterminate(true);
-            String Tnew = DSLE.text.trim();
-            library.renameCategory(node,Tnew);
-            StructureTreeModel.reload();
-            final StructureNode child = node;
-            jTStructureTree.scrollPathToVisible(new TreePath(child.getPath().toArray()));
-            jPBSearch.setIndeterminate(false);
-            updateStatusBar(false);
-        }
-        DSLE.dispose();
+        categoryTreePanel.renameCategory();
     }//GEN-LAST:event_jMIRenameCatActionPerformed
 
     private void jMIShowCitedinFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIShowCitedinFileActionPerformed
@@ -1528,15 +1324,6 @@ public class MainFrame extends javax.swing.JFrame implements
             swAP.execute();
         }
     }//GEN-LAST:event_jMIShowCitedinFileActionPerformed
-
-    private void jMIOpenNewTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIOpenNewTabActionPerformed
-        RSC.makeNewTabAvailable(CelsiusTable.EMPTY_TABLE, "", "default");
-        jTPTabList.setSelectedIndex(jTPTabList.getTabCount() - 1);
-        int cordx = bufmousex - jTStructureTree.getLocationOnScreen().x;
-        int cordy = bufmousey - jTStructureTree.getLocationOnScreen().y;
-        jTStructureTree.setSelectionPath(null);
-        jTStructureTree.setSelectionPath(jTStructureTree.getPathForLocation(cordx, cordy));
-    }//GEN-LAST:event_jMIOpenNewTabActionPerformed
 
     private void jMIConsistencyCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConsistencyCheckActionPerformed
         ProgressMonitor progressMonitor = new ProgressMonitor(this, "", "", 0, RSC.getCurrentlySelectedLibrary().getSize());                    // Progress label
@@ -1560,116 +1347,12 @@ public class MainFrame extends javax.swing.JFrame implements
         }
     }//GEN-LAST:event_jMIEditDSActionPerformed
 
-    private void jMICatSuperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICatSuperActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if ((node == null) || (node.getParent() == null)) {
-            return;
-        }
-        if (node.getParent().getParent()==null) {
-            return;
-        }
-        StructureNode node2 = node.getParent();
-        StructureNode node3 = node2.getParent();
-        if ((node2 != RSC.getCurrentlySelectedLibrary().structureTreeRoot) || (node3 != null)) {
-            final StructureNode TNT = node;
-            StructureTreeModel.removeNodeFromParent(node);
-            StructureTreeModel.insertNodeInto(TNT, node3, node3.getChildCount());
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node2);
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node3);
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeParent(node);
-            jTStructureTree.scrollPathToVisible(new TreePath(TNT.getPath().toArray()));
-        }
-    }//GEN-LAST:event_jMICatSuperActionPerformed
-
-    private void jMICatSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICatSubActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node == null) {
-            return;
-        }
-        if (node.isRoot()) {
-            return;
-        }
-        StructureNode node2 = node.getParent();
-        final int i = node2.getIndex(node);
-        if (i > 0) {
-            StructureNode node3=node2.getChildAt(i - 1);
-            final StructureNode node4 = node;
-            StructureTreeModel.removeNodeFromParent(node);
-            StructureTreeModel.insertNodeInto(node4,node3, node3.getChildCount());
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node2);
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node3);
-            RSC.getCurrentlySelectedLibrary().updateCategoryNodeParent(node);
-            jTStructureTree.scrollPathToVisible(new TreePath(node4.getPath().toArray()));
-        }
-    }//GEN-LAST:event_jMICatSubActionPerformed
-
-    private void jMICatDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICatDownActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node != null) {
-            if (node.isRoot()) {
-                return;
-            }
-            StructureNode node2 = node.getParent();
-            final int i = node2.getIndex(node);
-            final int j = (jTStructureTree.getSelectionRows())[0];
-            if (i < node2.getChildCount() - 1) {
-                node2.remove(node);
-                node2.insert(node, i + 1);
-                StructureTreeModel.nodeStructureChanged(node2);
-                jTStructureTree.addSelectionPath(jTStructureTree.getPathForRow(j + 1));
-                RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node2);
-            }
-        }
-    }//GEN-LAST:event_jMICatDownActionPerformed
-
-    private void jMICatUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICatUpActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node != null) {
-            if (node.isRoot()) {
-                return;
-            }
-            StructureNode node2 = node.getParent();
-            final int i = node2.getIndex(node);
-            final int j = (jTStructureTree.getSelectionRows())[0];
-            if (i > 0) {
-                node2.remove(node);
-                node2.insert(node, i - 1);
-                StructureTreeModel.nodeStructureChanged(node2);
-                jTStructureTree.addSelectionPath(jTStructureTree.getPathForRow(j - 1));
-                RSC.getCurrentlySelectedLibrary().updateCategoryNodeChildren(node2);
-            }
-        }
-    }//GEN-LAST:event_jMICatUpActionPerformed
-
     private void jMIDelCatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIDelCatActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node != null) {
-            if (node.isRoot()) {
-                return;
-            }
-            final int i = RSC.askQuestionOC("Click OK to delete subcategory.", "Warning");
-            if (i == JOptionPane.YES_OPTION) {
-                RSC.getCurrentlySelectedLibrary().deleteCategoryNode(node);
-                StructureTreeModel.removeNodeFromParent(node);
-            }
-        }
+        categoryTreePanel.deleteCategory();        
     }//GEN-LAST:event_jMIDelCatActionPerformed
 
     private void jMIInsertCatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIInsertCatActionPerformed
-        StructureNode node = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        if (node == null) {
-            return;
-        }
-        SingleLineEditor SLE = new SingleLineEditor(RSC, "Please enter a name for the category", "Category",false);
-        SLE.setVisible(true);
-        if (!SLE.cancel) {
-            Library library = RSC.getCurrentlySelectedLibrary();
-            final HashMap<String,String> data = new HashMap<String,String>();
-            final StructureNode child = library.createCategory(SLE.text.trim(),node);
-            StructureTreeModel.reload();
-            jTStructureTree.scrollPathToVisible(new TreePath(child.getPath().toArray()));
-        }
-        SLE.dispose();
+        categoryTreePanel.insertCategory();        
     }//GEN-LAST:event_jMIInsertCatActionPerformed
 
     private void jMICheckBibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICheckBibActionPerformed
@@ -1739,7 +1422,7 @@ public class MainFrame extends javax.swing.JFrame implements
     }//GEN-LAST:event_jMIExportTabActionPerformed
 
     private void jMIUnregisterDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIUnregisterDocActionPerformed
-        StructureNode structureNode = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
+        StructureNode structureNode = categoryTreePanel.getSelectedNode();
         if (structureNode != null) {
             CelsiusTable DT=RSC.getCurrentTable();
             if (DT!=null) {
@@ -1868,17 +1551,6 @@ public class MainFrame extends javax.swing.JFrame implements
         }
         RSC.guiStates.adjustState("mainFrame","tabAvailable", jTPTabList.getSelectedIndex()!=-1);
     }//GEN-LAST:event_jTPTabListStateChanged
-
-    private void jTStructureTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTStructureTreeValueChanged
-        if (jTStructureTree.getSelectionModel().isSelectionEmpty()) {
-            RSC.guiStates.adjustState("mainFrame","categorySelected", false);
-            return;
-        }
-        StructureNode TN = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
-        RSC.guiStates.adjustState("mainFrame","categorySelected", true);
-        RSC.out("Selected category: "+TN.category.label);
-        goToCategory(TN.category);
-    }//GEN-LAST:event_jTStructureTreeValueChanged
     // Search stopped by clicking on Button "Stop""    // Search started by clicking on Button "Start"    // Menu: View Selected
     private void jMIViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIViewActionPerformed
         RSC.viewCurrentlySelectedObject();
@@ -2004,22 +1676,7 @@ private void jTPTabListComponentResized(java.awt.event.ComponentEvent evt) {//GE
     Create category from current table
 */
 private void jMITab2Cat2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMITab2Cat2ActionPerformed
-    Library Lib = RSC.getCurrentlySelectedLibrary();
-    StructureNode node = Lib.structureTreeRoot;
-    String cat = RSC.getCurrentTable().title;
-    //RSC.getCurrentTable().setCategoryByID(node.category.id);
-    StructureNode child = Lib.createCategory(cat,node);
-    // ###
-    String ids=RSC.getTableRowIDs(RSC.getCurrentTable().celsiusTableModel.tableRows);
-    for (TableRow tableRow : RSC.getCurrentTable().celsiusTableModel.tableRows) {
-        try {
-            Lib.registerItem((Item)tableRow, node, 0);
-        } catch (Exception e) {
-            RSC.outEx(e);
-        }
-    }
-    StructureTreeModel.reload();
-    jTStructureTree.scrollPathToVisible(new TreePath(child.getPath().toArray()));
+    categoryTreePanel.turnTabIntoCategory();
     updateStatusBar(false);
 }//GEN-LAST:event_jMITab2Cat2ActionPerformed
 
@@ -2099,14 +1756,6 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
         searchstate=0;
     }*/
 }//GEN-LAST:event_jTFMainSearchKeyTyped
-
-private void jMIExpandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExpandActionPerformed
-    GUIToolBox.expandAll(jTStructureTree, true);
-}//GEN-LAST:event_jMIExpandActionPerformed
-
-private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICollapseActionPerformed
-    GUIToolBox.expandAll(jTStructureTree, false);
-}//GEN-LAST:event_jMICollapseActionPerformed
 
     private void jLWhenAddedValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLWhenAddedValueChanged
         goToHistory(jLWhenAdded.getSelectedIndex());
@@ -2191,6 +1840,12 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             }
         }
     }//GEN-LAST:event_jMIDeletePersonActionPerformed
+
+    private void jMICatDragDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICatDragDropActionPerformed
+        System.out.println("MAINFRAME adjust");
+        categoryTreePanel.miCatDragAndDrop.setState(jMICatDragDrop.getState());
+        categoryTreePanel.setDragAndDropState(jMICatDragDrop.getState());
+    }//GEN-LAST:event_jMICatDragDropActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -2215,21 +1870,13 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIAddTab;
     private javax.swing.JMenuItem jMIAddToLib;
     private javax.swing.JMenuItem jMIBibClipboard;
-    private javax.swing.JMenuItem jMICatDown;
-    private javax.swing.JMenuItem jMICatDown1;
-    private javax.swing.JMenuItem jMICatSub;
-    private javax.swing.JMenuItem jMICatSub1;
-    private javax.swing.JMenuItem jMICatSuper;
-    private javax.swing.JMenuItem jMICatSuper1;
-    private javax.swing.JMenuItem jMICatUp;
-    private javax.swing.JMenuItem jMICatUp1;
+    public javax.swing.JCheckBoxMenuItem jMICatDragDrop;
     private javax.swing.JMenuItem jMICheckBib;
     private javax.swing.JMenuItem jMICitationTagClipboard;
     private javax.swing.JMenuItem jMIClearLoggingFile;
     private javax.swing.JMenuItem jMICloseLib;
     public javax.swing.JMenuItem jMICloseTab;
     public javax.swing.JMenuItem jMICloseTab2;
-    private javax.swing.JMenuItem jMICollapse;
     private javax.swing.JMenuItem jMIConfig;
     private javax.swing.JMenuItem jMIConsistencyCheck;
     private javax.swing.JMenuItem jMIConvertLibrary;
@@ -2237,7 +1884,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMICopyTab2;
     private javax.swing.JMenuItem jMICreateLib;
     private javax.swing.JMenuItem jMIDelCat;
-    private javax.swing.JMenuItem jMIDelCat1;
     private javax.swing.JMenuItem jMIDeleteFile;
     private javax.swing.JMenuItem jMIDeleteFile1;
     private javax.swing.JMenuItem jMIDeleteLib;
@@ -2248,20 +1894,17 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIEditLibTemplates;
     private javax.swing.JMenuItem jMIEmail;
     private javax.swing.JMenuItem jMIEmail1;
-    private javax.swing.JMenuItem jMIExpand;
     private javax.swing.JMenuItem jMIExportBibliography;
     private javax.swing.JMenuItem jMIExportTab;
     private javax.swing.JMenuItem jMIExportTab1;
     private javax.swing.JMenuItem jMIFullBibToFile;
     private javax.swing.JMenuItem jMIInsertCat;
-    private javax.swing.JMenuItem jMIInsertCat1;
     private javax.swing.JMenuItem jMIJoin;
     private javax.swing.JMenuItem jMIJoin1;
     private javax.swing.JMenuItem jMILoadLib;
     private javax.swing.JMenuItem jMIMerge;
     private javax.swing.JMenuItem jMIMerge1;
     private javax.swing.JMenuItem jMINew;
-    private javax.swing.JMenuItem jMIOpenNewTab;
     private javax.swing.JMenuItem jMIPeople;
     private javax.swing.JMenuItem jMIPeople2;
     private javax.swing.JMenuItem jMIQuit;
@@ -2274,7 +1917,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenuItem jMIRemoveHalf;
     private javax.swing.JMenuItem jMIRemoveHalf1;
     private javax.swing.JMenuItem jMIRenameCat;
-    private javax.swing.JMenuItem jMIRenameCat1;
     private javax.swing.JMenuItem jMIShowCitedinFile;
     private javax.swing.JMenuItem jMIShowItems;
     private javax.swing.JMenuItem jMIShowItems1;
@@ -2292,7 +1934,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JMenu jMTabs;
     private javax.swing.JMenuBar jMainMenu;
     public javax.swing.JProgressBar jPBSearch;
-    private javax.swing.JPopupMenu jPMCategories;
     public javax.swing.JPopupMenu jPMItemList;
     public javax.swing.JPopupMenu jPMItemTable;
     public javax.swing.JPopupMenu jPMPeopleTable;
@@ -2305,7 +1946,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -2316,21 +1956,17 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JSplitPane jSPMain3;
     private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
     private javax.swing.JSeparator jSeparator14;
-    private javax.swing.JSeparator jSeparator15;
-    private javax.swing.JSeparator jSeparator16;
     private javax.swing.JPopupMenu.Separator jSeparator19;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator20;
     private javax.swing.JSeparator jSeparator24;
     private javax.swing.JSeparator jSeparator26;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator31;
     private javax.swing.JPopupMenu.Separator jSeparator33;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator6;
@@ -2341,7 +1977,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JButton jTBAdd;
     public javax.swing.JTabbedPane jTPSearches;
     public javax.swing.JTabbedPane jTPTabList;
-    private javax.swing.JTree jTStructureTree;
     // End of variables declaration//GEN-END:variables
 
     public void reloadPlugins() {
@@ -2404,7 +2039,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
     
     public Category getSelectedCategory() {
-        StructureNode structureNode = (StructureNode) jTStructureTree.getLastSelectedPathComponent();
+        StructureNode structureNode = categoryTreePanel.getSelectedNode();
         if (structureNode==null) return(null);
         return(structureNode.category);
     }
@@ -2433,10 +2068,10 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     @Override
     public void drop(DropTargetDropEvent dtde) {
         final Point p = dtde.getLocation();
-        if (jTStructureTree.getPathForLocation(p.x,p.y)==null) {
+        if (categoryTreePanel.structureTree.getPathForLocation(p.x,p.y)==null) {
             RSC.showWarning("Could not find category to drop into. Cancelling...", "Warning");
         } else {
-            StructureNode structureNode = (StructureNode) ((jTStructureTree.getPathForLocation(p.x,p.y)).getLastPathComponent());
+            StructureNode structureNode = (StructureNode) ((categoryTreePanel.structureTree.getPathForLocation(p.x,p.y)).getLastPathComponent());
             CelsiusTable DT = RSC.getCurrentTable();
             // TODO DT.setCategoryByID(structureNode.category.id);
             if (DT != null) {
@@ -2474,7 +2109,6 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
 
     public void keyPressed(DocumentEvent e) {
-        if (e.getDocument().equals(jCE1.getDocument())) performCategoriesSearch();
         if (e.getDocument().equals(jCE3.getDocument())) performKeySearch();
     }
 
@@ -2521,19 +2155,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         celsiusTable.properties.put("keyword", key);
         guiInfoPanel.updateGUI();
     }
-
-    public void performCategoriesSearch() {
-        String srch = jCE1.getText();
-        if (srch.length() > 0) {
-            StructureNode structureNode = RSC.getCurrentlySelectedLibrary().structureTreeRoot.nextOccurence(srch.toLowerCase());
-            if (!(structureNode == null)) {
-                jTStructureTree.setSelectionPath(new TreePath(structureNode.getPath().toArray()));
-                jTStructureTree.scrollPathToVisible(new TreePath(structureNode.getPath().toArray()));
-                goToCategory(structureNode.category);
-            }
-        }
-    }
-    
+   
     public void performKeySearch() {
         String search = jCE3.getText().toLowerCase();
         KeywordListModel KLM = new KeywordListModel();
@@ -2894,7 +2516,7 @@ private void jMICollapseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
 
     public void clearCategorySelection() {
-        jTStructureTree.clearSelection();
+        categoryTreePanel.clearTreeSelection();
     }
     
 }

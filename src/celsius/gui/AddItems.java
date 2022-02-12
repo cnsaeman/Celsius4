@@ -74,10 +74,10 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     private boolean cancelAdding, autoDelete, autoReplace;
 
     /** Creates new form DialogAdd */
-    public AddItems(Resources rsc) {
-        super(rsc.MF, true);
+    public AddItems(Resources RSC) {
+        super(RSC.MF, true);
         initializing = true;
-        RSC = rsc;
+        this.RSC = RSC;
         library = RSC.getCurrentlySelectedLibrary();
         library.addLibraryChangeListener(this);
         standardKeys=(new Item(library)).getEditableFields();
