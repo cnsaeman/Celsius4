@@ -14,7 +14,7 @@
 
 package celsius3;
 
-import celsius.data.BibTeXRecord;
+import celsius.components.bibliography.BibTeXRecord;
 import atlantis.tools.FileTools;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;

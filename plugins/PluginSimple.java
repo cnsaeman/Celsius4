@@ -75,7 +75,7 @@ public class PluginSimple extends Thread {
      * Turn BibTeX-information string into a Latex string
      */
     public String LatexFromBibTeX(String t1) {
-        celsius.data.BibTeXRecord BTR=new celsius.data.BibTeXRecord(t1);
+        celsius.components.bibliography.BibTeXRecord BTR=new celsius.components.bibliography.BibTeXRecord(t1);
         if (BTR.parseError!=0) return("parse Error");
         String out=new String("");
         out+=LaTeXAuthorsFromBibTex(BTR.get("author"))+", \""+clean(BTR.get("title"))+"\",";

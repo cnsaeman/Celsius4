@@ -6,7 +6,7 @@
 
 package celsius.data;
 
-import celsius.gui.Editable;
+import celsius.components.library.Library;
 import atlantis.tools.Parser;
 import atlantis.tools.FileTools;
 import java.io.File;

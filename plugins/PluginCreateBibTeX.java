@@ -43,12 +43,12 @@ public class PluginCreateBibTeX extends Thread {
     }
         
     public void run() {
-        celsius.data.BibTeXRecord BTR;
+        celsius.components.bibliography.BibTeXRecord BTR;
         String currentBibTeX=item.getS("bibtex");
         if ((currentBibTeX!=null) && (currentBibTeX.length()>0)) {
-            BTR=new celsius.data.BibTeXRecord(currentBibTeX);
+            BTR=new celsius.components.bibliography.BibTeXRecord(currentBibTeX);
         } else {
-            BTR=new celsius.data.BibTeXRecord(item.getS("type"));
+            BTR=new celsius.components.bibliography.BibTeXRecord(item.getS("type"));
         }
         
         // tag

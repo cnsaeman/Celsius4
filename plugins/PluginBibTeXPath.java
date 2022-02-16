@@ -43,7 +43,7 @@ public class PluginBibTeXPath extends Thread {
             communication.put("output", "");
             return;
         }
-        celsius.data.BibTeXRecord BTR=new celsius.data.BibTeXRecord(bib);
+        celsius.components.bibliography.BibTeXRecord BTR=new celsius.components.bibliography.BibTeXRecord(bib);
         if (item.linkedAttachments.size()>0) BTR.put("fullpath", getPath(item));
         communication.put("output", BTR.toString()+"\n\n");
     }

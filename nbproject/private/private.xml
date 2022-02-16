@@ -4,13 +4,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/Resources.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/TreeTransferHandler.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/data/StructureNode.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/CelsiusMain.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/MainFrame.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/CategoryTreePanel.java</file>
-            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/gui/ChooseItemCategory.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/components/categories/CategoryTreePanel.java</file>
+            <file>file:/home/cnsaeman/Celsius4/Celsius4/src/celsius/components/categories/StructureNode.java</file>
         </group>
     </open-files>
 </project-private>

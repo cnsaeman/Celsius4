@@ -6,31 +6,42 @@
 
 package celsius.gui;
 
+import celsius.components.infopanel.InformationPanel;
+import celsius.components.tableTabs.CelsiusTable;
+import celsius.components.library.EditLibrary;
+import celsius.components.library.CreateNewLibrary;
+import celsius.components.bibliography.ExportBibliography;
+import celsius.components.search.SearchPanel;
+import celsius.components.search.DeepSearch;
+import celsius.components.addItems.AddItems;
+import atlantis.tools.ExecutionShell;
+import celsius.components.plugins.PluginPanel;
+import celsius.components.categories.CategoryTreePanel;
 import atlantis.tools.FileTools;
 import atlantis.gui.HasManagedStates;
 import atlantis.tools.TextFile;
-import celsius.SwingWorkers.SWFinalizer;
-import celsius.SwingWorkers.SWApplyPlugin;
-import celsius.SwingWorkers.SWBibTeXIntegrity;
-import celsius.SwingWorkers.SWShowCited;
+import celsius.components.SWFinalizer;
+import celsius.components.plugins.SWApplyPlugin;
+import celsius.components.integrity.SWBibTeXIntegrity;
+import celsius.components.bibliography.SWShowCited;
 import experimental.AddTransferHandler;
 import celsius.CelsiusMain;
-import celsius.data.StructureNode;
+import celsius.components.categories.StructureNode;
 import celsius3.Library3;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.Resources;
 import celsius.data.Item;
 import celsius.SplashScreen;
-import celsius.SwingWorkers.SWLibraryCheck;
+import celsius.components.integrity.SWLibraryCheck;
 import celsius.data.Attachment;
 import atlantis.tools.Parser;
-import celsius.data.Category;
-import celsius.data.DoubletteResult;
+import celsius.components.categories.Category;
+import celsius.components.addItems.DoubletteResult;
 import celsius.data.ItemSelection;
 import celsius.data.KeywordListModel;
 import celsius.data.PeopleListModel;
 import celsius.data.Person;
-import celsius.data.RecentLibraryCache;
+import celsius.components.library.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.BorderLayout;
@@ -1681,7 +1692,7 @@ private void jMITab2Cat2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_jMITab2Cat2ActionPerformed
 
 private void jMIEditLibTemplatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditLibTemplatesActionPerformed
-    (new celsius.gui.EditLibraryTemplates(this,RSC)).setVisible(true);
+    (new celsius.components.library.EditLibraryTemplates(this,RSC)).setVisible(true);
 }//GEN-LAST:event_jMIEditLibTemplatesActionPerformed
 
 private void jMIAddToLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAddToLibActionPerformed
@@ -2352,6 +2363,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             guiInfoPanel.jTARemarks.setText("No remarks found.");
             return;
         }
+        guiInfoPanel.currentObject=category;
         CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(CelsiusTable.TABLETYPE_ITEMS_IN_CATEGORY, category.label, "folder_table");
         Library library=RSC.getCurrentlySelectedLibrary();
         try {
@@ -2361,6 +2373,14 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
         }
         celsiusTable.properties.put("category", category.label);
         guiInfoPanel.updateGUI();
+    }
+    
+    public void goToCategory(String categoryID) {
+        if (categoryID==null) {
+            return;
+        }
+        Category category=new Category(RSC.getCurrentlySelectedLibrary(),categoryID);
+        goToCategory(category);
     }
     
     /**
@@ -2486,26 +2506,6 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             return(true);
         }
         return(false);
-    }
-
-    public void viewPlainText(Item item) {
-        String fn = item.getCompletedDirKey("plaintxt");
-        if (fn == null) {
-            return;
-        }
-        try {
-            if (new File(fn).exists()) {
-                FileTools.copyFile(fn, item.library.baseFolder + "/viewer.tmp.txt.gz");
-                TextFile.GUnZip(item.library.baseFolder + "/viewer.tmp.txt.gz");
-                (new ViewerText(RSC, item.library.baseFolder + "/viewer.tmp.txt", "Plain text for document: " + item.get("title") + " by " + item.getNames("authors",3))).setVisible(true);
-                //RSC.Configuration.viewHTML(Lib.basedir + "/viewer.tmp.txt");
-            } else {
-                RSC.showWarning("The associated plain text file:\n" + fn + "\ncould not be found.", "Error:");
-            }
-        } catch (Exception ex) {
-            RSC.showWarning("Error while viewing plain text:\n" + ex.toString(), "Exception:");
-            RSC.outEx(ex);
-        }
     }
 
     @Override

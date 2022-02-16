@@ -5,6 +5,7 @@
  */
 package celsius.data;
 
+import celsius.components.library.Library;
 import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import celsius.tools.ToolBox;

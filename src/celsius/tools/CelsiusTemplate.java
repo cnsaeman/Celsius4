@@ -7,9 +7,9 @@ package celsius.tools;
 
 import atlantis.tools.Parser;
 import celsius.Resources;
-import celsius.data.BibTeXRecord;
+import celsius.components.bibliography.BibTeXRecord;
 import celsius.data.Item;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.data.Person;
 import celsius.data.TableRow;
 import java.text.SimpleDateFormat;
@@ -141,6 +141,9 @@ public class CelsiusTemplate {
                 if (field.equals("attachments")) insert=item.getAttachments(modifier);
             } else if (item.library.isPeopleField(key)) {
                 insert=item.getNames(field, 3);
+            }
+            if (field.equals("$categories")) {
+                insert = item.getClickableCategoriesList();
             }
             int i=out.indexOf("#"+key+"#");
             while (i>-1) {

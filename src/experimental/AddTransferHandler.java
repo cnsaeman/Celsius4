@@ -5,12 +5,12 @@
  */
 package experimental;
 
-import celsius.gui.CelsiusTable;
+import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.MainFrame;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.data.Item;
 import celsius.gui.GUIToolBox;
-import celsius.tools.ExecutionShell;
+import atlantis.tools.ExecutionShell;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.tools.ToolBox;

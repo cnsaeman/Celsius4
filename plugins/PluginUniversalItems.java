@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
 import celsius.data.*;
+import celsius.components.bibliography.BibTeXRecord;
 import atlantis.tools.*;
 import celsius.tools.ToolBox;
 

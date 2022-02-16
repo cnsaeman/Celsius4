@@ -121,7 +121,7 @@ public class PluginListOfPublicationsWeb extends Thread {
          }
     }
 
-    public boolean compare(celsius.data.BibTeXRecord btr1,celsius.data.BibTeXRecord btr2) {
+    public boolean compare(celsius.components.bibliography.BibTeXRecord btr1,celsius.components.bibliography.BibTeXRecord btr2) {
         String eprint1=btr1.getS("eprint");
         if (eprint1.indexOf('/')>0) eprint1=Parser.cutFrom(eprint1,"/");
         if (eprint1.length()==0) eprint1=btr1.getS("year").substring(2)+"00000";
@@ -133,9 +133,9 @@ public class PluginListOfPublicationsWeb extends Thread {
 
     public String lowestOut(ArrayList<String> lop, String l) {
         int i=0;
-        celsius.data.BibTeXRecord btr=new celsius.data.BibTeXRecord(lop.get(0));
+        celsius.components.bibliography.BibTeXRecord btr=new celsius.components.bibliography.BibTeXRecord(lop.get(0));
         for (int j=0;j<lop.size();j++) {
-            celsius.data.BibTeXRecord btr2=new celsius.data.BibTeXRecord(lop.get(j));
+            celsius.components.bibliography.BibTeXRecord btr2=new celsius.components.bibliography.BibTeXRecord(lop.get(j));
             if (compare(btr,btr2)) { btr=btr2; i=j; }
         }
         System.out.println(lop.get(i));
@@ -200,7 +200,7 @@ public class PluginListOfPublicationsWeb extends Thread {
     /**
      * Turn BibTeX-information string into a Latex string
      */
-    public String HTMLFromBibTeX(celsius.data.BibTeXRecord BTR, String l, int i) {
+    public String HTMLFromBibTeX(celsius.components.bibliography.BibTeXRecord BTR, String l, int i) {
         if (BTR.parseError!=0) return("parse Error");
         String out = new String("<tr valign=\"top\">\n<td style='width:34px'><p>["+l+Integer.toString(i)+"]</p></td>\n<td><p>\n");
         String title=BTR.get("mytitle").trim();
@@ -272,7 +272,7 @@ public class PluginListOfPublicationsWeb extends Thread {
         return(s);
     }
 
-    public String eprint(celsius.data.BibTeXRecord BTR) {
+    public String eprint(celsius.components.bibliography.BibTeXRecord BTR) {
         String out=BTR.get("eprint");
         if (out.indexOf("/")==-1) out+=" ["+BTR.get("primaryclass")+"]";
         return(out);

@@ -9,7 +9,7 @@ package celsius;
 import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.gui.MainFrame;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.data.TableRow;
 import atlantis.tools.FileTools;
 import atlantis.tools.JSONParser;

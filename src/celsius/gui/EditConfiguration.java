@@ -13,10 +13,11 @@
 
 package celsius.gui;
 
+import atlantis.tools.ExecutionShell;
 import atlantis.tools.FileTools;
 import atlantis.tools.TextFile;
-import celsius.tools.Plugins;
-import celsius.tools.Plugin;
+import celsius.components.plugins.Plugins;
+import celsius.components.plugins.Plugin;
 import celsius.images.Icons;
 import celsius.Resources;
 import atlantis.tools.Parser;

@@ -5,10 +5,11 @@
  */
 package celsius.gui;
 
+import celsius.data.Editable;
 import celsius.Resources;
 import celsius.data.Item;
 import celsius.data.KeyValueTableModel;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.data.PeopleListModelDetailed;
 import celsius.data.Person;
 import atlantis.tools.Parser;

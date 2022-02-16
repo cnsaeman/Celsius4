@@ -7,26 +7,28 @@
 
 package celsius;
 
+import atlantis.tools.ExecutionShell;
+import celsius.components.plugins.Plugin;
 import atlantis.tools.FillPainter;
 import atlantis.tools.FileTools;
 import atlantis.gui.GuiStates;
 import atlantis.tools.TextFile;
 import atlantis.tools.Parser;
 import celsius.images.Icons;
-import celsius.gui.CelsiusTable;
+import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.MainFrame;
-import celsius.tools.Plugins;
+import celsius.components.plugins.Plugins;
 import celsius.gui.SafeMessage;
-import celsius.data.BibTeXRecord;
+import celsius.components.bibliography.BibTeXRecord;
 import celsius.gui.TabLabel;
 import celsius.data.Item;
 import celsius.data.ItemSelection;
-import celsius.data.Library;
-import celsius.data.LibraryTemplate;
+import celsius.components.library.Library;
+import celsius.components.library.LibraryTemplate;
 import celsius.data.Person;
-import celsius.data.RecentLibraryCache;
+import celsius.components.library.RecentLibraryCache;
 import celsius.data.TableRow;
-import celsius.gui.InformationPanel;
+import celsius.components.infopanel.InformationPanel;
 import celsius.gui.MultiLineMessage;
 import celsius.tools.*;
 import java.awt.Color;

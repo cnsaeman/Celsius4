@@ -61,7 +61,7 @@ public class PluginWatchCitationCount extends Thread {
                 System.out.println(e.toString());
             }
         } else {
-            celsius.data.BibTeXRecord BTR2=new celsius.data.BibTeXRecord(item.get("bibtex"));
+            celsius.components.bibliography.BibTeXRecord BTR2=new celsius.components.bibliography.BibTeXRecord(item.get("bibtex"));
             if (item.get("inspirekey") != null) {
                 //String citationtag = BTR2.getTag();
                 try {

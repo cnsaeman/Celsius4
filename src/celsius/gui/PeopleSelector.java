@@ -6,7 +6,7 @@
 package celsius.gui;
 
 import celsius.Resources;
-import celsius.data.Library;
+import celsius.components.library.Library;
 import celsius.data.PeopleListModel;
 import atlantis.tools.Parser;
 import java.awt.KeyEventDispatcher;

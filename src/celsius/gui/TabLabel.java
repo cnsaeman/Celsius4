@@ -1,6 +1,6 @@
 package celsius.gui;
 
-import celsius.gui.CelsiusTable;
+import celsius.components.tableTabs.CelsiusTable;
 import celsius.Resources;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

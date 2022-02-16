@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import java.net.*;
 import java.io.*;
 import celsius.data.*;
+import celsius.components.bibliography.BibTeXRecord;
 import atlantis.tools.*;
 
 /**

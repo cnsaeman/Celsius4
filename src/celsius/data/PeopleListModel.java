@@ -5,6 +5,7 @@
  */
 package celsius.data;
 
+import celsius.components.library.Library;
 import celsius.tools.ToolBox;
 import java.sql.ResultSet;
 import java.sql.SQLException;

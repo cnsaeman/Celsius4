@@ -6,7 +6,8 @@
 
 package celsius.data;
 
-import celsius.gui.Editable;
+import celsius.components.library.Library;
+import celsius.components.categories.Category;
 import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
@@ -150,7 +151,7 @@ public final class Item extends TableRow implements Editable {
         
         // read in registration
         try {
-            String sql = "SELECT GROUP_CONCAT(label, ' | ') AS result FROM item_category_links INNER JOIN item_categories on item_categories.id=category_id  WHERE item_id=" + id + " ORDER BY label ASC";
+            String sql = "SELECT GROUP_CONCAT(label || '$' || item_categories.id, ' | ') AS result FROM item_category_links INNER JOIN item_categories on item_categories.id=category_id  WHERE item_id=" + id + " ORDER BY label ASC";
             ResultSet rs = library.executeResEX(sql);
             if (rs.next()) {
                 properties.put("$categories", rs.getString(1));
@@ -643,6 +644,15 @@ public final class Item extends TableRow implements Editable {
             count++;
         }
         return(out.toString());
+    }
+    
+    public String getClickableCategoriesList() {
+        StringBuilder out=new StringBuilder();
+        for (String categoryString : getS("$categories").split("\\|")) {
+            String[] categoryData=categoryString.split("\\$");
+            out.append(", <a href=\"http://$$category.").append(categoryData[1]).append("\">").append(categoryData[0]).append("</a>");
+        }
+        return(out.substring(2));
     }
 
     /**
