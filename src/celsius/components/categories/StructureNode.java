@@ -205,9 +205,44 @@ public class StructureNode implements MutableTreeNode {
         updateCategoryLabelInDatabase();
     }
     
-    // TODO Fix this
     public StructureNode nextOccurence(String search) {
+        if (category.label.toLowerCase().contains(search)) return(this);
+        for (StructureNode node : childNodes) {
+            StructureNode found=node.nextOccurence(search);
+            if (found!=null) {
+                return(found);
+            }
+        }
+        if (parent!=null) return(parent.nextOccurence(search,parent.getIndex(this)));
         return(null);
+    }
+    
+    /** 
+     * Find next occurrence of search string in category tree, starting from this node and children at position
+     * 
+     * @param search
+     * @param position
+     * @return 
+     */
+    public StructureNode nextOccurence(String search, int position) {
+        for(int i=position+1;i<childNodes.size();i++) {
+            StructureNode found=childNodes.get(i).nextOccurence(search);
+            if (found!=null) {
+                return(found);
+            }
+        }
+        if (parent!=null) return(parent.nextOccurence(search,parent.getIndex(this)));
+        return(null);
+    }
+    
+    public StructureNode next() {
+        if (childNodes.size()>0) return(childNodes.get(0));
+        return(parent.next(parent.getIndex(this)));
+    }
+    
+    public StructureNode next(int position) {
+        if (childNodes.size()>position+1) return(childNodes.get(position+1));
+        return(parent.next(parent.getIndex(this)));
     }
 
     public String getChildListString() {

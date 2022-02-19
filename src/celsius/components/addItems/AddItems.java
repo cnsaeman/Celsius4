@@ -1,10 +1,8 @@
 /*
- * Celsius v2
+ * Panel for adding items 
  *
- * DialogAdd.java
- *
- * Created on 19.03.2010, 18:19:12
  */
+
 package celsius.components.addItems;
 
 import celsius.components.categories.ChooseItemCategory;
@@ -75,7 +73,6 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
 
     private boolean cancelAdding, autoDelete, autoReplace;
 
-    /** Creates new form DialogAdd */
     public AddItems(Resources RSC) {
         super(RSC.MF, true);
         initializing = true;

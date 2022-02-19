@@ -71,9 +71,8 @@ public class CelsiusTemplate {
         }
         
         // setup thumbnail
-        String thumb=item.getThumbnailPath();
-        if (thumb!=null) {
-            item.put("$thumbnail",thumb);
+        if (item.hasThumbnail()) {
+            item.put("$thumbnail", item.getThumbnailPath());
         }
         
         

@@ -649,9 +649,12 @@ public final class Item extends TableRow implements Editable {
     public String getClickableCategoriesList() {
         StringBuilder out=new StringBuilder();
         for (String categoryString : getS("$categories").split("\\|")) {
-            String[] categoryData=categoryString.split("\\$");
-            out.append(", <a href=\"http://$$category.").append(categoryData[1]).append("\">").append(categoryData[0]).append("</a>");
+            if (categoryString.length()>0) {
+                String[] categoryData = categoryString.split("\\$");
+                out.append(", <a href=\"http://$$category.").append(categoryData[1]).append("\">").append(categoryData[0]).append("</a>");
+            }
         }
+        if (out.length()==0) return(null);
         return(out.substring(2));
     }
 

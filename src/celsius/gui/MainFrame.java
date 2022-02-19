@@ -1702,8 +1702,8 @@ private void jMIAddToLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             CelsiusTable celsiusTable=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_WHEN_ADDED, "Last added","search");
             celsiusTable.addRows(DA.addedItems);
             celsiusTable.resizeTable(true);
-            guiInfoPanel.updateGUI();
             updateStatusBar(true);
+            guiInfoPanel.updateGUI();
         }
 }//GEN-LAST:event_jMIAddToLibActionPerformed
 
