@@ -11,7 +11,7 @@
 
 package celsius.components.library;
 
-import celsius.data.KeyValueTableModel;
+import atlantis.gui.KeyValueTableModel;
 import celsius.components.library.Library;
 import celsius.Resources;
 import celsius.components.library.LibraryTemplate;
@@ -20,8 +20,8 @@ import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
-import celsius.gui.MultiLineEditor;
-import celsius.gui.SingleLineEditor;
+import atlantis.gui.MultiLineEditor;
+import atlantis.gui.SingleLineEditor;
 import celsius.gui.TabLabel;
 import celsius.components.tableTabs.TableTTRenderer;
 import celsius.tools.ToolBox;
@@ -299,7 +299,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
         String name=libraryTemplate.name;
         SingleLineEditor SLE = new SingleLineEditor(RSC, "Rename template", name,true);
         SLE.setVisible(true);
-        if (!SLE.cancel && (!SLE.text.equals(name))) {
+        if (!SLE.cancelled && (!SLE.text.equals(name))) {
             libraryTemplate.rename(SLE.text);
             // update UI
             int i=DLM.indexOf(libraryTemplate);
@@ -383,7 +383,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
            String key=(String)jTabConfiguration.getModel().getValueAt(jTabConfiguration.getSelectedRow(),0);
             MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit configuration string", libraryTemplate.configuration.get(key));
             MLE.setVisible(true);
-            if (!MLE.cancel) {
+            if (!MLE.cancelled) {
                 libraryTemplate.setConfiguration(key,MLE.text);
                 jTabConfiguration.setModel(libraryTemplate.getConfigurationModel());
             }
@@ -391,7 +391,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
            String key=(String)jTabHTMLTemplates.getModel().getValueAt(jTabHTMLTemplates.getSelectedRow(),0);
             MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML Template", libraryTemplate.htmlTemplates.get(key));
             MLE.setVisible(true);
-            if (!MLE.cancel) {
+            if (!MLE.cancelled) {
                 libraryTemplate.setHTMLTemplate(key,MLE.text);
                 jTabHTMLTemplates.setModel(libraryTemplate.getHTMLTemplatesModel());
                 jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiScale(40));
@@ -402,7 +402,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
             String value=(String)jTabCreationInstructions.getModel().getValueAt(row,0);
             MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit SQLite Instructions", libraryTemplate.creationInstructions.get(row));
             MLE.setVisible(true);
-            if (!MLE.cancel) {
+            if (!MLE.cancelled) {
                 libraryTemplate.setCreationInstruction(row,MLE.text);
                 jTabCreationInstructions.setModel(libraryTemplate.getCreationInstructionsModel());
             }

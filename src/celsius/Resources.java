@@ -12,6 +12,7 @@ import celsius.components.plugins.Plugin;
 import atlantis.tools.FillPainter;
 import atlantis.tools.FileTools;
 import atlantis.gui.GuiStates;
+import atlantis.gui.StandardResources;
 import atlantis.tools.TextFile;
 import atlantis.tools.Parser;
 import celsius.images.Icons;
@@ -29,13 +30,16 @@ import celsius.data.Person;
 import celsius.components.library.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.components.infopanel.InformationPanel;
-import celsius.gui.MultiLineMessage;
+import atlantis.gui.MultiLineMessage;
+import celsius.components.tableTabs.CelsiusTableModel;
 import celsius.tools.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +59,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -73,7 +78,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  *
  * @author cnsaeman
  */
-public class Resources {
+public class Resources implements StandardResources {
 
     public final String VersionNumber = "v4.0.3";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
@@ -139,7 +144,7 @@ public class Resources {
     public GuiStates guiStates;
     
     public String celsiusBaseFolder;
-    public final Image celsiusIcon;
+    private final Image appIcon;
 
     public boolean displayHidden;
 
@@ -167,9 +172,17 @@ public class Resources {
         executorService=java.util.concurrent.Executors.newScheduledThreadPool(5);
         LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
-        celsiusIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
+        appIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
     }
-
+    
+    public MainFrame getMF() {
+        return(MF);
+    }
+    
+    public Image getAppIcon() {
+        return(appIcon);
+    }
+    
     public void initResources() {
         try {
             out("RES>Verifying standard folders");
@@ -319,6 +332,28 @@ public class Resources {
         out(sw.toString());
         if (MF!=null) {
             String out=sw.toString();
+            if (out.length()>10001) out=out.substring(0,1000);
+            showLongInformation("Exception:", out);
+        }
+    }
+
+    public void outEr(Error e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        out(sw.toString());
+        if (MF!=null) {
+            String out=sw.toString();
+            if (out.length()>10001) out=out.substring(0,1000);
+            showLongInformation("Exception:", out);
+        }
+    }
+
+    public void outEr(String msg, Error e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        out(sw.toString());
+        if (MF!=null) {
+            String out=msg+sw.toString();
             if (out.length()>10001) out=out.substring(0,1000);
             showLongInformation("Exception:", out);
         }
@@ -642,13 +677,21 @@ public class Resources {
             MF.jTPTabList.setTabComponentAt(MF.jTPTabList.getTabCount() - 1, new TabLabel(title,icon,this,celsiusTable,true));
             MF.jTPTabList.setSelectedComponent(scrollpane);
             guiStates.adjustState("mainFrame", "tabAvailable", true);
-            guiStates.adjustState("mainFrame", "itemSelected", false);
             MF.buildingNewTab=false;            
         } else {
             celsiusTable=getCurrentTable();
             celsiusTable.setLibraryAndTableType(getCurrentlySelectedLibrary(), tableType);
             setCurrentItemTable(title,icon);
         }
+        if (celsiusTable.getObjectType() == CelsiusTableModel.CELSIUS_TABLE_ITEM_TYPE) {
+            guiStates.adjustState("mainFrame", "itemTabAvailable", true);
+            guiStates.adjustState("mainFrame", "personTabAvailable", false);
+        } else if (celsiusTable.getObjectType() == CelsiusTableModel.CELSIUS_TABLE_ITEM_TYPE) {
+            guiStates.adjustState("mainFrame", "itemTabAvailable", false);
+            guiStates.adjustState("mainFrame", "personTabAvailable", true);
+        }
+        guiStates.adjustState("mainFrame", "itemSelected", false);
+        guiStates.adjustState("mainFrame", "personSelected", false);
         MF.guiPluginPanel.adjustPluginList();
         return(celsiusTable);
     }
@@ -666,6 +709,7 @@ public class Resources {
         MF.jTPTabList.setSelectedComponent(scrollpane);
         guiStates.adjustState("mainFrame", "tabAvailable", true);
         guiStates.adjustState("mainFrame", "itemSelected", false);
+        guiStates.adjustState("mainFrame", "personSelected", false);
         MF.buildingNewTab=false;
         MF.guiPluginPanel.adjustPluginList();
         return(celsiusTable);
@@ -716,6 +760,18 @@ public class Resources {
     public final static Object[] optionsOC = { "OK", "Cancel" };
     public final static Object[] optionsYN = { "Yes", "No" };    
 
+    
+    /**
+     * Center the current JDialog frame over main frame
+     */
+    public void centerDialog(JDialog frame) {
+        Point p=MF.getLocationOnScreen();
+        Dimension d=MF.getSize();
+        frame.setLocation(p.x+(d.width/2)-(frame.getWidth()/2),p.y+(d.height/2)-(frame.getHeight()/2));
+        /*Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
+        DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+        frame.setLocation(bounds.x+dm.getWidth()/2 - (frame.getWidth()/2),bounds.y+dm.getHeight()/2 - (frame.getHeight()/2));*/
+    }
     
     /**
      * Shows an information message dialog

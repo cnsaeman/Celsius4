@@ -11,7 +11,7 @@ import celsius.Resources;
 import celsius.components.SWFinalizer;
 import celsius.data.Item;
 import celsius.data.TableRow;
-import celsius.gui.MultiLineMessage;
+import atlantis.gui.MultiLineMessage;
 import celsius.tools.ToolBox;
 import java.sql.ResultSet;
 import java.util.ArrayList;

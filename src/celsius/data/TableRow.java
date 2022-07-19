@@ -6,7 +6,6 @@
 package celsius.data;
 
 import celsius.components.library.Library;
-import atlantis.tools.Parser;
 import celsius.tools.ToolBox;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,14 +39,14 @@ public class TableRow {
     
     public HashMap<Integer,ArrayList<Item>> linkedItems;
     
-    public TableRow(Library lib, String tab, String i, HashSet<String> pF) {
-        library=lib;
-        table=tab;
-        id=i;
+    public TableRow(Library library, String table, String id, HashSet<String> pF) {
+        this.library=library;
+        this.table=table;
+        this.id=id;
         lastError=null;
         properties = new HashMap<>();
         dirtyFields = new ArrayList<>();
-        if(i!=null) {
+        if(id!=null) {
             this.loadLevel(2);
         }
         propertyKeys=pF;
@@ -174,6 +172,12 @@ public class TableRow {
         return(out);
     }
     
+    public void flatCopy(TableRow tr) {
+        for (String key : tr.getFields()) {
+            if (!key.equals("id")) this.put(key,tr.get(key));
+        }
+    }
+    
     public boolean needsSaving() {
         if (dirtyFields.isEmpty()) return(false);
         for (String key : dirtyFields) {
@@ -197,8 +201,8 @@ public class TableRow {
                 // set last modified, if field available
                 if (tableHeaders.contains("last_modifiedTS")) put("last_modifiedTS", Long.toString(l));
                 
-                // bundle up transactions
-                //library.dbConnection.setAutoCommit(false);
+                // TODO: bundle up transactions
+                // library.dbConnection.setAutoCommit(false);
 
                 // go through all fields and identify which fields need to written when, etc.
                 // Identify all associated persons, find or create, and save in a HashMap
@@ -217,8 +221,10 @@ public class TableRow {
                 }
                 if (id==null) {
                     // adjust time stamp
-                    if (tableHeaders.contains("createdTS")) put("createdTS", Long.toString(l));
-                    itemDirtyFields.add("createdTS");
+                    if (tableHeaders.contains("createdTS")) {
+                        put("createdTS", Long.toString(l));
+                        itemDirtyFields.add("createdTS");
+                    }
                     String fieldsList="";
                     String qmarks="";
                     for (String field : itemDirtyFields) {

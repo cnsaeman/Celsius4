@@ -12,14 +12,14 @@
 package celsius.components.library;
 
 import celsius.components.plugins.EditLibraryPluginPanel;
-import celsius.data.KeyValueTableModel;
+import atlantis.gui.KeyValueTableModel;
 import celsius.Resources;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
 import celsius.components.plugins.Plugins;
 import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
-import celsius.gui.MultiLineEditor;
+import atlantis.gui.MultiLineEditor;
 import celsius.gui.TabLabel;
 import celsius.tools.ToolBox;
 import java.awt.Dimension;
@@ -397,7 +397,7 @@ public class EditLibrary extends javax.swing.JDialog {
         String value = library.config.get(key.toLowerCase());
         MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit value", value);
         MLE.setVisible(true);
-        if (!MLE.cancel) {
+        if (!MLE.cancelled) {
             value = MLE.text;
             if (value.equals("<unknown>")) {
                 value = null;

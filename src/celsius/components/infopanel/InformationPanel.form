@@ -56,7 +56,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTPItem" alignment="0" pref="873" max="32767" attributes="0"/>
+          <Component id="jTPItem" alignment="0" pref="778" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -686,7 +686,7 @@
                                   <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jScrollPane2" alignment="1" pref="835" max="32767" attributes="0"/>
+                              <Component id="jScrollPane2" alignment="1" pref="740" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -757,7 +757,6 @@
                       </FontInfo>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Resize to 240x240"/>
-                    <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnResizeThumbActionPerformed"/>
@@ -771,7 +770,6 @@
                       </FontInfo>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Remove"/>
-                    <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnRemoveThumbActionPerformed"/>
@@ -857,7 +855,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="769" max="32767" attributes="0"/>
+                              <EmptySpace pref="674" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>

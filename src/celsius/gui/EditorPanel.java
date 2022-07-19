@@ -5,10 +5,11 @@
  */
 package celsius.gui;
 
+import atlantis.gui.MultiLineEditor;
 import celsius.data.Editable;
 import celsius.Resources;
 import celsius.data.Item;
-import celsius.data.KeyValueTableModel;
+import atlantis.gui.KeyValueTableModel;
 import celsius.components.library.Library;
 import celsius.data.PeopleListModelDetailed;
 import celsius.data.Person;
@@ -149,7 +150,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
         String key;
         MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit new row name", "");
         MLE.setVisible(true);
-        if (MLE.cancel) return;
+        if (MLE.cancelled) return;
         key=MLE.text.toLowerCase();
         if (!editable.containsKey(key)) {
             editable.put(key, "<unknown>");
@@ -195,7 +196,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
             peopleEditor.setVisible(true);
             // check if information edited and save if necessary
             if ((!peopleEditor.cancelled) && (peopleEditor.modified)) {
-                item.linkedPersons.put(key, peopleEditor.PLMD.people);
+                item.linkedPersons.put(key, peopleEditor.peopleListModelDetailed.people);
                 // delete "<unknown>" entry, etc.
                 editable.put(key,"");
                 item.dirtyFields.add(key);
@@ -219,7 +220,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
             String value=editable.get(key);
             MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit value", value);
             MLE.setVisible(true);
-            if (!MLE.cancel) {
+            if (!MLE.cancelled) {
                 value=MLE.text;
                 if (value.equals("<unknown>")) value=null;
                 editable.put(key, value);

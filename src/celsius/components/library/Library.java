@@ -175,6 +175,7 @@ public final class Library { //implements Iterable<Item> {
             if (!baseFolder.endsWith(ToolBox.filesep)) baseFolder+=ToolBox.filesep;
             
             // ensure thumnail folders
+            if (!(new File(baseFolder+"items")).exists()) (new File(baseFolder+"items")).mkdir();
             if (!(new File(baseFolder+"item-thumbnails")).exists()) (new File(baseFolder+"item-thumbnails")).mkdir();
             if (!(new File(baseFolder+"person-thumbnails")).exists()) (new File(baseFolder+"person-thumbnails")).mkdir();
 
@@ -614,11 +615,11 @@ public final class Library { //implements Iterable<Item> {
         Attachment attachment=null;
         if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
         try {
-            String[] uf = configToArray("item-unique-fields");
+            String[] uniqueFields = configToArray("item-unique-fields");
             String sql = "SELECT "+itemTableSQLTags+" FROM items WHERE ";
             String cond = "";
             ArrayList<String> params = new ArrayList<>();
-            for (String key : uf) {
+            for (String key : uniqueFields) {
                 String cV = item.get(key);
                 if ((cV != null) && (!cV.equals("<unknown>")) && (!cV.equals(""))) {
                     cond += " OR `"+key+"`=?";
@@ -632,11 +633,16 @@ public final class Library { //implements Iterable<Item> {
                 if (rs.next()) {
                     Item doublette=new Item(this,rs);
                     RSC.out("Lib>Found doublette item: " + doublette.toText(false));
-                    return (new DoubletteResult(100,doublette));
+                    StringBuffer matchingFields=new StringBuffer();
+                    for (String key : uniqueFields) {
+                        if (doublette.getS(key).equals(item.getS(key))) 
+                            matchingFields.append(", ").append(key);
+                    }
+                    return (new DoubletteResult(100,doublette,matchingFields.substring(2)));
                 }
             }
             if (attachment==null){
-                return (new DoubletteResult(0, null));
+                return (new DoubletteResult(0, null,null));
             } else {
                 String md5 = FileTools.md5checksum(item.getCompletedDir(attachment.get("path")));
                 if (md5 != null) {
@@ -644,21 +650,22 @@ public final class Library { //implements Iterable<Item> {
                     if (rs.next()) {
                         Item doublette = new Item(this, rs.getString(1));
                         doublette.loadLevel(1);
-                        return (new DoubletteResult(10, doublette));
+                        return (new DoubletteResult(10, doublette, "MD5 checksum matching"));
                     }
                 }
             }
         } catch (Exception ex) {
             RSC.outEx(ex);
         }
-        return(new DoubletteResult(0,null));
+        return(new DoubletteResult(0,null,null));
     }
     
     public void acquireCopyOfItem(Item sourceItem) {
         String TI="LIB"+name+">";
         String[] essentialFields=configToArray("essential-fields");
+        sourceItem.loadLinkedPeople();
         for (int i=0; i<essentialFields.length;i++) {
-            if (sourceItem.get(essentialFields[i])==null) {
+            if (!sourceItem.isPropertySet(essentialFields[i])) {
                 RSC.showWarning("The item "+sourceItem.toText(false)+"\ncould not be copied, as the field "+essentialFields[i]+",\nrequired by the library "+this.name+" is not set.", "Copying cancelled...");
                 return;
             }
@@ -668,67 +675,48 @@ public final class Library { //implements Iterable<Item> {
         String filename="";
         String fullfilename;
         
-        Item targetItem;
+        sourceItem.loadLevel(3);
         
-        // TODO rewrite this, rest is done
-
-        /*if (sourceItem.get("location").startsWith("LD")) {
-            filename=standardFileName(sourceItem);
-            if (!guaranteeStandardFolder(sourceItem)) {
-                RSC.showWarning("Item folder could not be created.", "Warning:");
-                return;
-            }
-            targetItem=createEmptyItem();
-            guaranteeStandardFolder(targetItem);
-            filename=getStandardFolder(targetItem)+ToolBox.filesep+filename;
-            fullfilename=completeDir(filename);
-        } else {
-            targetItem=createEmptyItem();
-            fullfilename=sourceItem.getCompleteDirS("location");
-        }*/
-
-        /*String id=targetItem.get("id");
-        targetItem.put("location",filename);
+        // create new item
+        Item targetItem=new Item(this);
         
-        // The actual move document procedure
-        // Item
-        // TODO Rewrite this: 
-        RSC.out(TI+"Registering under name: "+filename+", "+fullfilename);*/
-        try {
-            //if (filename.startsWith("LD::"))
-              //  TextFile.CopyFile(sourceItem.getCompleteDirS("location"),fullfilename);
-            /*ArrayList<String> tags=src.getAITags();
-            for (String key : tags) {
-                if ((src.get(key)!=null) && (!key.equals("id")) && (!key.equals("location"))) {
-                    if (src.get(key).indexOf("::")==2) {
-                        String from=src.getCompleteDirS(key);
-                        String end=Parser.Substitute(src.get(key),src.get("id"),doc.get("id"));
-                        try {
-                            TextFile.CopyFile(src.getCompleteDirS(key),doc.completeDir(end));
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
-                        doc.put(key,end);
-                    } else {
-                        doc.put(key,src.get(key));
-                    }
+        // copy over all standard fields
+        targetItem.flatCopy(sourceItem);
+        targetItem.save();
+        
+        // copy over all people
+        for(String key : peopleFields) {
+            if (sourceItem.linkedPersons.get(key)!=null) {
+                targetItem.linkedPersons.put(key,new ArrayList<>());
+                for (Person person : sourceItem.linkedPersons.get(key)) {
+                    Person p = findOrCreatePerson(person);
+                    p.save();
+                    targetItem.linkedPersons.get(key).add(p);
                 }
+                targetItem.saveLinkedPeople(key, 0);
             }
-            // Plaintext
-            if (src.get("plaintxt")!=null) {
-                doc.put("parse","all");
-            } else {
-                doc.put("parse","header");
-            }
-            doc.save();*/
-        } catch (Exception ex) {
-            RSC.outEx(ex);
         }
+
+        targetItem.save();
         
-        
-        // update AuthorList
-        //addPeople(doc);
-        
+        // copy over all attachments
+        for (Attachment attachment : sourceItem.linkedAttachments) {
+            try {
+                String fn = attachment.get("path");
+                if (fn.startsWith("LD::items/")) {
+                    FileTools.copyFile(attachment.getFullPath(), completeDir(attachment.get("path")));
+                }
+                Attachment targetAttachment = new Attachment(this, targetItem);
+                targetAttachment.flatCopy(attachment);
+                attachment.dirtyFields.clear();
+                targetAttachment.save();
+                targetAttachment.attachToParent();
+                targetAttachment.saveAttachmentLinkToDatabase();
+            } catch (Exception ex) {
+                RSC.outEx(ex);
+            }
+        }
+
     }
     
     public String compressFilePath(String s) {
@@ -853,26 +841,26 @@ public final class Library { //implements Iterable<Item> {
         celsiusTable.resizeTable(true);
     }
     
-    public String getNumberOfItemsForPerson(TableRow tr) {
+    public void addStandardStatistics(Person person) {
+        String result;
         try {
-            ResultSet rs = executeResEX("SELECT COUNT(*) FROM item_person_links JOIN items ON item_person_links.item_id=items.id WHERE person_id=" + tr.id + ";");
-            return (rs.getString(1));
+            ResultSet rs = executeResEX("SELECT COUNT(*) FROM item_person_links JOIN items ON item_person_links.item_id=items.id WHERE person_id=" + person.id + ";");
+            result=rs.getString(1);
+            if (result==null) result="Error";
+            person.put("$$currentitems", result);
+            rs = executeResEX("SELECT SUM(pages) FROM item_person_links JOIN item_attachment_links ON item_person_links.item_id=item_attachment_links.item_id JOIN attachments ON item_attachment_links.attachment_id=attachments.id WHERE person_id=" + person.id + ";");
+            result=rs.getString(1);
+            if (result==null) result="Error";
+            person.put("$$currentpages", result);
+            rs = executeResEX("SELECT SUM(pages) FROM item_person_links JOIN item_attachment_links ON item_person_links.item_id=item_attachment_links.item_id JOIN attachments ON item_attachment_links.attachment_id=attachments.id WHERE person_id=" + person.id + " AND item_attachment_links.ord=0;");
+            result=rs.getString(1);
+            if (result==null) result="Error";
+            person.put("$$currentuniquepages", result);
         } catch (Exception e) {
             RSC.outEx(e);
         }
-        return("Error");
     }
-
-    public String getNumberOfPagesForPerson(TableRow tr) {
-        try {
-            ResultSet rs = executeResEX("SELECT SUM(pages) FROM item_person_links JOIN item_attachment_links ON item_person_links.item_id=item_attachment_links.item_id JOIN attachments ON item_attachment_links.attachment_id=attachments.id WHERE person_id=" + tr.id + ";");
-            return (rs.getString(1));
-        } catch (Exception e) {
-            RSC.outEx(e);
-        }
-        return("Error");
-    }
-
+    
     public int getNumberOfItemsForPeople(ArrayList<TableRow> tableRows) {
         int total=0;
         if (tableRows.size()>0) {
@@ -1612,7 +1600,7 @@ public final class Library { //implements Iterable<Item> {
         } else {
             for (Integer id : itemCategories.keySet()) {
                 Category c=itemCategories.get(id);
-                if (c.label.equals(value)) category=c;
+                if (c.getS("label").equals(value)) category=c;
             }
         }
         
@@ -1623,7 +1611,11 @@ public final class Library { //implements Iterable<Item> {
             } else {
                 if (key.equals("label")) {
                     category = new Category(this, null, value);
-                    category.save();
+                    try {
+                        category.save();
+                    } catch (Exception ex) {
+                        RSC.outEx(ex);
+                    }
                 }
             }
             itemCategories.put(Integer.valueOf(category.id),category);
@@ -1633,7 +1625,31 @@ public final class Library { //implements Iterable<Item> {
     }
     
     /**
-     * Find or create person by name
+     * Find or create person by from a given Person
+     * 
+     * @param description
+     * @return
+     * @throws SQLException 
+     */
+    public Person findOrCreatePerson(Person person) {
+        Person out=null;
+        try {
+            ResultSet rs = executeResEX("SELECT * FROM persons WHERE last_name=? AND first_name=?", new String[]{person.get("last_name"), person.get("first_name")});
+            if (rs.next()) {
+                // TODO: perform identity check a bit more carefully, perhaps with unique-people-fields
+                out = new Person(this, rs);
+            } else {
+                out = new Person(this);
+                out.flatCopy(person);
+            }
+        } catch (Exception ex) {
+            RSC.outEx(ex);
+        }
+        return (out);
+    }
+
+    /**
+     * Find or create person by description string. Different properties are separated by #
      * 
      * @param description
      * @return

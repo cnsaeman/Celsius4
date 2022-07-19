@@ -31,7 +31,7 @@ public class ChooseItemCategory extends javax.swing.JDialog {
     public ChooseItemCategory(Resources RSC) {
         super(RSC.MF, true);
         this.RSC=RSC;
-        setIconImage(RSC.celsiusIcon);
+        setIconImage(RSC.getAppIcon());
         initComponents();
         jTreeCategories.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTreeCategories.setShowsRootHandles(true);

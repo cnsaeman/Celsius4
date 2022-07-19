@@ -49,7 +49,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
         super(parent, true);
         changed=false;
         RSC=rsc;
-        setIconImage(RSC.celsiusIcon);
+        setIconImage(RSC.getAppIcon());
         MF=parent;
         initComponents();
         jTFLibDir.setText(RSC.celsiusBaseFolder+"/Libraries/NewLibrary");

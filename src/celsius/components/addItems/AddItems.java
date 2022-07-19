@@ -80,7 +80,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         library = RSC.getCurrentlySelectedLibrary();
         library.addLibraryChangeListener(this);
         standardKeys=(new Item(library)).getEditableFields();
-        setIconImage(RSC.celsiusIcon);
+        setIconImage(RSC.getAppIcon());
         preparedItems = new ArrayList<>();
         addedItems = new ArrayList<>();
         getDetailsSWs = new ArrayList<>();
@@ -1155,7 +1155,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
 }//GEN-LAST:event_jBtnCreateEmptyActionPerformed
 
     private void jBtnNormalize1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNormalize1ActionPerformed
-        String tmp = BibTeXRecord.normalizeBibTeX(jTABibTeX.getText());
+        String tmp = BibTeXRecord.sanitize(BibTeXRecord.normalizeBibTeX(jTABibTeX.getText()));
         if (!tmp.startsWith("@")) {
             RSC.showWarning(tmp, "BibTeX Error");
         } else {
@@ -1424,7 +1424,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     if (always) {
                         toDelete.add(item);
                     } else {
-                        int j = RSC.askQuestionABCD("Exact doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Warning","Delete all exact doublettes","Delete this one","No","Cancel");
+                        int j = RSC.askQuestionABCD("Exact file doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Warning","Delete all exact doublettes","Delete this one","No","Cancel");
                         if (j == 0) {
                             always=true;
                             toDelete.add(item);
@@ -1438,7 +1438,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     }
                 }
                 if (doubletteResult.type == 100) {
-                    int j = RSC.askQuestionYNC("Item with overlapping unique fields found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
+                    int j = RSC.askQuestionYNC("Item with overlapping unique fields: \n"+doubletteResult.message+"\n found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
                     if (j == JOptionPane.YES_OPTION) toDelete.add(item);
                     if (j == JOptionPane.CANCEL_OPTION) return;
                 }
@@ -1566,13 +1566,15 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             item.put("$$beingadded","true");
             final Integer[] res=new Integer[1];
             RSC.out("checking for doublettes");
-            DoubletteResult dr=library.isDoublette(item);
-            if ((dr.type==100) || (dr.type==4)){
+            DoubletteResult doubletteResult=library.isDoublette(item);
+            if (doubletteResult.type==100){
                 if (!autoReplace) {
                     Object[] options=new Object[6];
                     options[0]="Delete"; options[1]="Replace"; options[2]="New Version"; options[3]="Replace All"; options[4]="Ignore"; options[5]="Cancel";
                     String msg="The item \n"+library.itemRepresentation.fillIn(item,true)+
-                                               "\nalready exists in the library as "+library.itemRepresentation.fillIn(item,true)+". You can\n"+
+                                               "\n has matching unique fields \n"+
+                                               doubletteResult.message+
+                                               "\n with item "+library.itemRepresentation.fillIn(doubletteResult.item,true)+". You can\n"+
                                                "- Delete the item in the inclusion folder\n"+
                                                "- Replace the item in the library by this item\n"+
                                                "- Replace the item but treat its current file as an additional version\n"+
@@ -1588,7 +1590,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                 }
                 if (res[0]==3) autoReplace=true;
                 if ((res[0]==1) || (res[0]==3)) {
-                    Item oldItem=dr.item;
+                    Item oldItem=doubletteResult.item;
                     oldItem.replaceData(item);
                     oldItem.replaceAttachment(item);
                     library.itemChanged(oldItem.id);
@@ -1598,7 +1600,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     return;
                 }
                 if (res[0]==2) {
-                    Item oldItem=dr.item;
+                    Item oldItem=doubletteResult.item;
                     oldItem.replaceData(item);
                     oldItem.insertAsFirstAttachment(item);
                     library.itemChanged(oldItem.id);
@@ -1610,9 +1612,9 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                 if (res[0]==5) cancelAdding=true;
                 return;
             }
-            if (dr.type==10) {
+            if (doubletteResult.type==10) {
                 if (!autoDelete) {
-                    res[0]=RSC.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+dr.item.toText(false)+" with id: "+dr.item.id+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
+                    res[0]=RSC.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+doubletteResult.item.toText(false)+" with id: "+doubletteResult.item.id+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
                 } else res[0]=0;
                 item.put("$$beingadded", null);
                 if (res[0]==0) {
@@ -1627,7 +1629,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                 }
                 return;
             }
-            if (dr.type==5) {
+            if (doubletteResult.type==5) {
                 res[0]=RSC.askQuestionYN("A file with exactly the same length as the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library.\nProceed anyway?","Warning");
                 if (res[0]==JOptionPane.NO_OPTION) {
                     return;

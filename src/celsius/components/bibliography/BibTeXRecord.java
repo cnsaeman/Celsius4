@@ -307,6 +307,28 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
         return (authors.replaceAll("\\|", " and "));
     }
     
+    public static String normalizeTitle(String title) {
+        StringBuffer out=new StringBuffer();
+        int pos=0;
+        title=title.trim();
+        int mode=-1; // mode: 0: just after space, 1: inside word, 2 and higher: inside {
+        while (pos<title.length()) {
+            if (mode==-1) {
+                out.append(Character.toUpperCase(title.charAt(pos)));
+            } else if (mode==0) {
+                out.append(Character.toLowerCase(title.charAt(pos)));
+            } else {
+                out.append(title.charAt(pos));
+            }
+            if (title.charAt(pos)==' ') mode=0;
+            if (title.charAt(pos)=='{') mode++;
+            if (title.charAt(pos)=='}') mode--;
+            if (mode<0) mode=1;
+            pos++;
+        }
+        return(out.toString());
+    }
+    
     
     /**
      * Normalize the BibTeX-String passed as an argument
@@ -317,9 +339,9 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
         if (btr.parseError!=0) {
             return("BibTeX entry not consistent: "+BibTeXRecord.status[btr.parseError]);
         }
-        btr.put("title", Parser.lowerEndOfWords2(btr.get("title")));
-        return(btr.toString());
-    }
+        btr.put("title", normalizeTitle(btr.get("title")));
+        return(sanitize(btr.toString()));
+    }   
 
     public static String Identifier(Item item) {
         String tmp = "";
@@ -357,6 +379,24 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
             }
         }
         return tmp.trim();
+    }
+    
+    /**
+     * Removes all special UTF8-characters from auhors names
+     * 
+     * @param input
+     * @return 
+     */
+    public static String sanitize(String input) {
+        input=input.replace("č", "\\v{c}");
+        input=input.replace("á", "\\'{a}");
+        input=input.replace("à", "\\`{a}");
+        input=input.replace("é", "\\'{e}");
+        input=input.replace("è", "\\`{e}");
+        input=input.replace("ê", "\\^{e}");
+        input=input.replace("í", "\\'{\\i}");
+        input=input.replace("ô", "\\^{o}");
+        return(input);
     }
     
     

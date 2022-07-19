@@ -331,7 +331,7 @@ public class PluginUniversalItems extends Thread {
                 inspireRecord=webToolsHEP.jsonFromInspire("literature",item.get("inspirekey"));
                 Msgs.add("Response: "+inspireRecord);
             }
-            if (inspireRecord.length()>2) {
+            if ((inspireRecord!=null) && (inspireRecord.length()>2)) {
                 Msgs.add("XXI Inspire record found");
                 if (item.isEmpty("inspirekey")) {
                     String inspirekey=Parser.cutUntil(Parser.cutFrom(inspireRecord,"\"control_number\":"),",");

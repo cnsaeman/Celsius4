@@ -85,6 +85,8 @@ public class webToolsHEP {
             }
             in.close();
             return(rtn.toString());
+        } catch (FileNotFoundException ex) {
+            System.out.println("No Inspire record found.");
         } catch (Exception e) {
             e.printStackTrace();
         }

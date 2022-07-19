@@ -6,47 +6,31 @@
 package celsius.components.categories;
 
 import celsius.components.library.Library;
+import celsius.data.TableRow;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  *
  * @author cnsaeman
  */
-public class Category extends HashMap<String,String> {
+public class Category extends TableRow {
     
-    public final Library library;
-    public String id;
-    public String label;
-    public String remarks;
-    public long created;
+    public final static HashSet<String> categoryPropertyKeys=new HashSet<String>((List<String>)Arrays.asList("label","remarks"));
     
-    /**
-     * Create category 
-     * 
-     * @param library
-     * @param id
-     * @param label
-     */
-    public Category(Library library, String id,String label) {
-        this.library=library;
+    public Category(Library library, String id, String label) {
+        super(library,"item_categories",categoryPropertyKeys);
         this.id=id;
-        this.label=label;
+        this.put("label",label);
+        tableHeaders=categoryPropertyKeys;
     }
 
     public Category(Library library, String id) {
-        this.library=library;
-        this.id=id;
-        ResultSet rs=library.executeResEX("SELECT * FROM item_categories WHERE id=?;",new String[]{id});
-        try {
-            rs.next();
-            this.label=rs.getString(2);
-            this.remarks=rs.getString(3);
-        } catch (Exception ex) {
-            this.label="ERROR";
-            this.remarks="ERROR";
-        }
+        super(library,"item_categories",id,categoryPropertyKeys);
+        tableHeaders=categoryPropertyKeys;
     }
 
     
@@ -57,36 +41,21 @@ public class Category extends HashMap<String,String> {
      * @throws SQLException 
      */
     public Category(Library library,ResultSet rs) throws SQLException {
-        super();
-        this.library=library;
-        id=rs.getString(1);
-        label=rs.getString(2);
-        remarks=rs.getString(3);
+        super(library,"item_categories",rs,categoryPropertyKeys);
+        tableHeaders=categoryPropertyKeys;
     }
 
-    public void setRemarks(String rem) {
+    public void setRemarks(String remarks) {
         // check if update necessary?
-        if (rem.equals(remarks)) return;
+        if (remarks.equals(get("remarks"))) return;
         // in memory rename
-        remarks=rem;
+        put("remarks",remarks);
         // save in database
         try {
-            library.executeEX("UPDATE item_categories SET remarks=? where id=?;", new String[] {remarks,id});
+            save();
         } catch (Exception ex) {
             library.RSC.outEx(ex);
         }
     }
-    
-    /**
-     *  Saves or updates a category
-     *  just updates label and remarks data, nothing else
-     */
-    public void save() {
-        if (id==null) {
-            id=library.executeInsertEX("INSERT INTO item_categories (label,remarks) VALUES (?,?);", new String[] {label,remarks});
-        } else {
-            library.executeEX("UPDATE item_categories SET remarks=?, label=? WHERE id=?;", new String[] {remarks,label,id});
-        }
-    }
-    
+        
 }

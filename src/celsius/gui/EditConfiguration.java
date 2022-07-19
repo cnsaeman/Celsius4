@@ -13,6 +13,8 @@
 
 package celsius.gui;
 
+import atlantis.gui.SingleLineEditor;
+import atlantis.gui.MultiLineEditor;
 import atlantis.tools.ExecutionShell;
 import atlantis.tools.FileTools;
 import atlantis.tools.TextFile;
@@ -67,7 +69,7 @@ public class EditConfiguration extends javax.swing.JDialog {
         });
         jTabbedPane1.setTabComponentAt(0, new TabLabel("General Configuration",Resources.pluginSetupIcon,RSC,null,false));
         jTabbedPane1.setTabComponentAt(1, new TabLabel("File support","default",RSC,null,false));
-        setIconImage(RSC.celsiusIcon);
+        setIconImage(RSC.getAppIcon());
         jLFileTypes.setModel(configuration.getTypeDLM());
         jLFileTypes.setSelectedIndex(0);
         jTFIconFolder.setText(RSC.configuration.getConfigurationProperty("iconfolder"));
@@ -588,7 +590,7 @@ public class EditConfiguration extends javax.swing.JDialog {
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
         SingleLineEditor DSLE=new SingleLineEditor(RSC,"Please enter a new filetype","filetype, e.g. pdf",false);
         DSLE.setVisible(true);
-        if (!DSLE.cancel) {
+        if (!DSLE.cancelled) {
             configuration.addFileType(DSLE.text);
             ((DefaultListModel)jLFileTypes.getModel()).addElement(DSLE.text);
             jTFView.setText("use standard viewer");
@@ -643,7 +645,7 @@ public class EditConfiguration extends javax.swing.JDialog {
             tmp = tmp.substring(1);
             MultiLineEditor DMLE = new MultiLineEditor(RSC, "Edit Journallinks", tmp);
             DMLE.setVisible(true);
-            if (!DMLE.cancel) {
+            if (!DMLE.cancelled) {
                 SC = new TextFile("celsius.journallinks", false);
                 SC.putString(DMLE.text);
                 SC.close();
@@ -665,7 +667,7 @@ public class EditConfiguration extends javax.swing.JDialog {
             tmp = tmp.substring(1);
             MultiLineEditor DMLE = new MultiLineEditor(RSC, "Edit Shortcuts", tmp);
             DMLE.setVisible(true);
-            if (!DMLE.cancel) {
+            if (!DMLE.cancelled) {
                 SC = new TextFile("celsius.shortcuts", false);
                 SC.putString(DMLE.text);
                 SC.close();

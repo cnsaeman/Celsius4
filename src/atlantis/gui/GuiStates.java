@@ -63,8 +63,10 @@ public class GuiStates {
             states.put(stateGroup, new HashMap<>());
         }
         states.get(stateGroup).put(stateName, state);
-        for (JComponent component : directlyEnabledComponents.get(stateGroup).get(stateName)) {
-            component.setEnabled(state);
+        if (directlyEnabledComponents.get(stateGroup).get(stateName)!=null) {
+            for (JComponent component : directlyEnabledComponents.get(stateGroup).get(stateName)) {
+                component.setEnabled(state);
+            }
         }
         for (HasManagedStates component : notificationList.get(stateGroup)) {
             component.adjustStates();

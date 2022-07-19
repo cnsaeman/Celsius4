@@ -5,7 +5,7 @@
  */
 package celsius.data;
 
-import celsius.data.KeyValueTableModel;
+import atlantis.gui.KeyValueTableModel;
 import celsius.components.library.Library;
 
 /**

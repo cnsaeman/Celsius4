@@ -9,11 +9,9 @@ import celsius.Resources;
 import celsius.components.library.Library;
 import celsius.data.PeopleListModel;
 import atlantis.tools.Parser;
-import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -31,7 +29,6 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
     public final int NAME_SELECTED=3; // enter pressed, reaction necessary
     
     public final Resources RSC;
-    private Library library;
     private final ClearEdit jCE2;
     private final ArrayList<GenericCelsiusEventListener> listeners;
     
@@ -39,10 +36,12 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
     public String name;
     
     /**
-     * Creates new form PeopleSelector
+     * Creates new form PeopleSelector.
+     * 
+     * @param RSC
      */
-    public PeopleSelector(Resources rsc) {
-        RSC=rsc;
+    public PeopleSelector(Resources RSC) {
+        this.RSC=RSC;
         initComponents();
         setBorder(RSC.stdBorder());
         jCE2=new ClearEdit(RSC,"Enter a person (CTRL+P)");
@@ -52,10 +51,6 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
         listeners=new ArrayList<>();
     }
     
-    public void setLibrary(Library lib) {
-        library=lib;
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -299,7 +294,7 @@ public class PeopleSelector extends javax.swing.JPanel implements DocumentListen
 
     String getSelectedPersonIDs() {
         List<String> firstNames = (List<String>) jLSearchPeopleFirstNames.getSelectedValuesList();
-        if (firstNames.size()==0) return(getSelectedLastNameIDs());
+        if (firstNames.isEmpty()) return(getSelectedLastNameIDs());
         StringBuilder ids = new StringBuilder();
         PeopleListModel PLM = (PeopleListModel) jLSearchPeopleLastName.getModel();
         for (String lastName : (List<String>) jLSearchPeopleLastName.getSelectedValuesList()) {

@@ -1,6 +1,7 @@
 
 package celsius.components.tableTabs;
 
+import atlantis.gui.HasManagedStates;
 import celsius.components.library.Library;
 import celsius.Resources;
 import celsius.data.Item;

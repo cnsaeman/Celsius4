@@ -44,7 +44,11 @@ public class Plugin {
     public Plugin(String f) throws Exception {
         className=f;
         URLClassLoader ucl = new URLClassLoader(new URL[] { (new File("plugins")).toURI().toURL() });
-        c = Class.forName(className,true,ucl);
+        try {
+            c = Class.forName(className,true,ucl);
+        } catch (Exception ex) {
+            throw(ex);
+        }
 
         metaData=(HashMap<String,String>)c.getDeclaredField("metaData").get(c);
         

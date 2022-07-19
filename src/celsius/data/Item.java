@@ -6,6 +6,7 @@
 
 package celsius.data;
 
+import atlantis.gui.KeyValueTableModel;
 import celsius.components.library.Library;
 import celsius.components.categories.Category;
 import atlantis.tools.FileTools;
@@ -53,8 +54,8 @@ public final class Item extends TableRow implements Editable {
         currentLoadLevel=0;
     }
 
-    public Item(Library lib,String i) {
-        super(lib,"items",i,lib.itemPropertyKeys);
+    public Item(Library library,String id) {
+        super(library,"items",id,library.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
         linkedItems=new HashMap<>();
@@ -63,12 +64,12 @@ public final class Item extends TableRow implements Editable {
         error=0;
     }
 
-    public Item(Library lib) {
-        super(lib,"items",lib.itemPropertyKeys);
+    public Item(Library library) {
+        super(library,"items",library.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
         linkedItems=new HashMap<>();
-        library=lib;
+        this.library=library;
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
         error=0;
@@ -82,12 +83,12 @@ public final class Item extends TableRow implements Editable {
      * @param lib
      * @param rs 
      */
-    public Item(Library lib, ResultSet rs) {
-        super(lib,"items",rs,lib.itemPropertyKeys);
+    public Item(Library library, ResultSet rs) {
+        super(library,"items",rs,library.itemPropertyKeys);
         linkedPersons=new HashMap<>();
         linkedAttachments=new ArrayList<>();
         linkedItems=new HashMap<>();
-        library=lib;
+        this.library=library;
         orderedStandardKeys=library.orderedItemPropertyKeys;
         tableHeaders=library.itemPropertyKeys;
         error=0;
@@ -189,6 +190,21 @@ public final class Item extends TableRow implements Editable {
         
         properties.put("$attachment-count", String.valueOf(linkedAttachments.size()));
     }
+    
+    /**
+     * Returns true if a value is associated with the key
+     * 
+     * @param key
+     * @return 
+     */
+    public boolean isPropertySet(String key) {
+        if (library.isPeopleField(key)) loadLinkedPeople();
+        boolean isSet = false;
+        isSet = isSet
+                || (get(key) != null)
+                || (library.isPeopleField(key) && (linkedPersons.get(key) != null) && (linkedPersons.get(key).size() > 0));
+        return(isSet);
+    }
             
 
     @Override
@@ -259,6 +275,22 @@ public final class Item extends TableRow implements Editable {
     public String getThumbnailPath() {
         return(library.completeDir("LD::item-thumbnails/"+id+".jpg"));
     }
+    
+    public void saveLinkedPeople(String key, int linkType){
+        int order = 0;
+
+        // delete all person links
+        library.executeEX("DELETE FROM item_person_links WHERE item_id=" + id + " AND link_type=" + String.valueOf(linkType) + ";");
+
+        // create new person links
+        String data = "";
+        for (Person person : linkedPersons.get(key)) {
+            data += ",(" + id + "," + person.id + "," + String.valueOf(linkType) + "," + String.valueOf(order) + ")";
+            order++;
+        }
+        library.executeEX("INSERT INTO item_person_links (item_id, person_id, link_type, ord) VALUES " + data.substring(1) + ";");
+        
+    }
 
     /**
      * Save an item. Note that this should only be done if loadlevel is maximal
@@ -325,21 +357,9 @@ public final class Item extends TableRow implements Editable {
             // link persons
             for (String field : personDirtyFields) {
                 int linkType = 0; // position in peopleFields
-                int order = 0;
                 for (String peopleField : library.peopleFields) {
                     if (field.equals(peopleField)) {
-
-                        // delete all person links
-                        library.executeEX("DELETE FROM item_person_links WHERE item_id=" + id + " AND link_type=" + String.valueOf(linkType) + ";");
-
-                        // create new person links
-                        String data = "";
-                        for (Person person : linkedPersons.get(field)) {
-                            data += ",(" + id + "," + person.id + "," + String.valueOf(linkType) + "," + String.valueOf(order) + ")";
-                            order++;
-                        }
-                        library.executeEX("INSERT INTO item_person_links (item_id, person_id, link_type, ord) VALUES " + data.substring(1) + ";");
-
+                        saveLinkedPeople(peopleField,linkType);
                         // do not clean up old personlinks, as there may be other data associated with person as remarks, etc.
                     }
                     linkType++;
@@ -508,10 +528,9 @@ public final class Item extends TableRow implements Editable {
         StringBuilder people = new StringBuilder();
         for (Person person : linkedPersons.get(field)) {
             people.append(" and ");
-            people.append(person.get("first_name"));
-            people.append(' ');
-            people.append(person.get("last_name"));
+            people.append(person.getBibTeXForm());
         }
+        if (people.length()==0) return("");
         return(people.substring(5));
     }
     

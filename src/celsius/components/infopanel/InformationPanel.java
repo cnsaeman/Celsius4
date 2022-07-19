@@ -22,8 +22,8 @@ import celsius.data.Person;
 import celsius.data.TableRow;
 import celsius.gui.EditorPanel;
 import celsius.gui.GuiEventListener;
-import celsius.gui.MultiLineEditor;
-import celsius.gui.SingleLineEditor;
+import atlantis.gui.MultiLineEditor;
+import atlantis.gui.SingleLineEditor;
 import celsius.gui.TabLabel;
 import celsius.tools.*;
 import java.awt.Component;
@@ -141,6 +141,13 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
         // TODO: Questionable
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame", "noLib", new JComponent[] {jMIEditDS1});
+
+        RSC.guiStates.registerDirectlyEnabledComponent("infoPanel", "thumbnailAvailable", new JComponent[] { jBtnResizeThumb,jBtnRemoveThumb });
+        RSC.guiStates.adjustState("infoPanel", "thumbnailAvailable", false);
+        RSC.guiStates.registerDirectlyEnabledComponent("infoPanel", "bibliographyEditable", new JComponent[] { jBtnApplyBibTeX, jBtnCreateBibTeX, jBtnNormalizeBibTeX, jCBAddProperty });
+        RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", false);
+        RSC.guiStates.registerDirectlyEnabledComponent("infoPanel", "thumbInClipboard", new JComponent[] { jMIAddThumb });
+        RSC.guiStates.adjustState("infoPanel", "thumbInClipboard", false);
         
         celsiusTable=null;
         tabMode=-1000;
@@ -162,8 +169,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 if (currentRow.hasThumbnail()) {
                     String thumbPath = currentRow.getThumbnailPath();
                     if (thumbPath != null) {
-                        jBtnResizeThumb.setEnabled(true);
-                        jBtnRemoveThumb.setEnabled(true);
+                        RSC.guiStates.adjustState("infoPanel","thumbnailAvailable", true);
                         try {
                             jLIcon.setIcon(new ImageIcon(new URL("file://" + thumbPath)));
                             return;
@@ -173,8 +179,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     }
                 }
             }
-            jBtnResizeThumb.setEnabled(false);
-            jBtnRemoveThumb.setEnabled(false);
+            RSC.guiStates.adjustState("infoPanel", "thumbnailAvailable", false);
             jLIcon.setIcon(null);
         }
     }
@@ -607,7 +612,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 740, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -635,7 +640,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
         jBtnResizeThumb.setFont(jBtnResizeThumb.getFont().deriveFont(jBtnResizeThumb.getFont().getStyle() & ~java.awt.Font.BOLD, jBtnResizeThumb.getFont().getSize()-1));
         jBtnResizeThumb.setText("Resize to 240x240");
-        jBtnResizeThumb.setEnabled(false);
         jBtnResizeThumb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnResizeThumbActionPerformed(evt);
@@ -645,7 +649,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
         jBtnRemoveThumb.setFont(jBtnRemoveThumb.getFont().deriveFont(jBtnRemoveThumb.getFont().getStyle() & ~java.awt.Font.BOLD, jBtnRemoveThumb.getFont().getSize()-1));
         jBtnRemoveThumb.setText("Remove");
-        jBtnRemoveThumb.setEnabled(false);
         jBtnRemoveThumb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnRemoveThumbActionPerformed(evt);
@@ -684,7 +687,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addContainerGap(769, Short.MAX_VALUE))
+                .addContainerGap(674, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -703,7 +706,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 873, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -837,12 +840,16 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 }//GEN-LAST:event_jBtnCreateBibTeXActionPerformed
 
     private void jBtnNormalizeBibTeXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNormalizeBibTeXActionPerformed
-        String tmp = BibTeXRecord.normalizeBibTeX(jTABibTeX.getText());
-        if (!tmp.startsWith("@")) {
-            RSC.showWarning(tmp, "BibTeX Error");
-        } else {
-            jTABibTeX.setText(tmp);
+        Item item = getItem();
+        try {
+            BibTeXRecord bibtex=new BibTeXRecord(jTABibTeX.getText());
+            bibtex.put("title", BibTeXRecord.normalizeTitle(bibtex.get("title")));
+            bibtex.put("author", item.getBibTeXNames("authors"));
+            jTABibTeX.setText(bibtex.toString());
             jTABibTeX.setCaretPosition(0);
+        } catch (Exception ex) {
+            RSC.showWarning("BibTeX record is not well formed.", "Error");
+            RSC.outEx(ex);
         }
 }//GEN-LAST:event_jBtnNormalizeBibTeXActionPerformed
 
@@ -877,17 +884,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     RSC.showWarning("BibTeX parsing error: " + BibTeXRecord.status[bibtex.parseError], "Warning:");
             }
             jTABibTeX.setCaretPosition(0);
-            jBtnApplyBibTeX.setEnabled(true);
-            jBtnCreateBibTeX.setEnabled(true);
-            jBtnNormalizeBibTeX.setEnabled(true);
-            jCBAddProperty.setEnabled(true);
+            RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", true);
         } else {
             jTABibTeX.setText(RSC.getBibOutput(currentItem));
             jTABibTeX.setCaretPosition(0);
-            jBtnApplyBibTeX.setEnabled(false);
-            jBtnCreateBibTeX.setEnabled(false);
-            jBtnNormalizeBibTeX.setEnabled(false);
-            jCBAddProperty.setEnabled(false);
+            RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", false);
         }
 }//GEN-LAST:event_jCBBibPluginsActionPerformed
 
@@ -906,7 +907,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             Category category=(Category)currentObject;
             if (category!=null) {
                 category.setRemarks(jTARemarks.getText().trim());
-                category.save();
+                try {
+                    category.save();
+                } catch (Exception ex) {
+                    RSC.outEx(ex);
+                }
             }
         }
         updateGUI();
@@ -916,7 +921,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         String tmp = library.getHTMLTemplate(currentTemplate).templateString;
         MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML template", tmp);
         MLE.setVisible(true);
-        if (!MLE.cancel) {
+        if (!MLE.cancelled) {
             library.setHTMLTemplate(currentTemplate,MLE.text);
             updateGUI();
         }
@@ -924,11 +929,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     private void jPMHTMLPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPMHTMLPopupMenuWillBecomeVisible
         Clipboard cb=Toolkit.getDefaultToolkit().getSystemClipboard();
-        if ((tabMode==0) && cb.isDataFlavorAvailable(DataFlavor.imageFlavor)) {
-            jMIAddThumb.setEnabled(true);
-        } else {
-            jMIAddThumb.setEnabled(false);
-        }
+        RSC.guiStates.adjustState("infoPanel", "thumbInClipboard", (tabMode==0) && cb.isDataFlavorAvailable(DataFlavor.imageFlavor));
     }//GEN-LAST:event_jPMHTMLPopupMenuWillBecomeVisible
     
     private void jMIAddThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAddThumbActionPerformed
@@ -1134,7 +1135,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         Attachment attachment=item.linkedAttachments.get(jLAttachments.getSelectedIndex());
         SingleLineEditor SLE=new SingleLineEditor(RSC,"Enter a new name",attachment.get("name"),true);
         SLE.setVisible(true);
-        if (!SLE.cancel) {
+        if (!SLE.cancelled) {
             attachment.put("name", SLE.text);
             try {
                 attachment.save();
@@ -1476,7 +1477,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         RSC.getCurrentTable().updateStats();
         HashMap<String,String> data=RSC.getCurrentTable().properties;
         jHTMLview.setText(template.fillIn(data));
-        jTARemarks.setText(category.remarks);
+        jTARemarks.setText(category.getS("remarks"));
     }
 
     private void guiToKeyword() {
@@ -1522,8 +1523,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         person.loadCollaborators();
         CelsiusTemplate template=library.getHTMLTemplate(1);
         currentTemplate=1;
-        person.put("$$currentitems",library.getNumberOfItemsForPerson(person));
-        person.put("$$currentpages",library.getNumberOfPagesForPerson(person));
+        library.addStandardStatistics(person);
         jHTMLview.setText(template.fillIn(person,true));
         jTARemarks.setText(person.get("remarks"));
         jTARemarks.setCaretPosition(0);
@@ -1699,7 +1699,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 } else {
                     final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a description for the associated file", "", true);
                     DSLE.setVisible(true);
-                    if (!DSLE.cancel) {
+                    if (!DSLE.cancelled) {
                         name = DSLE.text.trim();
                     }
                     DSLE.dispose();

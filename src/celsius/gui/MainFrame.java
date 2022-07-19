@@ -6,6 +6,7 @@
 
 package celsius.gui;
 
+import atlantis.gui.MultiLineEditor;
 import celsius.components.infopanel.InformationPanel;
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.components.library.EditLibrary;
@@ -42,6 +43,7 @@ import celsius.data.KeywordListModel;
 import celsius.data.PeopleListModel;
 import celsius.data.Person;
 import celsius.components.library.RecentLibraryCache;
+import celsius.components.tableTabs.CelsiusTableModel;
 import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.BorderLayout;
@@ -186,9 +188,11 @@ public class MainFrame extends javax.swing.JFrame implements
         
         // STATEMANAGER TODO: check
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIRememberSelectedItems, jMIRememberSelectedItems1});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMIMerge1,jMIRemoveFromTable2,jMIShowItems,});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMPeople,jMIMerge1,jMIRemoveFromTable2,jMIShowItems});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography, categoryTreePanel.searchCategories});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personTabAvailable", new JComponent[] { });
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemTabAvailable", new JComponent[] { });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","categorySelected", new JComponent[] { jMCategories, jMIInsertCat });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","pluginSelected", new JComponent[] { });
         RSC.guiStates.setState("mainFrame","librarySelected", false);
@@ -197,10 +201,12 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.guiStates.setState("mainFrame","personSelected", false);
         RSC.guiStates.setState("mainFrame","pluginSelected", false);
         RSC.guiStates.setState("mainFrame","tabAvailable",false);        
+        RSC.guiStates.setState("mainFrame","itemTabAvailable",false);        
+        RSC.guiStates.setState("mainFrame","personTabAvailable",false);        
         RSC.guiStates.registerListener("mainFrame", this);
         RSC.guiStates.adjustStates("mainFrame");
 
-        setIconImage(RSC.celsiusIcon);
+        setIconImage(RSC.getAppIcon());
    }
 
     public void setShortCuts() {
@@ -294,11 +300,11 @@ public class MainFrame extends javax.swing.JFrame implements
      * @param targetLibrary
      */
     private void copyItemToLibrary(Library targetLibrary) {
-        Library sourceLibrary = RSC.getCurrentlySelectedLibrary();
+        Library sourceLibrary = RSC.getCurrentTable().library;
         if (sourceLibrary != targetLibrary) {
             for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows()) {
                 Item item=(Item)tableRow;
-                DoubletteResult dr=new DoubletteResult(0,null);
+                DoubletteResult dr=new DoubletteResult(0,null,null);
                 try {
                     dr = targetLibrary.isDoublette(item);
                 } catch (IOException ex) {
@@ -1352,7 +1358,7 @@ public class MainFrame extends javax.swing.JFrame implements
         String tmp = library.getHTMLTemplate(guiInfoPanel.currentTemplate).templateString;
         MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML template", tmp);
         MLE.setVisible(true);
-        if (!MLE.cancel) {
+        if (!MLE.cancelled) {
             library.setHTMLTemplate(guiInfoPanel.currentTemplate,MLE.text);
             guiInfoPanel.updateGUI();
         }
@@ -1555,10 +1561,19 @@ public class MainFrame extends javax.swing.JFrame implements
         if (celsiusTable == null) {
             guiPluginPanel.adjustPluginList();
             guiInfoPanel.updateGUI();
+            RSC.guiStates.adjustState("mainFrame","tabAvailable", false);
         } else {
             switchToLibrary(celsiusTable.library);
             guiPluginPanel.adjustPluginList();
             guiInfoPanel.updateGUI();
+            RSC.guiStates.adjustState("mainFrame","tabAvailable", true);
+            if (celsiusTable.getObjectType()==CelsiusTableModel.CELSIUS_TABLE_ITEM_TYPE) {
+                RSC.guiStates.adjustState("mainFrame","itemTabAvailable", true);
+                RSC.guiStates.adjustState("mainFrame","personTabAvailable", false);
+            } else if (celsiusTable.getObjectType()==CelsiusTableModel.CELSIUS_TABLE_ITEM_TYPE) {
+                RSC.guiStates.adjustState("mainFrame","itemTabAvailable", false);
+                RSC.guiStates.adjustState("mainFrame","personTabAvailable", true);
+            }
         }
         RSC.guiStates.adjustState("mainFrame","tabAvailable", jTPTabList.getSelectedIndex()!=-1);
     }//GEN-LAST:event_jTPTabListStateChanged
@@ -2364,14 +2379,14 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             return;
         }
         guiInfoPanel.currentObject=category;
-        CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(CelsiusTable.TABLETYPE_ITEMS_IN_CATEGORY, category.label, "folder_table");
+        CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(CelsiusTable.TABLETYPE_ITEMS_IN_CATEGORY, category.getS("label"), "folder_table");
         Library library=RSC.getCurrentlySelectedLibrary();
         try {
             library.showItemsInCategory(category, celsiusTable);
         } catch (Exception e) {
             RSC.outEx(e);
         }
-        celsiusTable.properties.put("category", category.label);
+        celsiusTable.properties.put("category", category.getS("label"));
         guiInfoPanel.updateGUI();
     }
     

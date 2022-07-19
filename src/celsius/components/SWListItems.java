@@ -49,6 +49,7 @@ public class SWListItems extends SwingWorker<Void, TableRow> implements Property
                 RSC.MF.jPBSearch.setValue(0);
                 RSC.MF.setThreadMsg("Searching...");
                 RSC.guiStates.adjustState("mainFrame","itemSelected", false);
+                RSC.guiStates.adjustState("mainFrame","personSelected", false);
                 celsiusTable.removeAllRows();
             }
         });    }

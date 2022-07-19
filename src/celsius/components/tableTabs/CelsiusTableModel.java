@@ -23,9 +23,12 @@ import javax.swing.table.AbstractTableModel;
  * @author cnsaeman
  */
 public class CelsiusTableModel extends AbstractTableModel {
+    
+    public static final int CELSIUS_TABLE_ITEM_TYPE=0;
+    public static final int CELSIUS_TABLE_PERSON_TYPE=1;
 
     private final Resources RSC;
-    public int objectType; // 0 : items, 1 : persons
+    public int objectType; // 0 : items, 1 : persons, see above
     public final ArrayList<String> columns;
     public final ArrayList<String> headers;
     public final ArrayList<String> IDs;

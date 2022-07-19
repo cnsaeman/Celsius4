@@ -19,30 +19,33 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
 
     public final Resources RSC;
     public final PeopleSelector peopleSelector;
-    public final PeopleListModelDetailed PLMD;
+    public final PeopleListModelDetailed peopleListModelDetailed;
     
     public boolean cancelled;
     public boolean modified;
     
     /**
      * Creates new form PeopleEditor
+     * 
+     * @param RSC
+     * @param peopleListModelDetailed
      */
-    public PeopleEditor(Resources rsc, PeopleListModelDetailed plmd) {
-        super(rsc.MF, true);
+    public PeopleEditor(Resources RSC, PeopleListModelDetailed peopleListModelDetailed) {
+        super(RSC.MF, true);
         this.setTitle("Edit person field");
-        RSC=rsc;
-        PLMD=plmd;
+        this.RSC=RSC;
+        this.peopleListModelDetailed=peopleListModelDetailed;
         initComponents();
-        jList.setModel(PLMD);
+        jList.setModel(this.peopleListModelDetailed);
         jPanel2.setBorder(RSC.stdBorder());
         jPanel3.setBorder(RSC.stdBorder());
         peopleSelector=new PeopleSelector(RSC);
         peopleSelector.addEventListener(this);
         jPanel4.add(peopleSelector);
-        this.pack();
-        GUIToolBox.centerDialog(this, RSC.MF);
         cancelled=true;
         modified=false;
+        this.pack();
+        GUIToolBox.centerDialog(this, RSC.MF);
     }
 
     /**
@@ -232,27 +235,27 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
     private void jBtnAdd2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAdd2ActionPerformed
         String id=peopleSelector.getSelectedPersonIDs();
         Person person=new Person(RSC.getCurrentlySelectedLibrary(),id);
-        PLMD.add(person);
+        peopleListModelDetailed.add(person);
         modified=true;
     }//GEN-LAST:event_jBtnAdd2ActionPerformed
 
     private void jBtnUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnUpActionPerformed
         int p=jList.getSelectedIndex();
-        PLMD.swap(p-1,p);
+        peopleListModelDetailed.swap(p-1,p);
         jList.setSelectedIndex(p-1);        
         modified=true;
     }//GEN-LAST:event_jBtnUpActionPerformed
 
     private void jBtnDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDownActionPerformed
         int p=jList.getSelectedIndex();
-        PLMD.swap(p,p+1);
+        peopleListModelDetailed.swap(p,p+1);
         jList.setSelectedIndex(p+1);
         modified=true;
     }//GEN-LAST:event_jBtnDownActionPerformed
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
         int p=jList.getSelectedIndex();
-        PLMD.remove(p);
+        peopleListModelDetailed.remove(p);
         modified=true;
     }//GEN-LAST:event_jBtnDeleteActionPerformed
 
@@ -273,7 +276,7 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
                 RSC.outEx(ex);
             }
         }
-        PLMD.add(peopleToBeAdded);
+        peopleListModelDetailed.add(peopleToBeAdded);
     }//GEN-LAST:event_jBtnAdd1ActionPerformed
 
     private void jBtnNormalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNormalizeActionPerformed
@@ -310,7 +313,7 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
 
     @Override
     public void genericEventOccured(GenericCelsiusEvent e) {
-        if (e.type==peopleSelector.SHOW_ITEMS) {
+        if (peopleSelector.SHOW_ITEMS==e.type) {
             String ids=peopleSelector.getSelectedPersonIDs();
             jBtnAdd2.setEnabled((ids!=null) && (ids.length()>0) && (!ids.contains(",")));
         } else if (e.type==peopleSelector.NAME_SELECTED) {
@@ -318,7 +321,7 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
             if ((ids!=null) && (ids.length()>0) && (!ids.contains(","))) {
                 String id = peopleSelector.getSelectedPersonIDs();
                 Person person = new Person(RSC.getCurrentlySelectedLibrary(), id);
-                PLMD.add(person);
+                peopleListModelDetailed.add(person);
                 modified = true;
             }
         }

@@ -132,11 +132,15 @@ public class FileTools {
     }
 
     /**
-     * Kopiere eine Datei von s1 nach s2
+     * Copy file with path source to file with path target
+     * 
+     * @param source
+     * @param target
+     * @throws IOException 
      */
-    public static void copyFile(String s1, String s2) throws IOException {
-        FileInputStream fis = new FileInputStream(new File(s1));
-        FileOutputStream fos = new FileOutputStream(new File(s2));
+    public static void copyFile(String source, String target) throws IOException {
+        FileInputStream fis = new FileInputStream(new File(source));
+        FileOutputStream fos = new FileOutputStream(new File(target));
         byte[] buf = new byte[4096];
         int i = 0;
         while ((i = fis.read(buf)) != -1) {

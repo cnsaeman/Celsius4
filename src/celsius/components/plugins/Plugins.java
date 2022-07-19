@@ -49,10 +49,12 @@ public class Plugins extends HashMap<String,Plugin> {
                     Plugin pl=new Plugin(Parser.cutUntil(fn,".class"));
                     put(pl.metaData.get("title"),pl);
                     // TODO set configuration paramters??
-                }
-                catch (Exception e) { 
+                } catch (Exception e) { 
                     RSC.out("Error loading Plugin "+fn);
                     RSC.outEx(e);
+                } catch (Error e) {
+                    RSC.out("Error loading Plugin "+fn);
+                    RSC.outEr("Error while loading Plugin "+fn+":\n\n",e);
                 }
             }
         }

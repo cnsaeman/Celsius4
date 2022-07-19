@@ -6,9 +6,11 @@
 
 package celsius.data;
 
+import atlantis.gui.KeyValueTableModel;
 import celsius.components.library.Library;
 import atlantis.tools.Parser;
 import atlantis.tools.FileTools;
+import celsius.components.bibliography.BibTeXRecord;
 import java.io.File;
 import java.sql.ResultSet;
 import java.text.Normalizer;
@@ -33,13 +35,22 @@ public class Person extends TableRow implements Editable {
     }
     
     public Person(Library lib, ResultSet rs) {
-        super(lib,"persons",rs,lib.itemPropertyKeys);
+        super(lib,"persons",rs,lib.personPropertyKeys);
         library=lib;
         orderedStandardKeys=library.orderedPersonPropertyKeys;
         tableHeaders=library.personPropertyKeys;
         linkedItems=new HashMap<>();
     }
 
+    public Person(Library lib) {
+        super(lib,"persons",lib.personPropertyKeys);
+        library=lib;
+        orderedStandardKeys=library.orderedPersonPropertyKeys;
+        tableHeaders=library.personPropertyKeys;
+        linkedItems=new HashMap<>();
+    }
+    
+    
     @Override
     public void save() {
         try {
@@ -74,7 +85,7 @@ public class Person extends TableRow implements Editable {
         try {        
             collaborators = "";
             collaboratorsID = "";
-            ResultSet rs=library.dbConnection.prepareStatement("SELECT id, first_name, last_name FROM persons WHERE id IN (SELECT DISTINCT p2.person_id FROM item_person_links p1 INNER JOIN item_person_links p2 ON p2.item_id=p1.item_id AND (p1.person_id<>p2.person_id) WHERE p1.person_id IN ("+id+"));").executeQuery();
+            ResultSet rs=library.dbConnection.prepareStatement("SELECT id, first_name, last_name FROM persons WHERE id IN (SELECT DISTINCT p2.person_id FROM item_person_links p1 INNER JOIN item_person_links p2 ON p2.item_id=p1.item_id AND (p1.person_id<>p2.person_id) WHERE p1.person_id IN ("+id+")) ORDER BY last_name;").executeQuery();
             while (rs.next()) {
                 collaborators+="|"+rs.getString(3)+", "+rs.getString(2);
                 collaboratorsID+="|"+rs.getString(1);
@@ -223,6 +234,13 @@ public class Person extends TableRow implements Editable {
     @Override
     public String getThumbnailPath() {
         return(library.completeDir("LD::person-thumbnails/"+id+".jpg"));
+    }
+    
+    public String getBibTeXForm() {
+        if (containsKey("bibtex")) return(getS("bibtex"));
+        StringBuffer out=new StringBuffer();
+        out.append(BibTeXRecord.sanitize(getS("last_name"))).append(", ").append(BibTeXRecord.sanitize(getS("first_name")));
+        return(out.toString());
     }
     
 

@@ -5,7 +5,6 @@
 
 package celsius.components.categories;
 
-import celsius.components.categories.Category;
 import celsius.components.library.Library;
 import celsius.tools.ToolBox;
 import java.sql.PreparedStatement;
@@ -126,7 +125,7 @@ public class StructureNode implements MutableTreeNode {
 
     public ArrayList<StructureNode> getPath() {
         if (parent==null) {
-            ArrayList<StructureNode> path=new ArrayList<StructureNode>();
+            ArrayList<StructureNode> path=new ArrayList<>();
             path.add(this);
             return(path);
         }
@@ -138,7 +137,7 @@ public class StructureNode implements MutableTreeNode {
     @Override
     public String toString() {
         if (category==null) return(library.name);
-        return(category.label.trim());
+        return(category.getS("label").trim());
     }
 
     @Override
@@ -200,13 +199,17 @@ public class StructureNode implements MutableTreeNode {
     @Override
     public void setUserObject(Object object) {
         String newLabel=(String)object;
-        if ((category.label!=null) && (category.label.equals(newLabel))) return;
-        category.label=newLabel;
-        updateCategoryLabelInDatabase();
+        if (category.getS("label").equals(newLabel)) return;
+        category.put("label",newLabel);
+        try {
+            category.save();
+        } catch (Exception ex) {
+            category.library.RSC.outEx(ex);
+        }
     }
     
     public StructureNode nextOccurence(String search) {
-        if (category.label.toLowerCase().contains(search)) return(this);
+        if (category.getS("label").toLowerCase().contains(search)) return(this);
         for (StructureNode node : childNodes) {
             StructureNode found=node.nextOccurence(search);
             if (found!=null) {
@@ -252,14 +255,6 @@ public class StructureNode implements MutableTreeNode {
             childrenList.append(",").append(String.valueOf(node.id));
         }
         return(childrenList.substring(1));
-    }
-    
-    public void updateCategoryLabelInDatabase() {
-        try {
-            library.executeEX("UPDATE item_categories SET label=? where id=?;", new String[] { category.label, category.id});
-        } catch (Exception ex) {
-            library.RSC.outEx(ex);
-        }
     }
     
     public void writeParentToDatabase() {
