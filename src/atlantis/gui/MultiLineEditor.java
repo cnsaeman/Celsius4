@@ -10,6 +10,8 @@ public class MultiLineEditor extends javax.swing.JDialog {
     public boolean cancelled;
     private final StandardResources RSC;
     
+    private final AtlantisTextArea jText;
+    
     /** Creates new form DialogMultiLineEditor */
     public MultiLineEditor(StandardResources RSC, String title, String text) {
         super(RSC.getMF(), true);
@@ -17,6 +19,13 @@ public class MultiLineEditor extends javax.swing.JDialog {
         setIconImage(RSC.getAppIcon());
         this.setTitle(title);
         initComponents();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jText = new AtlantisTextArea(RSC.guiScale(12));
+        jText.setColumns(20);
+        jText.setRows(5);
+        jScrollPane1.setViewportView(jText);
+
+
         this.text=text;
         jText.setText(text);
         jText.setCaretPosition(0);
@@ -37,16 +46,11 @@ public class MultiLineEditor extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jText = new javax.swing.JTextArea();
         jBtnCancel = new javax.swing.JButton();
         jBtnApply = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jText.setColumns(20);
-        jText.setRows(5);
-        jScrollPane1.setViewportView(jText);
 
         jBtnCancel.setText("Cancel");
         jBtnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -69,11 +73,12 @@ public class MultiLineEditor extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 416, Short.MAX_VALUE)
                         .addComponent(jBtnApply)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBtnCancel)))
+                        .addComponent(jBtnCancel))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -106,7 +111,6 @@ public class MultiLineEditor extends javax.swing.JDialog {
     private javax.swing.JButton jBtnApply;
     private javax.swing.JButton jBtnCancel;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jText;
     // End of variables declaration//GEN-END:variables
     
 }

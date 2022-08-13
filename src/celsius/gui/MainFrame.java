@@ -189,7 +189,7 @@ public class MainFrame extends javax.swing.JFrame implements
         // STATEMANAGER TODO: check
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemSelected", new JComponent[] { jMItems, jMICitationTagClipboard, jMIBibClipboard, jMICitationTagClipboard, jMIPeople, jMIRememberSelectedItems, jMIRememberSelectedItems1});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personSelected", new JComponent[] { jMPeople,jMIMerge1,jMIRemoveFromTable2,jMIShowItems});
-        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography, categoryTreePanel.searchCategories});
+        RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","librarySelected", new JComponent[] { jMICloseLib, jMIDeleteLib, jMIShowCitedinFile, jMIConsistencyCheck, jMICheckBib, jMIEditLib,jMIFullBibToFile, jMIEditDS, jMIAddToLib, jTBAdd, jCE3, guiSearchPanel, guiPluginPanel.jBMPlugins, jMIExportBibliography, categoryTreePanel.searchCategories, jMIAutoImport});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","tabAvailable", new JComponent[] { jMICopyTab, jMICopyTab2, jMITab2Cat, jMITab2Cat2, jMICloseTab, jMICloseTab2});
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","personTabAvailable", new JComponent[] { });
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame","itemTabAvailable", new JComponent[] { });
@@ -292,6 +292,7 @@ public class MainFrame extends javax.swing.JFrame implements
             jCBLibraries.setSelectedIndex(RSC.currentLibrary);
         categoryTreePanel.structureTreeModel.setRoot(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         updateStatusBar(true);
+        jMIAutoImport.setSelected((RSC.currentLibrary!=-1) && RSC.getCurrentlySelectedLibrary().autoImport());
         RSC.plugins.updateExportPlugins();
     }
     
@@ -444,6 +445,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jMIDeleteLib = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         jMIAddToLib = new javax.swing.JMenuItem();
+        jMIAutoImport = new javax.swing.JCheckBoxMenuItem();
         jSeparator2 = new javax.swing.JSeparator();
         jMIEditLib = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JSeparator();
@@ -978,6 +980,15 @@ public class MainFrame extends javax.swing.JFrame implements
             }
         });
         jMLibraries.add(jMIAddToLib);
+
+        jMIAutoImport.setSelected(true);
+        jMIAutoImport.setText("Automatically import items");
+        jMIAutoImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIAutoImportActionPerformed(evt);
+            }
+        });
+        jMLibraries.add(jMIAutoImport);
         jMLibraries.add(jSeparator2);
 
         jMIEditLib.setText("Edit library properties");
@@ -1872,6 +1883,10 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
         categoryTreePanel.miCatDragAndDrop.setState(jMICatDragDrop.getState());
         categoryTreePanel.setDragAndDropState(jMICatDragDrop.getState());
     }//GEN-LAST:event_jMICatDragDropActionPerformed
+
+    private void jMIAutoImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAutoImportActionPerformed
+        RSC.getCurrentlySelectedLibrary().setAutoImport(jMIAutoImport.isSelected());
+    }//GEN-LAST:event_jMIAutoImportActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -1895,6 +1910,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     private javax.swing.JMenuItem jMIAbout;
     private javax.swing.JMenuItem jMIAddTab;
     private javax.swing.JMenuItem jMIAddToLib;
+    public javax.swing.JCheckBoxMenuItem jMIAutoImport;
     private javax.swing.JMenuItem jMIBibClipboard;
     public javax.swing.JCheckBoxMenuItem jMICatDragDrop;
     private javax.swing.JMenuItem jMICheckBib;

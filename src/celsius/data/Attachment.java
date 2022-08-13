@@ -103,6 +103,10 @@ public class Attachment extends TableRow {
         return(parent.getCompletedDir(get("path")));
     }
     
+    public boolean isFilePresent() {
+        return((new File(getFullPath())).exists());
+    }
+    
     public String normalizeForSave(String s) {
         s=Parser.replace(s, "\n", " ");
         s=Parser.replace(s, "\t", " ");

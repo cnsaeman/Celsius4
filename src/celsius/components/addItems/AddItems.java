@@ -5,6 +5,7 @@
 
 package celsius.components.addItems;
 
+import atlantis.gui.AtlantisTextArea;
 import celsius.components.categories.ChooseItemCategory;
 import celsius.components.library.Library;
 import celsius.components.bibliography.BibTeXRecord;
@@ -21,6 +22,7 @@ import atlantis.gui.HasManagedStates;
 import atlantis.tools.Parser;
 import celsius.components.plugins.Plugin;
 import atlantis.tools.TextFile;
+import celsius.components.infopanel.InformationPanel;
 import celsius.gui.EditorPanel;
 import celsius.gui.GUIToolBox;
 import celsius.gui.GuiEventListener;
@@ -28,16 +30,28 @@ import celsius.gui.TabLabel;
 import celsius.tools.ToolBox;
 import java.awt.BorderLayout;
 import java.awt.DisplayMode;
+import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
@@ -72,6 +86,8 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     private JList currentList;
 
     private boolean cancelAdding, autoDelete, autoReplace;
+    
+    private AtlantisTextArea jTABibTeX; 
 
     public AddItems(Resources RSC) {
         super(RSC.MF, true);
@@ -85,6 +101,11 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         addedItems = new ArrayList<>();
         getDetailsSWs = new ArrayList<>();
         initComponents();
+        jTABibTeX=new AtlantisTextArea(RSC.guiScale(12));
+        jTABibTeX.setColumns(20);
+        jTABibTeX.setRows(5);
+        jScrollPane7.setViewportView(jTABibTeX);
+        
         editorPanel=new EditorPanel(RSC,false);
         editorPanel.addChangeListener(this);
         jPanel1.add(editorPanel,BorderLayout.CENTER);
@@ -101,12 +122,11 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jLPlugins.setModel(RSC.plugins.getPluginsDLM("manual-items",RSC.getCurrentlySelectedLibrary()));
         
         toInitState();
-        LBQ=new LinkedBlockingQueue<Runnable>();
+        LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
         DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
         this.setSize((int)(0.8*dm.getWidth()), (int)(0.8*dm.getHeight()));
         RSC.adjustComponents(this.getComponents());
-        jTABibTeX.setFont(new java.awt.Font("Monospaced", 0, RSC.guiScale(12)));
         GUIToolBox.centerDialog(this,RSC.MF);
         initializing = false;
         ThreadStatus.setText("No item selected. No threads running.");
@@ -125,6 +145,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jBtnImport.setEnabled(false);
         jTABibTeX.setText("");
         updateItemInformation();
+        RSC.workerRunning=true;
     }
 
     private void viewItem() {
@@ -138,42 +159,11 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jLstFileList.grabFocus();
     }
 
-    /*private Item createEntry() {
-        Item item = new Item(library);
-        for (String tag : library.itemPropertyKeys) {
-            if (!tag.equals("addinfo") && !tag.equals("autoregistered") && !tag.equals("registered") && !tag.equals("id")) {
-                item.put(tag, "");
-                RSC.out(tag);
-            }
-        }
-        if (library.config.get("standard-item-fields")!=null) 
-            for (String tag : library.configToArray("standard-item-fields")) {
-                item.put(tag, "");
-                RSC.out(tag);
-            }
-        return(item);
-    }*/
-
     private void createItemFromFile(String fileName) {
         String fileType = FileTools.getFileType(fileName);
-        if (!RSC.configuration.isFileTypeSupported(fileType)) {
-            return;
-        }
-        String sft = library.config.get("filetypes");
-        if (!sft.equals("*")) {
-            if (!Parser.listContains(sft, fileType)) {
-                return;
-            }
-        }
+        if (!library.isFileTypeSupported(fileType)) return;
         // create item
-        Item item=new Item(library);
-        // attach file to item
-        Attachment attachment=new Attachment(library,item);
-        attachment.put("name","Main File");
-        attachment.put("path",fileName);
-        attachment.put("filetype",fileType);
-        attachment.attachToParent();
-        attachment.order=0;
+        Item item=library.createItemFromFile(fileName);
         preparedItems.add(item);
         if (jTPane.getSelectedIndex()==0) {
             if (fileName.length() > 52) {
@@ -248,13 +238,12 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jTAFileText = new javax.swing.JTextArea();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
-        jScrollPane7 = new javax.swing.JScrollPane();
-        jTABibTeX = new javax.swing.JTextArea();
         jPanel16 = new javax.swing.JPanel();
         jBtnCreateEmpty = new javax.swing.JButton();
         jBtnNormalize1 = new javax.swing.JButton();
         jCBAddProperty = new javax.swing.JComboBox();
         jBtnAdd1 = new javax.swing.JButton();
+        jScrollPane7 = new javax.swing.JScrollPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jBtnCreateManualEntry = new javax.swing.JButton();
@@ -286,6 +275,11 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jBtnDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.GridLayout(2, 1));
 
         jTPane.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -542,13 +536,6 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("BibTeX"));
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jTABibTeX.setColumns(20);
-        jTABibTeX.setFont(new java.awt.Font("Monospaced", 0, RSC.guiScale(12)));
-        jTABibTeX.setRows(5);
-        jScrollPane7.setViewportView(jTABibTeX);
-
-        jPanel7.add(jScrollPane7, java.awt.BorderLayout.CENTER);
-
         jPanel16.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         jBtnCreateEmpty.setText("Create empty BibTeX-record");
@@ -607,6 +594,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         );
 
         jPanel7.add(jPanel16, java.awt.BorderLayout.SOUTH);
+        jPanel7.add(jScrollPane7, java.awt.BorderLayout.CENTER);
 
         jPanel5.add(jPanel7, java.awt.BorderLayout.CENTER);
 
@@ -1022,6 +1010,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
         RSC.emptyThreadPoolExecutor();
         RSC.guiStates.unregister("addDialog");
+        RSC.workerRunning=false;
         this.setVisible(false);
         this.dispose();
 }//GEN-LAST:event_jBtnDoneActionPerformed
@@ -1344,6 +1333,10 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         eliminateDoublettes2();
     }//GEN-LAST:event_jBtnImpDoubActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        RSC.workerRunning=false;
+    }//GEN-LAST:event_formWindowClosed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea ThreadStatus;
     public javax.swing.JButton jBtnAdd;
@@ -1403,7 +1396,6 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTextArea jTABibTeX;
     private javax.swing.JTextArea jTAFileText;
     private javax.swing.JTextField jTFBarcode;
     private javax.swing.JTextField jTFFile;

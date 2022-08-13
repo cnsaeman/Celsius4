@@ -31,6 +31,7 @@ import celsius.components.library.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.components.infopanel.InformationPanel;
 import atlantis.gui.MultiLineMessage;
+import celsius.components.RegularWorker;
 import celsius.components.tableTabs.CelsiusTableModel;
 import celsius.tools.*;
 import java.awt.Color;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -141,6 +143,10 @@ public class Resources implements StandardResources {
     public ThreadPoolExecutor TPE;
     public LinkedBlockingQueue<Runnable> LBQ;
     
+    public final ScheduledExecutorService regularExecutor;
+    public final RegularWorker regularWorker;
+    public boolean workerRunning;
+    
     public GuiStates guiStates;
     
     public String celsiusBaseFolder;
@@ -172,6 +178,10 @@ public class Resources implements StandardResources {
         executorService=java.util.concurrent.Executors.newScheduledThreadPool(5);
         LBQ=new LinkedBlockingQueue<>();
         TPE=new ThreadPoolExecutor(5, 5, 500L, TimeUnit.DAYS,LBQ);
+        regularExecutor=Executors.newScheduledThreadPool ( 1 );
+        regularWorker=new RegularWorker(this);
+        workerRunning=false;
+        regularExecutor.scheduleAtFixedRate ( regularWorker, 0L , 15L , TimeUnit.SECONDS );
         appIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
     }
     
@@ -527,7 +537,7 @@ public class Resources implements StandardResources {
 
     public void rememberDir(String dir, String folderPath) {
         if (getCurrentlySelectedLibrary()==null) return;
-        getCurrentlySelectedLibrary().putConfig("dir::"+dir,folderPath);
+        getCurrentlySelectedLibrary().setConfiguration("dir::"+dir,folderPath);
     }
     
     

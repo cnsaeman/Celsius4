@@ -488,7 +488,7 @@ public final class Library { //implements Iterable<Item> {
             s+="|"+Integer.toString(i);
         }
         s=s.substring(1);
-        putConfig("columnsizes", s);
+        setConfiguration("columnsizes", s);
     }
     
     public void close() {
@@ -506,7 +506,42 @@ public final class Library { //implements Iterable<Item> {
         return (!config.containsKey(key) || config.get(key)==null || config.get(key).isBlank());
     }
     
-    public void putConfig(String key, String value) {
+    public boolean isFileTypeSupported(String fileType) {
+        if (!RSC.configuration.isFileTypeSupported(fileType)) {
+            return(false);
+        }
+        String sft = config.get("filetypes");
+        if (!sft.equals("*")) {
+            if (!Parser.listContains(sft, fileType)) {
+                return(false);
+            }
+        }
+        return(true);
+    }
+    
+    /**
+     * Creates an item from a given file name for adding it later. The item is not saved to the library.
+     * 
+     * @param fileName
+     * @return 
+     */
+    public Item createItemFromFile(String fileName) {
+        Item item=new Item(this);
+        // attach file to item
+        Attachment attachment=new Attachment(this,item);
+        attachment.put("name","Main File");
+        attachment.put("path",fileName);
+        attachment.put("filetype",FileTools.getFileType(fileName));
+        attachment.attachToParent();
+        attachment.order=0;
+        return(item);
+    }
+    
+    public String getConfiguration(String key){
+        return(config.get(key));
+    }
+    
+    public void setConfiguration(String key, String value) {
         if (!config.containsKey(key) || (config.get(key)==null) || !config.get(key).equals(value)) {
             config.put(key,value);
             try {
@@ -1119,7 +1154,7 @@ public final class Library { //implements Iterable<Item> {
      * modes : 0: move to doc folder, 1: leave where it is
      * return: 0: success, 1: name occupied, 2: couldn't create folder
      */
-    public String includeFile(String path) {
+    public String TODELETEincludeFile(String path) {
         String tmp="location";
         if (configToArray("essential-fields").length>0) tmp=configToArray("essential-fields")[0];
         Item item=new Item(this);
@@ -1723,6 +1758,17 @@ public final class Library { //implements Iterable<Item> {
         return(data);
     }
 
+    public boolean autoImport() {
+        return(config.containsKey("autoimport") && config.get("autoimport").equals("true"));
+    }
+    
+    public void setAutoImport(boolean b) {
+        if (b) {
+            setConfiguration("autoimport", "true");
+        } else {
+            setConfiguration("autoimport", "false");
+        }
+    }
 
     class ObjectComparatorText implements Comparator<TableRow> {
 

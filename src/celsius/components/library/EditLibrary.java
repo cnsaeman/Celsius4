@@ -11,25 +11,19 @@
 
 package celsius.components.library;
 
+import atlantis.gui.AtlantisTextArea;
 import celsius.components.plugins.EditLibraryPluginPanel;
 import atlantis.gui.KeyValueTableModel;
 import celsius.Resources;
 import atlantis.tools.Parser;
-import atlantis.tools.TextFile;
 import celsius.components.plugins.Plugins;
 import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
 import atlantis.gui.MultiLineEditor;
 import celsius.gui.TabLabel;
-import celsius.tools.ToolBox;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import javax.swing.DefaultComboBoxModel;
 
 /**
  *
@@ -45,6 +39,9 @@ public class EditLibrary extends javax.swing.JDialog {
     private final Plugins plugins;
     private final HashMap<String,EditLibraryPluginPanel> panels;
     
+    public AtlantisTextArea jTATemplate;
+    public AtlantisTextArea jTAStyleSheet;
+    
 
     /** Creates new form DialogEditLibrary */
     public EditLibrary(Resources rsc, int initiallySelected) {
@@ -54,6 +51,13 @@ public class EditLibrary extends javax.swing.JDialog {
         plugins = RSC.plugins;
         library=RSC.getCurrentlySelectedLibrary();
         initComponents();
+        jTAStyleSheet=new AtlantisTextArea(RSC.guiScale(12));
+        jTAStyleSheet.setColumns(20);
+        jScrollPane2.setViewportView(jTAStyleSheet);
+        jTATemplate=new AtlantisTextArea(RSC.guiScale(12));
+        jTATemplate.setColumns(20);
+        jScrollPane3.setViewportView(jTATemplate);
+        
         jTPEditMode.setTabComponentAt(0,new TabLabel("General settings",Resources.editTabIcon2,RSC,null,false));
         jTPEditMode.setTabComponentAt(1,new TabLabel("Templates",Resources.templateTabIcon,RSC,null,false));
         jTPEditMode.setTabComponentAt(2,new TabLabel("CSS style sheet",Resources.styleSheetTabIcon,RSC,null,false));
@@ -94,7 +98,7 @@ public class EditLibrary extends javax.swing.JDialog {
 
     public void saveModels() {
         for (String type : Plugins.types) {
-            library.putConfig("plugins-"+type, panels.get(type).getStringList());
+            library.setConfiguration("plugins-"+type, panels.get(type).getStringList());
         }
     }
     
@@ -114,16 +118,14 @@ public class EditLibrary extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTMain = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTATemplate = new javax.swing.JTextArea();
         jPanel7 = new javax.swing.JPanel();
         jCBHTMLtemplate = new javax.swing.JComboBox();
         jBtnApply2 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
         jPanel5 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTAStyleSheet = new javax.swing.JTextArea();
         jPanel6 = new javax.swing.JPanel();
         jBtnApply3 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -171,12 +173,6 @@ public class EditLibrary extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jTATemplate.setColumns(20);
-        jTATemplate.setRows(5);
-        jScrollPane3.setViewportView(jTATemplate);
-
-        jPanel4.add(jScrollPane3, java.awt.BorderLayout.CENTER);
-
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jCBHTMLtemplate.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Document", "Person", "Category", "Multiple Documents", "Identifier search", "General search", "Keyword search", "Links tab", "Just added" }));
@@ -196,16 +192,11 @@ public class EditLibrary extends javax.swing.JDialog {
         jPanel7.add(jBtnApply2);
 
         jPanel4.add(jPanel7, java.awt.BorderLayout.PAGE_END);
+        jPanel4.add(jScrollPane3, java.awt.BorderLayout.CENTER);
 
         jTPEditMode.addTab("tab2", jPanel4);
 
         jPanel5.setLayout(new java.awt.BorderLayout());
-
-        jTAStyleSheet.setColumns(20);
-        jTAStyleSheet.setRows(5);
-        jScrollPane2.setViewportView(jTAStyleSheet);
-
-        jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -218,6 +209,7 @@ public class EditLibrary extends javax.swing.JDialog {
         jPanel6.add(jBtnApply3);
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
+        jPanel5.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
         jTPEditMode.addTab("tab3", jPanel5);
 
@@ -353,7 +345,7 @@ public class EditLibrary extends javax.swing.JDialog {
 }//GEN-LAST:event_jBtnApply2ActionPerformed
 
     private void jBtnApply3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApply3ActionPerformed
-        library.putConfig("css-style", jTAStyleSheet.getText());
+        library.setConfiguration("css-style", jTAStyleSheet.getText());
         library.setStyleSheet();
         RSC.MF.guiInfoPanel.updateCSS();
     }//GEN-LAST:event_jBtnApply3ActionPerformed
@@ -402,7 +394,7 @@ public class EditLibrary extends javax.swing.JDialog {
             if (value.equals("<unknown>")) {
                 value = null;
             }
-            library.putConfig(key.toLowerCase(), value);
+            library.setConfiguration(key.toLowerCase(), value);
             library.initTablePresets();
             KVTM.put(key,value);
         }
@@ -438,8 +430,6 @@ public class EditLibrary extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JEditorPane jTAPlugin;
-    private javax.swing.JTextArea jTAStyleSheet;
-    private javax.swing.JTextArea jTATemplate;
     private javax.swing.JTable jTMain;
     private javax.swing.JTabbedPane jTPEditMode;
     // End of variables declaration//GEN-END:variables

@@ -6,6 +6,7 @@
 
 package celsius.components.infopanel;
 
+import atlantis.gui.AtlantisTextArea;
 import celsius.components.tableTabs.CelsiusTable;
 import atlantis.tools.ExecutionShell;
 import atlantis.tools.FileTools;
@@ -102,6 +103,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     public HTMLEditorKit kit;
     
+    public AtlantisTextArea jTABibTeX;
+    public AtlantisTextArea jTARemarks;
+    
     /** 
      *  Creates new form jInfoPanel
      *  @param rsc 
@@ -109,6 +113,12 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     public InformationPanel(Resources rsc) {
         RSC=rsc;
         initComponents();
+        jTABibTeX=new AtlantisTextArea(RSC.guiScale(12));
+        jTABibTeX.setColumns(20);
+        jScrollPane10.setViewportView(jTABibTeX);
+        jTARemarks=new AtlantisTextArea(RSC.guiScale(12));
+        jTARemarks.setColumns(20);
+        jScrollPane8.setViewportView(jTARemarks);
         jCBLinkType.setMinimumSize(new Dimension(RSC.guiScale(300),RSC.guiScale(25)));
         jPanel7.setBorder(RSC.stdBordermW());
         jPanel8.setBorder(RSC.stdBordermW());
@@ -200,19 +210,17 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jSP3 = new javax.swing.JScrollPane();
         jHTMLview = new javax.swing.JEditorPane();
         jPBibData = new javax.swing.JPanel();
-        jScrollPane10 = new javax.swing.JScrollPane();
-        jTABibTeX = new javax.swing.JTextArea();
         jPanel8 = new javax.swing.JPanel();
         jBtnApplyBibTeX = new javax.swing.JButton();
         jBtnCreateBibTeX = new javax.swing.JButton();
         jBtnNormalizeBibTeX = new javax.swing.JButton();
         jCBAddProperty = new javax.swing.JComboBox();
         jCBBibPlugins = new javax.swing.JComboBox();
+        jScrollPane10 = new javax.swing.JScrollPane();
         jPRemarks = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jBtnApplyRem = new javax.swing.JButton();
         jScrollPane8 = new javax.swing.JScrollPane();
-        jTARemarks = new javax.swing.JTextArea();
         jPAttachments = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jLAttachments = new javax.swing.JList<>();
@@ -314,13 +322,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPBibData.setName("Bibliography"); // NOI18N
         jPBibData.setLayout(new java.awt.BorderLayout());
 
-        jTABibTeX.setColumns(20);
-        jTABibTeX.setFont(new java.awt.Font("Monospaced", 0, RSC.guiScale(12))
-        );
-        jScrollPane10.setViewportView(jTABibTeX);
-
-        jPBibData.add(jScrollPane10, java.awt.BorderLayout.CENTER);
-
         jPanel8.setName(""); // NOI18N
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -364,6 +365,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPanel8.add(jCBBibPlugins);
 
         jPBibData.add(jPanel8, java.awt.BorderLayout.SOUTH);
+        jPBibData.add(jScrollPane10, java.awt.BorderLayout.CENTER);
 
         jTPItem.addTab("Bibliography1", jPBibData);
 
@@ -381,14 +383,6 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jPanel7.add(jBtnApplyRem);
 
         jPRemarks.add(jPanel7, java.awt.BorderLayout.SOUTH);
-
-        jTARemarks.setColumns(20);
-        jTARemarks.setFont(jTARemarks.getFont());
-        jTARemarks.setLineWrap(true);
-        jTARemarks.setRows(5);
-        jTARemarks.setWrapStyleWord(true);
-        jScrollPane8.setViewportView(jTARemarks);
-
         jPRemarks.add(jScrollPane8, java.awt.BorderLayout.CENTER);
 
         jTPItem.addTab("Remarks", jPRemarks);
@@ -706,7 +700,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
+            .addComponent(jTPItem, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1309,9 +1303,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JTextArea jTABibTeX;
     private javax.swing.JTextArea jTARaw1;
-    public javax.swing.JTextArea jTARemarks;
     public javax.swing.JTabbedPane jTPItem;
     // End of variables declaration//GEN-END:variables
 

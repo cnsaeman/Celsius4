@@ -18,7 +18,8 @@ import java.io.File;
 import javax.swing.SwingWorker;
 
 /**
- *
+ * This SwingWorker extracts plain text of files and gets additional information by applying the auto-plugins of the library
+ * 
  * @author cnsaeman
  */
 public class SWGetDetails extends SwingWorker<Void,Void> {
@@ -34,16 +35,16 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
     
     private final String TI;
     
-    public SWGetDetails(Resources RSC, Item item, boolean plugins, AddItems ai) {
+    public SWGetDetails(Resources RSC, Item item, boolean plugins, AddItems addItems) {
         this.RSC=RSC;
         this.item=item;        
         this.plugins=plugins;
+        this.addItems=addItems;
         attachment=null;
         if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
         state=-1;
         library=RSC.getCurrentlySelectedLibrary();
         TI="SWGetDetails>";
-        addItems=ai;
     }
 
     @Override
@@ -67,12 +68,14 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
         RSC.out(TI+"finished.");
         state=0;
         // update information
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                addItems.updateItemInformation();
+        if (addItems!=null) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    addItems.updateItemInformation();
                 }
-        });
+            });
+        }
         return null;
     }
     

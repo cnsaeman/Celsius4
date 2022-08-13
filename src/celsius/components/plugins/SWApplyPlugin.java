@@ -280,7 +280,7 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
                 if (communication.containsKey("showOutput")) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            MultiLineMessage MLM=new MultiLineMessage(RSC, "Plugin reports",communication.get("showOutput"));
+                            MultiLineMessage MLM=new MultiLineMessage(RSC, "Plugins report",communication.get("showOutput"));
                             MLM.setVisible(true);
                         }
                     });

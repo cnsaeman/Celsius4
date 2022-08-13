@@ -19,7 +19,7 @@ public class PluginUniversalItems extends Thread {
     
     public static final HashMap<String,String> metaData=new HashMap<String,String>() {
         {
-            put("title"             ,"Universal item Plugin");
+            put("title"             ,"Universal Item Plugin");
             put("author"            ,"Christian Saemann");
             put("version"           ,"4.0");
             put("help"              ,"This plugin tries to retrieve all possible information from offline and online sources.");

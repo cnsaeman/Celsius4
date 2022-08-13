@@ -14,6 +14,16 @@ import celsius.components.library.Library;
 import celsius.data.PeopleListModelDetailed;
 import celsius.data.Person;
 import atlantis.tools.Parser;
+import celsius.components.plugins.Plugin;
+import celsius.components.plugins.SWApplyPlugin;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -25,7 +35,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author cnsaeman
  */
-public class EditorPanel extends javax.swing.JPanel implements ListSelectionListener {
+public class EditorPanel extends javax.swing.JPanel implements ListSelectionListener, DropTargetListener {
 
     private final Resources RSC;
     public Editable editable;
@@ -34,7 +44,8 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
     public final boolean writeBack;
 
     public final ArrayList<GuiEventListener> guiEventListeners;
-    
+
+    public int type; // -1 : empty, 0 : item, 1 : person
     
     /**
      * Creates new form editorPanel
@@ -42,9 +53,11 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
     public EditorPanel(Resources rsc, boolean wB) {
         initComponents();        
         jTabEdit.getSelectionModel().addListSelectionListener(this);
+        DropTarget dt = (new DropTarget(jTabEdit, DnDConstants.ACTION_COPY_OR_MOVE,this,true,null));
         RSC=rsc;
         writeBack=wB;
         guiEventListeners=new ArrayList<>();
+        type=-1;
     }
     
     public void setEditable(Editable e) {
@@ -55,11 +68,18 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
             jBtnEdit.setEnabled(false);
             jBtnNewRow.setEnabled(true);
             jBtnRemove.setEnabled(false);
+            System.out.println(e.getClass().getName());
+            if (e.getClass().getName().equals("celsius.data.Item")) {
+                type=0;
+            } else {
+                type=1;
+            }
         } else {
             jTabEdit.setModel(new KeyValueTableModel("Tag","Value"));
             jBtnEdit.setEnabled(false);
             jBtnNewRow.setEnabled(false);
             jBtnRemove.setEnabled(false);
+            type=-1;
         }
         
     }
@@ -262,6 +282,69 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
         }
     }
     
+    public void dragEnter(DropTargetDragEvent dtde) {
+        if (!acceptData(dtde.getTransferable()))
+            dtde.rejectDrag();
+    }
+
+    public void dragOver(DropTargetDragEvent dtde) {
+        if (!acceptData(dtde.getTransferable()))
+            dtde.rejectDrag();
+    }
+
+    public void dropActionChanged(DropTargetDragEvent dtde) {
+        System.out.println("Drop action changed");
+    }
+
+    public void dragExit(DropTargetEvent dte) {
+        System.out.println("Drag exit");
+        System.out.println("Drop3:"+dte.toString());
+    }
+
+    public void drop(DropTargetDropEvent dtde) {
+        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+        if (acceptData(dtde.getTransferable())) {
+            dtde.acceptDrop(dtde.getDropAction());
+            try {
+                if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    String url=dtde.getTransferable().getTransferData(DataFlavor.stringFlavor).toString();
+                    Item item = (Item) editable;
+                    if (url.startsWith("https://inspirehep.net/literature/")) {
+                        String inspireKey = Parser.cutFrom(url,"https://inspirehep.net/literature/");
+                        item.put("inspirekey", inspireKey);
+                    } else if (url.startsWith("https://doi.org/")) {
+                        String doi = Parser.cutFrom(url,"https://doi.org/");
+                        item.put("doi", doi);
+                    }
+                    for (Plugin plugin : RSC.plugins.listPlugins("auto-items", library)) {
+                        // TODO: add paramters?
+                        SWApplyPlugin swAP = new SWApplyPlugin(library, RSC, null, plugin, "", item);
+                        swAP.execute();
+                        swAP.get();
+                    }
+                    this.writeBackIfNecessary();
+                    jTabEdit.setModel(editable.getEditModel());
+                }
+            } catch (Exception ex) {
+                RSC.outEx(ex);
+            }
+        }
+    }
+
+    private boolean acceptData(Transferable t) {
+        if (type!=0) return(false);
+        try {
+            if (t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                System.out.println("DATA:"+t.getTransferData(DataFlavor.stringFlavor).toString());
+                if (t.getTransferData(DataFlavor.stringFlavor).toString().startsWith("https://")) {
+                    return (true);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Conversion error!");
+        }
+        return(false);
+    }    
 
 }
 
