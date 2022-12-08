@@ -67,6 +67,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -451,6 +452,7 @@ public class MainFrame extends javax.swing.JFrame implements
         jSeparator4 = new javax.swing.JSeparator();
         jMIEditDS = new javax.swing.JMenuItem();
         jSeparator33 = new javax.swing.JPopupMenu.Separator();
+        jMIHistory = new javax.swing.JMenuItem();
         jMIConsistencyCheck = new javax.swing.JMenuItem();
         jMTabs = new javax.swing.JMenu();
         jMIAddTab = new javax.swing.JMenuItem();
@@ -1008,6 +1010,14 @@ public class MainFrame extends javax.swing.JFrame implements
         });
         jMLibraries.add(jMIEditDS);
         jMLibraries.add(jSeparator33);
+
+        jMIHistory.setText("Show item view history last 24h");
+        jMIHistory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIHistoryActionPerformed(evt);
+            }
+        });
+        jMLibraries.add(jMIHistory);
 
         jMIConsistencyCheck.setText("Check library consistency");
         jMIConsistencyCheck.addActionListener(new java.awt.event.ActionListener() {
@@ -1887,6 +1897,10 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     private void jMIAutoImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAutoImportActionPerformed
         RSC.getCurrentlySelectedLibrary().setAutoImport(jMIAutoImport.isSelected());
     }//GEN-LAST:event_jMIAutoImportActionPerformed
+
+    private void jMIHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIHistoryActionPerformed
+        showHistory(RSC.getCurrentlySelectedLibrary());
+    }//GEN-LAST:event_jMIHistoryActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMIManual;
@@ -1940,6 +1954,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     private javax.swing.JMenuItem jMIExportTab;
     private javax.swing.JMenuItem jMIExportTab1;
     private javax.swing.JMenuItem jMIFullBibToFile;
+    private javax.swing.JMenuItem jMIHistory;
     private javax.swing.JMenuItem jMIInsertCat;
     private javax.swing.JMenuItem jMIJoin;
     private javax.swing.JMenuItem jMIJoin1;
@@ -2026,6 +2041,23 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
         guiPluginPanel.objectType=-2;
         guiPluginPanel.adjustPluginList();
         RSC.plugins.updateExportPlugins();
+    }
+    
+    public void showHistory(Library library) {
+        CelsiusTable table=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_HISTORY, "History", "search");
+        try {
+            ResultSet RS = library.executeResEX("SELECT timestamp AS \"$$numtimestamp\", items.* from item_views JOIN items on item_id=items.id WHERE timestamp >"+String.valueOf(ToolBox.now()-60*60*24)+";");
+            while (RS.next()) {
+                Item item = new Item(library, RS);
+                item.currentLoadLevel = 2;
+                item.put("$$timestamp", RSC.SDF.format(new Date(Long.valueOf(item.get("$$numtimestamp"))*1000)));
+                table.addRow(item);
+            }
+        } catch (Exception ex) {
+            RSC.outEx(ex);
+        }
+        table.resizeTable(true);
+        RSC.MF.guiInfoPanel.updateGUI();
     }
     
     public void showAssociatedItems() {

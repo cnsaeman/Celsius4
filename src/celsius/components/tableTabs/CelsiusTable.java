@@ -38,6 +38,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     public static final int EMPTY_TABLE=-1;
     public static final int ITEM_TABLE=0;
     public static final int PERSON_TABLE=1;
+    public static final int ITEM_HISTORY_TABLE=2;
     
     // Table types: anything item related 0..9 anything person related 10..20
     public final static int TABLETYPE_EMPTY=-1;
@@ -51,6 +52,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
     public final static int TABLETYPE_PERSON_WHEN_ADDED=13;
     public final static int TABLETYPE_ITEMS_OF_PERSON=4;
     public final static int TABLETYPE_ITEMS_OF_PERSONS=5;
+    public final static int TABLETYPE_ITEM_HISTORY=20;
 
     private final Resources RSC;
 
@@ -99,6 +101,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
         int objectType=-1;
         if ((tableType>=0) && (tableType<10)) objectType=CelsiusTable.ITEM_TABLE;
         if ((tableType>=10) && (tableType<20)) objectType=CelsiusTable.PERSON_TABLE;
+        if (tableType==20) objectType=CelsiusTable.ITEM_HISTORY_TABLE;
         celsiusTableModel=new CelsiusTableModel(RSC,library,objectType);
         jtable=new JTable();
         jtable.setModel(celsiusTableModel);
@@ -569,6 +572,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
 
     public synchronized void setSizes(ArrayList<Integer> prefsizes) {
         sizes=new ArrayList<>();
+        if (this.tableType==CelsiusTable.TABLETYPE_ITEM_HISTORY) sizes.add(RSC.guiScale(120));
         for (Integer i : prefsizes) sizes.add(i);
     }
 

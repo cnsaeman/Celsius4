@@ -16,7 +16,7 @@ import celsius.*;
 import celsius.components.plugins.SWApplyPlugin;
 import celsius.data.Attachment;
 import celsius.components.library.LibraryChangeListener;
-import celsius.tools.FFilter;
+import atlantis.gui.FFilter;
 import atlantis.tools.FileTools;
 import atlantis.gui.HasManagedStates;
 import atlantis.tools.Parser;

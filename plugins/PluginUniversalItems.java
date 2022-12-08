@@ -50,6 +50,8 @@ public class PluginUniversalItems extends Thread {
     private Attachment attachment;
     public HashMap<String,String> communication;
     public ArrayList<String> Msgs;
+    
+    public String path;
 
     public void Initialize(celsius.data.TableRow tr, HashMap<String,String> com, ArrayList<String> m) {
         item = (Item)tr;
@@ -64,18 +66,33 @@ public class PluginUniversalItems extends Thread {
         debug=false;
         Msgs.add("Init");
         initializeThings();
-        Msgs.add("FN");
         if (attachment!=null) {
+            path=attachment.get("path");
+            if (path.indexOf("talk:[")>-1) {
+                getFromTalk();
+                return;
+            }
+        }
+        Msgs.add("FN");
+        if (attachment != null) {
             getFromFileName();
             Msgs.add("FP");
-            if (!attachment.isEmpty("$plaintext")) getFromFirstPage();
+            if (!attachment.isEmpty("$plaintext")) {
+                getFromFirstPage();
+            }
         }
         Msgs.add("PE");
-        if (containsKey("projecteuclid")) getFromProjectEuclid();
+        if (containsKey("projecteuclid")) {
+            getFromProjectEuclid();
+        }
         Msgs.add("ArX");
-        if (containsKey("arxiv-ref")) getFromArXiv();
+        if (containsKey("arxiv-ref")) {
+            getFromArXiv();
+        }
         Msgs.add("INSP");
-        if (containsKey("inspirekey") || containsKey("arxiv-ref") || containsKey("doi")) getFromInspire();
+        if (containsKey("inspirekey") || containsKey("arxiv-ref") || containsKey("doi")) {
+            getFromInspire();
+        }
         Msgs.add("DOI");
         getFromDoiNew();
         completeBibTeX();
@@ -95,7 +112,6 @@ public class PluginUniversalItems extends Thread {
     }
     
     public void getFromFileName() {
-        String path=attachment.get("path");
         // extract potential arXiv infomation from file name, do not overwrite.
         if (item.isEmpty("arxiv-ref") && !item.properties.containsKey("arxiv-ref")) {
             String fn=Parser.cutUntilLast(Parser.cutFromLast(path,"/"),".");
@@ -783,6 +799,28 @@ public class PluginUniversalItems extends Thread {
             tmp=getS(s);
             return(blank(tmp));
         }
+    }
+    
+    public void getFromTalk() {
+        putS("title",Parser.cutUntil(Parser.cutFromLast(path,"/"), " talk:["));
+        String rest=Parser.cutUntil(Parser.cutFrom(path," talk:["),"]");
+        String[] data=rest.split("\\|");
+        for(String datum : data) {
+            String[] pair=datum.split(":");
+            if (pair[0].equals("location")) putS("location",pair[1]);
+            if (pair[0].equals("date")) putS("date",pair[1]);
+            if (pair[0].equals("author")) putS("authors",pair[1]);
+        }
+        String year=Parser.cutFromLast(getS("date"), ".");
+        putS("type","Talk");
+        putS("identifier", year+" "+getS("location"));
+        BibTeXRecord BTR=new BibTeXRecord();
+        BTR.setTag(Parser.cutUntil(getS("authors"), ",")+":"+year+getS("location").substring(0,2).toLowerCase());
+        BTR.put("author",getS("authors"));
+        BTR.put("title", getS("title"));
+        BTR.put("year",year);
+        BTR.put("note","talk given at "+getS("location"));
+        putS("bibtex",BTR.toString());
     }
     
 }

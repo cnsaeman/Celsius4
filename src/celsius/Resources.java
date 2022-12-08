@@ -7,9 +7,10 @@
 
 package celsius;
 
+import atlantis.gui.FFilter;
 import atlantis.tools.ExecutionShell;
 import celsius.components.plugins.Plugin;
-import atlantis.tools.FillPainter;
+import atlantis.gui.FillPainter;
 import atlantis.tools.FileTools;
 import atlantis.gui.GuiStates;
 import atlantis.gui.StandardResources;
@@ -48,6 +49,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -76,13 +79,14 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.nimbus.AbstractRegionPainter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+
 /**
  *
  * @author cnsaeman
  */
 public class Resources implements StandardResources {
 
-    public final String VersionNumber = "v4.0.3";
+    public final String VersionNumber = "v4.1";
     public final String celsiushome = "https://github.com/cnsaeman/Celsius4";
     public final String stdHTMLstring;
     
@@ -578,14 +582,14 @@ public class Resources implements StandardResources {
         // Below: Adjust font sizes for menus etc.
         // For some reaons, the ofnt for menu change itself doesn't work, done manually in MainFrame.java
         UIDefaults defaults = UIManager.getDefaults();
-        UIManager.getDefaults().put("MenuBar:Menu[Selected].backgroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("MenuBar:Menu[Selected].backgroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
         UIManager.getDefaults().put("MenuBar:Menu[Enabled].textForeground",new Color(0,0,0));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Finished].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Indeterminate].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Finished].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Indeterminate].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled].foregroundPainter",new atlantis.tools.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled+Finished].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled+Indeterminate].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Disabled].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled+Finished].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled+Indeterminate].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
+        UIManager.getDefaults().put("ProgressBar[Enabled].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
         final FontUIResource fnt11 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(11)));
         final FontUIResource fnt12 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(12)));
         // Set all fonts to 12
@@ -633,7 +637,7 @@ public class Resources implements StandardResources {
         final ColorUIResource blue1 = new ColorUIResource(new Color(61,174,233));
         final ColorUIResource blue2 = new ColorUIResource(new Color(115,164,209));
         final ColorUIResource black = new ColorUIResource(new Color(0,0,0));
-        final FillPainter bluePainter = new atlantis.tools.FillPainter(blue1);
+        final FillPainter bluePainter = new atlantis.gui.FillPainter(blue1);
         // adjust colors
         String[] grey=new String[] {"nimbusBase","nimbusBlueGrey","control"};
         for (String col : grey) { laf.getDefaults().put(col,baseGrey); }
@@ -770,8 +774,8 @@ public class Resources implements StandardResources {
     public final static Object[] optionsOC = { "OK", "Cancel" };
     public final static Object[] optionsYN = { "Yes", "No" };    
 
-    
-    /**
+     
+   /**
      * Center the current JDialog frame over main frame
      */
     public void centerDialog(JDialog frame) {
@@ -816,6 +820,10 @@ public class Resources implements StandardResources {
     
     /**
      * Question dialog with options OC
+     * 
+     * @param msg
+     * @param head
+     * @return 
      */
     public int askQuestionOC(String msg,String head) {
         return(JOptionPane.showOptionDialog(MF,msg, head, JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,null, optionsOC, optionsOC[0]));
@@ -823,6 +831,10 @@ public class Resources implements StandardResources {
     
     /**
      * Question dialog with options YNC
+     * 
+     * @param msg
+     * @param head
+     * @return 
      */
     public int askQuestionYNC(String msg,String head) {
         return(JOptionPane.showOptionDialog(MF, msg, head,
@@ -832,6 +844,10 @@ public class Resources implements StandardResources {
     
     /**
      * Question dialog with options YN
+     * 
+     * @param msg
+     * @param head
+     * @return 
      */
     public int askQuestionYN(String msg,String head) {
         return(JOptionPane.showOptionDialog(MF, msg, head,
@@ -955,6 +971,7 @@ public class Resources implements StandardResources {
      * Display item in a form available, following a hierarchy of option
      */
     public void viewItem(Item item) {
+        item.logView();
         if (item == null) {
             return;
         }
@@ -984,7 +1001,7 @@ public class Resources implements StandardResources {
 
     public void viewCurrentlySelectedObject() {
         CelsiusTable celsiusTable=getCurrentTable();
-        if (celsiusTable.getObjectType()==CelsiusTable.ITEM_TABLE) {
+        if ((celsiusTable.getObjectType()==CelsiusTable.ITEM_TABLE) || (celsiusTable.getObjectType()==CelsiusTable.ITEM_HISTORY_TABLE)) {
             viewItem(getCurrentlySelectedItem());
         } else if (celsiusTable.getObjectType()==CelsiusTable.PERSON_TABLE) {
             String personIDs=celsiusTable.getSelectedIDsString();

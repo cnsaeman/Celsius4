@@ -2,7 +2,7 @@
  Atlantis Software tools package
 */
 
-package atlantis.tools;
+package atlantis.gui;
 
 /**
  *

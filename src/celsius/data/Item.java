@@ -25,7 +25,8 @@ import java.util.HashMap;
 import javax.swing.DefaultListModel;
 
 /**
- *
+ * Class representing an item that can be viewed.
+ * 
  * @author cnsaeman
  */
 public final class Item extends TableRow implements Editable {
@@ -935,7 +936,7 @@ public final class Item extends TableRow implements Editable {
         return(DLM);
     }
     
-    @Override
+    @Override 
     public Library getLibrary() {
         return(library);
     }
@@ -943,6 +944,10 @@ public final class Item extends TableRow implements Editable {
     @Override
     public void notifyChanged() {
         library.itemChanged(id);        
+    }
+    
+    public void logView() {
+        library.executeEX("INSERT INTO item_views (item_id,timestamp) VALUES ("+this.id+","+ToolBox.now()+");");
     }
     
     class CompareItems implements Comparator<Item> {

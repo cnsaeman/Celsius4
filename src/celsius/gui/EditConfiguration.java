@@ -13,6 +13,7 @@
 
 package celsius.gui;
 
+import atlantis.gui.FFilter;
 import atlantis.gui.SingleLineEditor;
 import atlantis.gui.MultiLineEditor;
 import atlantis.tools.ExecutionShell;

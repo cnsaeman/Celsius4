@@ -6,7 +6,7 @@
 package celsius.gui;
 
 import celsius.Resources;
-import celsius.tools.FFilter;
+import atlantis.gui.FFilter;
 import celsius.tools.ToolBox;
 import static celsius.tools.ToolBox.optionsOC;
 import static celsius.tools.ToolBox.optionsYN;

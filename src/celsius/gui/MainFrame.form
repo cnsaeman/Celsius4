@@ -394,6 +394,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator33">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMIHistory">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Show item view history last 24h"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIHistoryActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMIConsistencyCheck">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Check library consistency"/>

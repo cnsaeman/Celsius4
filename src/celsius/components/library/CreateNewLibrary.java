@@ -15,7 +15,7 @@
 package celsius.components.library;
 
 import celsius.Resources;
-import celsius.tools.FFilter;
+import atlantis.gui.FFilter;
 import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;

@@ -11,7 +11,7 @@
 // checked 16.09.2007
 //
 
-package celsius.tools;
+package atlantis.gui;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;

@@ -1,5 +1,11 @@
 package atlantis.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
+
 /**
  *
  * @author  cnsaeman
@@ -19,12 +25,22 @@ public class MultiLineEditor extends javax.swing.JDialog {
         setIconImage(RSC.getAppIcon());
         this.setTitle(title);
         initComponents();
-        jScrollPane1 = new javax.swing.JScrollPane();
         jText = new AtlantisTextArea(RSC.guiScale(12));
         jText.setColumns(20);
         jText.setRows(5);
         jScrollPane1.setViewportView(jText);
-
+        jText.getActionMap().put("Submit", new AbstractAction("Submit") {
+            public void actionPerformed(ActionEvent evt) {
+                submit();
+            }
+        });
+        jText.getActionMap().put("Cancel", new AbstractAction("Cancel") {
+            public void actionPerformed(ActionEvent evt) {
+                cancel();
+            }
+        });
+        jText.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0), "Cancel");
+        jText.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,InputEvent.CTRL_DOWN_MASK), "Submit");
 
         this.text=text;
         jText.setText(text);
@@ -36,6 +52,17 @@ public class MultiLineEditor extends javax.swing.JDialog {
     public void setLineWrapping(boolean b) {
         jText.setLineWrap(b);
         if (b) jText.setWrapStyleWord(true);
+    }
+    
+    public void submit() {
+        text=jText.getText();
+        cancelled=false;
+        setVisible(false);        
+    }
+    
+    public void cancel() {
+        cancelled=true;
+        setVisible(false);        
     }
     
     /** This method is called from within the constructor to
@@ -63,6 +90,12 @@ public class MultiLineEditor extends javax.swing.JDialog {
         jBtnApply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBtnApplyActionPerformed(evt);
+            }
+        });
+
+        jScrollPane1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jScrollPane1KeyPressed(evt);
             }
         });
 
@@ -97,15 +130,16 @@ public class MultiLineEditor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelActionPerformed
-        cancelled=true;
-        setVisible(false);
+        cancel();
     }//GEN-LAST:event_jBtnCancelActionPerformed
 
     private void jBtnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApplyActionPerformed
-        text=jText.getText();
-        cancelled=false;
-        setVisible(false);
+        submit();
     }//GEN-LAST:event_jBtnApplyActionPerformed
+
+    private void jScrollPane1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jScrollPane1KeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jScrollPane1KeyPressed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnApply;

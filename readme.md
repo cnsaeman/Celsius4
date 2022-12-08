@@ -28,9 +28,9 @@ Celsius supports HiDPI and Retina displays for all operating systems. Just start
 
 Celsius is a open source bibliographic tool and document manager with all the obvious features. Its main advantage is that it can automatically download information from the internet, and via its plugin technology, it can be adapted to any online database source. You can also specify plugins for formatting the bibliographic data. Celsius has a powerful and highly adaptable database interface with many search functions.
 
-Celsius can manage eBooks and synchronize the category 'eBook reader' with an eBook reader. It comes with a text extracting module of epub files and it can handle the metadata contained in these files.
+Celsius can manage eBooks. It comes with a text extracting module of epub files and it can handle the metadata contained in these files.
 
-The standard distribution of Celsius is set up for the needs of a scientist in high-energy or mathematical physics, i.e. it comes with plugins for the arXiv-preprint server as well as the inSPIRE-database. Additionally, Celsius now contains plugins for handling files from JSTOR and several scientific journals, sheet music from both IMSLP and Mutopia, barcodes and pdf-header information. It supports epub-files and synchronization with eBook readers is possible. Further plugins for other databases might be provided by third parties in the future and published on this webpage.
+The standard distribution of Celsius is set up for the needs of a scientist in high-energy or mathematical physics, i.e. it comes with plugins for the arXiv-preprint server as well as the inSPIRE-database. Additionally, Celsius now contains plugins for handling files from JSTOR and several scientific journals, sheet music from both IMSLP and Mutopia, barcodes and pdf-header information. Further plugins for other databases might be provided by third parties in the future and published on this webpage.
 
 The software comes with all the essential features of a bibliographic data manager, many of which can be guessed from the screenshot linked above.
 

@@ -65,13 +65,15 @@ public class CelsiusMain {
         /*try {
             Library library = new Library("/home/cnsaeman/Celsius4/Libraries/MathsPhys", RSC);
             library.dbConnection.setAutoCommit(false);
-            ResultSet rs = library.executeResEX("SELECT * FROM item_reference_links;");
+            ResultSet rs = library.executeResEX("SELECT items.* FROM item_person_links JOIN items on item_id=items.id WHERE person_id=606;");
             while (rs.next()) {
-                library.executeEX("INSERT INTO item_item_links (item1_id,item2_id,link_type) VALUES ("+rs.getString(1)+","+rs.getString(2)+",0);");
-            }
-            rs = library.executeResEX("SELECT * FROM item_citation_links;");
-            while (rs.next()) {
-                library.executeEX("INSERT INTO item_item_links (item1_id,item2_id,link_type) VALUES ("+rs.getString(1)+","+rs.getString(2)+",1);");
+                Item item=new Item(library,rs);
+                String path=item.get("source");
+                System.out.println(path);
+                if (path!=null) {
+                    item.put("source",Parser.replace(path, "/home/cnsaeman/Projects - finished/arXiv/", "/home/cnsaeman/Science/Publications/"));
+                    item.save();
+                }
             }
             library.dbConnection.commit();
             library.close();

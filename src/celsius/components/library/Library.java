@@ -18,9 +18,7 @@ import celsius.data.Person;
 import celsius.data.TableRow;
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.SafeMessage;
-import celsius.gui.GUIToolBox;
 import celsius.tools.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -194,6 +192,8 @@ public final class Library { //implements Iterable<Item> {
             }
             RSC.out("Lib>Connection established to SQLite database "+url);
             
+            ensureStandardTables();
+            
             // Read configuration
             config=new HashMap<>();
             ResultSet rs=dbConnection.prepareStatement("SELECT * FROM configuration;").executeQuery();
@@ -303,11 +303,21 @@ public final class Library { //implements Iterable<Item> {
         addingMode=1;
     }
     
+    public void ensureStandardTables() {
+        String sql = "CREATE TABLE IF NOT EXISTS item_views (item_id int, timestamp long);";
+        try {
+            Statement stmt = dbConnection.createStatement();
+            stmt.execute(sql);
+        } catch (Exception ex) {
+            RSC.outEx(ex);
+        }
+    }
+    
     public HashSet<String> properties(String table) {
         if ("items".equals(table)) return(itemPropertyKeys);
         return(personPropertyKeys);
     }
-
+    
     public void getFieldsFromConfig() {
         name=config.get("name");
         iconFields=configToArray("icon-fields");

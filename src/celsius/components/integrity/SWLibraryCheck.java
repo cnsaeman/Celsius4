@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.integrity;
 
 import celsius.Resources;
@@ -17,7 +12,8 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 /**
- *
+ * A swing worker that performs consistency checks on the library data and corrects information, if necessary.
+ * 
  * @author cnsaeman
  */
 public class SWLibraryCheck extends SwingWorker<Void,Void> {
@@ -38,13 +34,27 @@ public class SWLibraryCheck extends SwingWorker<Void,Void> {
         String itemFolder=library.completeDir(library.config.get("item-folder"));
         File f = new File(itemFolder);
         ArrayList<String> fileNames = new ArrayList<String>(Arrays.asList(f.list()));
+        ResultSet rs;
+        StringBuilder ids;
         
         // checks on attachments
         out.append("Verifying all attachments...\n");
         
+        // check that in category links, the linked items exist. If not, delete the links.
+        rs=library.executeResEX("SELECT item_category_links.item_id FROM item_category_links LEFT JOIN items on item_category_links.item_id=items.id WHERE items.id IS NULL;");
+        ids=new StringBuilder();
+        while (rs.next()) {
+            ids.append(',');
+            ids.append(rs.getString(1));
+        }
+        if (ids.length()>1) {
+            out.append("Some non-existing items were linked to categories. These links have been removed.\n");
+            library.executeEX("DELETE FROM item_category_links WHERE item_id in ("+ids.substring(1)+");");
+        }
+        
         // check attachments that are not linked to an item
-        ResultSet rs=library.executeResEX("SELECT id,path FROM attachments LEFT JOIN item_attachment_links on attachments.id=item_attachment_links.attachment_id WHERE item_attachment_links.item_id IS NULL;");
-        StringBuilder ids=new StringBuilder();
+        rs=library.executeResEX("SELECT id,path FROM attachments LEFT JOIN item_attachment_links on attachments.id=item_attachment_links.attachment_id WHERE item_attachment_links.item_id IS NULL;");
+        ids=new StringBuilder();
         ArrayList<String> paths=new ArrayList<>();
         while (rs.next()) {
             ids.append(',');

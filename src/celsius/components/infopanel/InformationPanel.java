@@ -1552,9 +1552,11 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 }
             }
             jTABibTeX.setCaretPosition(0);
+            RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", true);
         } else {
             jTABibTeX.setText(RSC.getBibOutput(item));
             jTABibTeX.setCaretPosition(0);
+            RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", false);
         }
         DefaultListModel listModel = (DefaultListModel) jLFiles1.getModel();
         listModel.clear();

@@ -1,7 +1,6 @@
 package celsius.components.plugins;
 
 import celsius.Resources;
-import celsius.components.plugins.SWApplyPlugin;
 import celsius.components.SWFinalizer;
 import celsius.components.library.Library;
 import celsius.data.TableRow;
@@ -11,7 +10,6 @@ import celsius.components.library.EditLibrary;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
 import javax.swing.ProgressMonitor;
 
 /**
@@ -20,9 +18,14 @@ import javax.swing.ProgressMonitor;
  */
 public class PluginPanel extends javax.swing.JPanel implements HasManagedStates {
     
+    public final static int EMPTY_STATE=0;
+    public final static int ITEM_STATE=1;
+    public final static int PERSON_STATE=2;
+    
     public final Resources RSC;
     
     public int objectType;
+    public Library currentLibrary;
     
 
     /**
@@ -31,6 +34,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
     public PluginPanel(Resources rsc) {
         RSC=rsc;
         objectType=-2;
+        currentLibrary=null;
         initComponents();
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame", "itemSelected", this);
         RSC.guiStates.registerDirectlyEnabledComponent("mainFrame", "tabAvailable", this);
@@ -49,21 +53,27 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
         Library library=RSC.getCurrentlySelectedLibrary();
         if (library==null) {
             jLPlugins.setModel(new DefaultListModel());
+            currentLibrary=null;
         } else {
             CelsiusTable celsiusTable=RSC.getCurrentTable();
             if (celsiusTable == null) {
                 jLPlugins.setModel(new DefaultListModel());
+                currentLibrary = null;
             } else {
                 int ot=celsiusTable.getObjectType();
-                if (objectType==ot) return;
+                library=celsiusTable.library;
+                if ((objectType==ot) && (library==currentLibrary)) return;
                 if (ot == -1) {
                     jLPlugins.setModel(new DefaultListModel());
+                    currentLibrary = null;
                 } else if (ot == 0) {
                     System.out.println("Set to model items");
                     jLPlugins.setModel(RSC.plugins.getPluginsDLM("manual-items", RSC.getCurrentlySelectedLibrary()));
+                    currentLibrary=library;
                 } else if (ot == 1) {
                     System.out.println("Set to model people");
                     jLPlugins.setModel(RSC.plugins.getPluginsDLM("manual-people", RSC.getCurrentlySelectedLibrary()));
+                    currentLibrary=library;
                 }
                 objectType=ot;
             }
@@ -252,6 +262,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
 
     @Override
     public void adjustStates() {
+        adjustPluginList();
         if (jLPlugins.getSelectedIndex()>-1) {
             jBtnApplyPluginSelected.setEnabled(RSC.guiStates.getState("mainFrame", "itemSelected") || RSC.guiStates.getState("mainFrame", "personSelected"));
             jBtnApplyPluginTable.setEnabled(RSC.guiStates.getState("mainFrame", "tabAvailable"));

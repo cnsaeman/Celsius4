@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.tableTabs;
 
 import celsius.components.library.Library;
@@ -19,13 +14,15 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ *  Class providing the data model for the tables displayed in tabs
+ * 
  * @author cnsaeman
  */
 public class CelsiusTableModel extends AbstractTableModel {
     
     public static final int CELSIUS_TABLE_ITEM_TYPE=0;
     public static final int CELSIUS_TABLE_PERSON_TYPE=1;
+    public static final int CELSIUS_TABLE_ITEM_HISTORY_TYPE=2;
 
     private final Resources RSC;
     public int objectType; // 0 : items, 1 : persons, see above
@@ -102,6 +99,18 @@ public class CelsiusTableModel extends AbstractTableModel {
                 } else {
                     columns.addAll(library.personTableTags);
                     headers.addAll(library.personTableHeaders);
+                }
+            } else if (objectType == CelsiusTable.ITEM_HISTORY_TABLE) {
+                columns.add("$$timestamp");
+                headers.add("Time");
+                if (library.itemTableHeaders.isEmpty()) {
+                    for (String th : library.itemTableTags) {
+                        headers.add(Parser.lowerEndOfWords2(Parser.cutUntil(th, "&")));
+                        columns.add(th);
+                    }
+                } else {
+                    columns.addAll(library.itemTableTags);
+                    headers.addAll(library.itemTableHeaders);
                 }
             }
             currentPages = 0;
