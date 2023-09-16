@@ -1,19 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components;
 
 import celsius.Resources;
-import celsius.data.Item;
 import celsius.components.library.Library;
 import celsius.data.TableRow;
 import celsius.components.tableTabs.CelsiusTable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -32,26 +25,26 @@ public class SWListItems extends SwingWorker<Void, TableRow> implements Property
     /**
      *  Constructor, read in information
      *  itemtable, postID
+     * @param celsiusTable
+     * @param postID
      */
-    public SWListItems(CelsiusTable it, int pid) {
+    public SWListItems(CelsiusTable celsiusTable, int postID) {
         super();
-        celsiusTable=it;
+        this.celsiusTable=celsiusTable;
         library=celsiusTable.library;
         RSC=celsiusTable.library.RSC;
-        postID=pid;
+        this.postID=postID;
         done=0;
         setProgress(0);
         addPropertyChangeListener(this);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                RSC.MF.jPBSearch.setMaximum(100);
-                RSC.MF.jPBSearch.setValue(0);
-                RSC.MF.setThreadMsg("Searching...");
-                RSC.guiStates.adjustState("mainFrame","itemSelected", false);
-                RSC.guiStates.adjustState("mainFrame","personSelected", false);
-                celsiusTable.removeAllRows();
-            }
+        SwingUtilities.invokeLater(() -> {
+            RSC.MF.jPBSearch.setMaximum(100);
+            RSC.MF.jPBSearch.setValue(0);
+            RSC.MF.setThreadMsg("Searching...");
+            RSC.guiStates.adjustState("mainFrame","itemSelected", false);
+            RSC.guiStates.adjustState("mainFrame","personSelected", false);
+            celsiusTable.removeAllRows();
         });    }
     
     @Override

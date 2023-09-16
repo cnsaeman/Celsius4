@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
-import celsius.gui.jExtTextField;
 import celsius.Resources;
 import java.awt.event.KeyListener;
 import javax.swing.text.Document;
@@ -21,10 +15,10 @@ public class ClearEdit extends javax.swing.JPanel {
     /**
      * Creates new form jClearEdit
      */
-    public ClearEdit(Resources rsc, String s) {
-        RSC=rsc;
+    public ClearEdit(Resources RSC, String defaultText) {
+        this.RSC=RSC;
         initComponents();
-        jETFContent.setDefaultText(s);
+        jETFContent.setDefaultText(defaultText);
     }
     
     public String getText() {
@@ -52,7 +46,7 @@ public class ClearEdit extends javax.swing.JPanel {
         jBtnClear = new javax.swing.JButton();
         jETFContent = new celsius.gui.jExtTextField();
 
-        jBtnClear.setIcon(RSC.getScaledIcon("closebtn"));
+        jBtnClear.setIcon(RSC.icons.getScaledIcon("closebtn"));
         jBtnClear.setMaximumSize(new java.awt.Dimension(60, 60));
         jBtnClear.setMinimumSize(new java.awt.Dimension(6, 6));
         jBtnClear.setPreferredSize(new java.awt.Dimension(RSC.guiScale(25), RSC.guiScale(25)));

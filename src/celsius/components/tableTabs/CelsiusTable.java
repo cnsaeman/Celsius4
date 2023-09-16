@@ -378,10 +378,22 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
 
     public synchronized void updateRow(TableRow tableRow) {
         celsiusTableModel.updateRow(tableRow);
+        int rowNumber=jtable.getSelectedRow();
+        if (rowNumber>-1) {
+            if (tableRow.id.equals(celsiusTableModel.tableRows.get(rowNumber).id)) {
+                RSC.guiInformationPanel.updateGUI();
+            }
+        }
     }
 
     public synchronized void updateRow(String id) {
         celsiusTableModel.updateRow(id);
+        int rowNumber=jtable.getSelectedRow();
+        if (rowNumber>-1) {
+            if (id.equals(celsiusTableModel.tableRows.get(rowNumber).id)) {
+                RSC.guiInformationPanel.updateGUI();
+            }
+        }
     }
 
     public synchronized void updateAll() {
@@ -433,7 +445,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
                 }
                 i++;
             }
-            jtable.setRowHeight(RSC.guiScale(24));
+            jtable.setRowHeight(RSC.guiTools.guiScale(24));
             if (updateView) {
                 if (!celsiusTableModel.tableview) thumbnailView.updateView(); //#### test to exclude
                 MF.guiInfoPanel.updateGUI();
@@ -572,7 +584,7 @@ public final class CelsiusTable implements ListSelectionListener, MouseListener,
 
     public synchronized void setSizes(ArrayList<Integer> prefsizes) {
         sizes=new ArrayList<>();
-        if (this.tableType==CelsiusTable.TABLETYPE_ITEM_HISTORY) sizes.add(RSC.guiScale(120));
+        if (this.tableType==CelsiusTable.TABLETYPE_ITEM_HISTORY) sizes.add(RSC.guiTools.guiScale(120));
         for (Integer i : prefsizes) sizes.add(i);
     }
 

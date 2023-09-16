@@ -34,8 +34,8 @@ public class ThreadLoadThumbnail extends Thread {
     public ThreadLoadThumbnail(Thumbnail thumbnail, Resources RSC) {
         this.thumbnail = thumbnail;
         this.RSC=RSC;
-        spx=RSC.guiScale(140);
-        spy=RSC.guiScale(160);
+        spx=RSC.guiTools.guiScale(140);
+        spy=RSC.guiTools.guiScale(160);
         setPriority(Thread.MIN_PRIORITY);
     }
 
@@ -67,7 +67,7 @@ public class ThreadLoadThumbnail extends Thread {
                     thumbnail.revalidate();
                 });
             } catch (Exception ex) {
-                final Image scaledImage=RSC.getImage("notavailable").getScaledInstance((spx - 3) / 2, (spx - 3) / 2, Image.SCALE_FAST);
+                final Image scaledImage=RSC.icons.getScaledIcon("notavailable").getImage().getScaledInstance((spx - 3) / 2, (spx - 3) / 2, Image.SCALE_FAST);
                 SwingUtilities.invokeLater(() -> {
                     thumbnail.jLIcon.setIcon(new ImageIcon(scaledImage));
                     thumbnail.jTFDesc.setText("<html><center>" + Parser.replace(ToolBox.wrap(es1,25), "\n", "<br>") + "</center></html>"); // size is here still 0
@@ -80,7 +80,7 @@ public class ThreadLoadThumbnail extends Thread {
             if (thumbnail.tableRow.get("type") != null && !thumbnail.tableRow.get("type").isBlank()) {
                 image=RSC.icons.get(thumbnail.tableRow.getIconField("type")).getImage();
             } else {
-                image=RSC.getImage("default");
+                image=RSC.icons.getScaledIcon("default").getImage();
             }
             final Image scaledImage=image.getScaledInstance((spx - 3) / 2, (spy - 3) / 2, Image.SCALE_FAST);
                 SwingUtilities.invokeLater(() -> {

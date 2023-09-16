@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.data;
 
 import celsius.components.library.Library;
@@ -13,7 +8,8 @@ import java.io.File;
 import java.sql.ResultSet;
 
 /**
- *
+ * This class describes a file attachment to an item.
+ * 
  * @author cnsaeman
  */
 public class Attachment extends TableRow {
@@ -121,10 +117,10 @@ public class Attachment extends TableRow {
     public int moveToStandardLocation(boolean save) {
         if (parent.library.addingMode==0) return(0);
         if (!parent.guaranteeStandardFolder()) {
-            library.RSC.showWarning("Standard item folder could not be created.", "Warning:");
+            library.RSC.guiTools.showWarning("Warning:","Standard item folder could not be created.");
             return (2);
         }
-        String newFileName = library.getStandardFolder(this) + ToolBox.filesep + standardFileName();
+        String newFileName = library.getStandardFolder(this) + ToolBox.FILE_SEPARATOR + standardFileName();
         String newFullPath = normalizeForSave(library.completeDir(newFileName, ""));
         
         // add numbers until a free filename is found

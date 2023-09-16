@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.data;
 
 import java.util.ArrayList;
@@ -52,16 +47,16 @@ public class PeopleListModelDetailed implements ListModel {
         }
     }
     
-    public void add(ArrayList<Person> pp) {
-        for (Person p : pp) {
+    public void add(ArrayList<Person> persons) {
+        for (Person p : persons) {
             if (!ids.contains(getIdentifier(p))) {
                 people.add(p);
                 ids.add(getIdentifier(p));
             }
         }
-        if (pp.size()>0) {
+        if (!persons.isEmpty()) {
             for (ListDataListener ll : listeners) {
-                ll.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, people.size() - pp.size(), people.size() - 1));
+                ll.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, people.size() - persons.size(), people.size() - 1));
             }
         }
     }

@@ -131,6 +131,7 @@ public class Person extends TableRow implements Editable {
         return(get("first_name")+" "+get("last_name").trim());
     }
     
+    @Override
     public String toText(boolean renew) {
         return(getName(0));
     }
@@ -238,7 +239,7 @@ public class Person extends TableRow implements Editable {
     
     public String getBibTeXForm() {
         if (containsKey("bibtex")) return(getS("bibtex"));
-        StringBuffer out=new StringBuffer();
+        StringBuilder out=new StringBuilder();
         out.append(BibTeXRecord.sanitize(getS("last_name"))).append(", ").append(BibTeXRecord.sanitize(getS("first_name")));
         return(out.toString());
     }

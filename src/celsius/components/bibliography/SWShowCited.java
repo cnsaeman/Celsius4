@@ -64,7 +64,7 @@ public class SWShowCited  extends SWListItems {
      * Get all citation tags from a latex-file
      */
     public void getCitationTags() {
-        String contents=TextFile.ReadOutFile(filename);
+        String contents=TextFile.readOutFile(filename);
         examine(contents,"\\\\cite\\{([^\\}]+)\\}");
         examine(contents,"\\\\cite\\[[^\\]]+\\]\\{([^\\}]+)\\}");
         examine(contents,"\\\\bibitem\\{([^\\}]+)\\}");

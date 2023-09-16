@@ -24,7 +24,6 @@ import celsius.data.TableRow;
 import celsius.gui.EditorPanel;
 import celsius.gui.GuiEventListener;
 import atlantis.gui.MultiLineEditor;
-import atlantis.gui.SingleLineEditor;
 import celsius.gui.TabLabel;
 import celsius.tools.*;
 import java.awt.Component;
@@ -74,13 +73,13 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  */
 public final class InformationPanel extends javax.swing.JPanel implements GuiEventListener, DropTargetListener {
 
-    public final static int TabMode_START_UP=-1;
-    public final static int TabMode_EMPTY=0;
-    public final static int TabMode_ITEM=1;
-    public final static int TabMode_PERSON=2;
-    public final static int TabMode_CATEGORY=3;
-    public final static int TabMode_ITEM_SEARCH=4;
-    public final static int TabMode_PERSON_SEARCH=5;
+    public final static int TABMODE_START_UP=-1;
+    public final static int TABMODE_EMPTY=0;
+    public final static int TABMODE_ITEM=1;
+    public final static int TABMODE_PERSON=2;
+    public final static int TABMODE_CATEGORY=3;
+    public final static int TABMODE_ITEM_SEARCH=4;
+    public final static int TABMODE_PERSON_SEARCH=5;
     
     // 4 and 7 missing?
 
@@ -110,16 +109,16 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
      *  Creates new form jInfoPanel
      *  @param rsc 
      */
-    public InformationPanel(Resources rsc) {
-        RSC=rsc;
+    public InformationPanel(Resources RSC) {
+        this.RSC=RSC;
         initComponents();
-        jTABibTeX=new AtlantisTextArea(RSC.guiScale(12));
+        jTABibTeX=new AtlantisTextArea(RSC.guiTools.guiScale(12));
         jTABibTeX.setColumns(20);
         jScrollPane10.setViewportView(jTABibTeX);
-        jTARemarks=new AtlantisTextArea(RSC.guiScale(12));
+        jTARemarks=new AtlantisTextArea(RSC.guiTools.guiScale(12));
         jTARemarks.setColumns(20);
         jScrollPane8.setViewportView(jTARemarks);
-        jCBLinkType.setMinimumSize(new Dimension(RSC.guiScale(300),RSC.guiScale(25)));
+        jCBLinkType.setMinimumSize(new Dimension(RSC.guiTools.guiScale(300),RSC.guiTools.guiScale(25)));
         jPanel7.setBorder(RSC.stdBordermW());
         jPanel8.setBorder(RSC.stdBordermW());
         jPanel9.setBorder(RSC.stdBordermW());
@@ -133,7 +132,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         DropTarget dt = (new DropTarget(jHTMLview, DnDConstants.ACTION_COPY_OR_MOVE,this,true,null));
         kit = new HTMLEditorKit();
         jHTMLview.setEditorKit(kit);
-        jTPItem.setTabComponentAt(0,new TabLabel("Info",Resources.infoTabIcon,rsc,null,false));
+        jTPItem.setTabComponentAt(0,new TabLabel("Info",Resources.infoTabIcon,RSC,null,false));
         // Init Linktree
         DefaultTreeCellRenderer renderer3 = new DefaultTreeCellRenderer();
         renderer3.setLeafIcon(RSC.icons.getIcon("arrow_right"));
@@ -729,27 +728,26 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 String s1=Parser.cutFrom(cmd, "http://$$display-message:");
                 String s2=Parser.cutFrom(s1,":");
                 s1=Parser.cutUntil(s1,":");
-                RSC.showInformation(s2,s1);
+                RSC.guiTools.showInformation(s2,s1);
                 return;
             }
             if (cmd.startsWith("http://$$view-attachment")) {
                 String nmb=Parser.cutFromLast(cmd, "-");
                 Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
-                RSC.configuration.view(currentItem, Integer.valueOf(nmb));
+                RSC.configuration.view(currentItem, Integer.parseInt(nmb));
                 return;
             }
             if (cmd.startsWith("http://cid-")) {
                 String id=Parser.cutFromLast(cmd, "-");
-                String nmb=null;
-                if (id.indexOf("-")>-1) {
-                    nmb=Parser.cutFrom(id,"-");
+                if (id.contains("-")) {
+                    Parser.cutFrom(id,"-");
                     id=Parser.cutUntil(id,"-");
                 }
                 RSC.configuration.view((new Item(library,id)),0);
                 return;
             }
             if (cmd.startsWith("http://$$links")) {
-                String type=Parser.cutFromLast(cmd, "-");
+                //String type=Parser.cutFromLast(cmd, "-");
                 //updateLinks();
                 //TODO
                 //RSC.showLinksOfType(type);
@@ -765,7 +763,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                     RSC.out("JM>Journal link command: " + cmdln);
                     (new ExecutionShell(cmdln, 0, true)).start();
                 } else {
-                    RSC.showWarning("No journal link found!", "Warning");
+                    RSC.guiTools.showWarning("Warning","No journal link found!");
                 }
                 return;
             }
@@ -800,7 +798,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         }
         BibTeXRecord btr = new BibTeXRecord(jTABibTeX.getText());
         if (btr.parseError != 0) {
-            RSC.showWarning("BibTeX entry not consistent: " + BibTeXRecord.status[btr.parseError], "Warning:");
+            RSC.guiTools.showWarning("Warning:","BibTeX entry not consistent: " + BibTeXRecord.status[btr.parseError]);
             return;
         }
         jTABibTeX.setText(btr.toString());
@@ -817,7 +815,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         }
         currentItem.save();
         updateGUI();
-        if (currentItem.error==6) RSC.showWarning("Error while saving information file.", "Exception:");
+        if (currentItem.error==6) RSC.guiTools.showWarning("Exception:","Error while saving information file.");
 }//GEN-LAST:event_jBtnApplyBibTeXActionPerformed
 
     private void jBtnCreateBibTeXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCreateBibTeXActionPerformed
@@ -842,7 +840,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             jTABibTeX.setText(bibtex.toString());
             jTABibTeX.setCaretPosition(0);
         } catch (Exception ex) {
-            RSC.showWarning("BibTeX record is not well formed.", "Error");
+            RSC.guiTools.showWarning("Error","BibTeX record is not well formed.");
             RSC.outEx(ex);
         }
 }//GEN-LAST:event_jBtnNormalizeBibTeXActionPerformed
@@ -852,7 +850,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (!val.equals("add property")) {
             String bib=jTABibTeX.getText();
             if (bib.length()==0) {
-                RSC.showWarning("Please create a BibTeX entry first with the \"Create\" button.", "Cancelled...");
+                RSC.guiTools.showWarning("Cancelled...","Please create a BibTeX entry first with the \"Create\" button.");
             } else {
                 int i=Parser.cutFrom(bib,"\n").trim().indexOf("=");
                 String tmp=Parser.cutUntilLast(Parser.cutUntilLast(bib,"}"),"\n");
@@ -875,7 +873,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             } else {
                 jTABibTeX.setText(currentItem.get("bibtex"));
                 if (bibtex.parseError < 250)
-                    RSC.showWarning("BibTeX parsing error: " + BibTeXRecord.status[bibtex.parseError], "Warning:");
+                    RSC.guiTools.showWarning("Warning:","BibTeX parsing error: " + BibTeXRecord.status[bibtex.parseError]);
             }
             jTABibTeX.setCaretPosition(0);
             RSC.guiStates.adjustState("infoPanel", "bibliographyEditable", true);
@@ -887,17 +885,17 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 }//GEN-LAST:event_jCBBibPluginsActionPerformed
 
     private void jBtnApplyRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnApplyRemActionPerformed
-        if (tabMode == InformationPanel.TabMode_ITEM) {
+        if (tabMode == InformationPanel.TABMODE_ITEM) {
             Item item=(Item)celsiusTable.getCurrentlySelectedRow();
             item.put("remarks", jTARemarks.getText().trim());
             item.save();
         }
-        if (tabMode == InformationPanel.TabMode_PERSON) {
+        if (tabMode == InformationPanel.TABMODE_PERSON) {
             Person person=(Person)celsiusTable.getCurrentlySelectedRow();
             person.put("remarks", jTARemarks.getText().trim());
             person.save();
         }
-        if (tabMode == InformationPanel.TabMode_CATEGORY) {
+        if (tabMode == InformationPanel.TABMODE_CATEGORY) {
             Category category=(Category)currentObject;
             if (category!=null) {
                 category.setRemarks(jTARemarks.getText().trim());
@@ -913,7 +911,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     private void jMIEditDS1jMIEditDSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditDS1jMIEditDSActionPerformed
         String tmp = library.getHTMLTemplate(currentTemplate).templateString;
-        MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML template", tmp);
+        MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit HTML template", tmp);
         MLE.setVisible(true);
         if (!MLE.cancelled) {
             library.setHTMLTemplate(currentTemplate,MLE.text);
@@ -931,7 +929,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if ((tabMode==0) && cb.isDataFlavorAvailable(DataFlavor.imageFlavor)) {
             try {
                 Item currentItem = (Item) celsiusTable.getCurrentlySelectedRow();
-                String target = currentItem.library.baseFolder + "thumbnails" + ToolBox.filesep + currentItem.id + ".jpg";
+                String target = currentItem.library.basefolder + "thumbnails" + ToolBox.FILE_SEPARATOR + currentItem.id + ".jpg";
                 Image image = (Image) cb.getData(DataFlavor.imageFlavor);
                 FileTools.deleteIfExists(target);
                 // convert from no longer supported types.
@@ -944,22 +942,19 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 } else {
                     RSC.out("Saving jpge failed!");
                 }
-            } catch (UnsupportedFlavorException ex) {
-                RSC.outEx(ex);
-            } catch (IOException ex) {
+            } catch (UnsupportedFlavorException | IOException ex) {
                 RSC.outEx(ex);
             }
         } else {
-            RSC.showWarning("Incompatible file type.", "Warning:");
+            RSC.guiTools.showWarning("Warning:","Incompatible file type.");
         }
     }//GEN-LAST:event_jMIAddThumbActionPerformed
 
     private void jBtnAddThumbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddThumbActionPerformed
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
-        String filename=RSC.selectFile("Indicate the file containing the thumbnail", "thumbnail", "_ALL", "All files");
+        String filename=RSC.guiTools.selectFileForOpen("Indicate the file containing the thumbnail", "thumbnail", "_ALL", "All files");
         if (filename!=null) {
             try {
-                String filetype="."+FileTools.getFileType(filename);
                 String oldThumb=currentItem.getThumbnailPath();
                 if (oldThumb!=null) {
                     FileTools.deleteIfExists(oldThumb);
@@ -968,7 +963,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 currentItem.save();
                 updateGUI();
             } catch (IOException ex) {
-                RSC.showWarning("Error writing thumbnail: "+ex.toString(), "Warning:");
+                RSC.guiTools.showWarning("Warning:","Error writing thumbnail: "+ex.toString());
                 RSC.outEx(ex);
             }
         }
@@ -1023,7 +1018,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (evt.getClickCount() == 2) {
             String fn=jLFiles1.getSelectedValue();
             if (fn.length()>0) {
-                fn=currentItem.get("source")+ToolBox.filesep+fn;
+                fn=currentItem.get("source")+ToolBox.FILE_SEPARATOR+fn;
                 RSC.configuration.view("pdf", fn);
             }
         }
@@ -1034,7 +1029,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (evt.getClickCount() == 2) {
             String fn=jLFiles2.getSelectedValue();
             if (fn.length()>0) {
-                fn=currentItem.get("source")+ToolBox.filesep+fn;
+                fn=currentItem.get("source")+ToolBox.FILE_SEPARATOR+fn;
                 RSC.configuration.view("tex", fn);
             }
         }
@@ -1045,7 +1040,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (evt.getClickCount() == 2) {
             String fn=jLFiles3.getSelectedValue();
             if (fn.length()>0) {
-                fn=currentItem.get("source")+ToolBox.filesep+fn;
+                fn=currentItem.get("source")+ToolBox.FILE_SEPARATOR+fn;
                 RSC.configuration.view("---", fn);
             }
         }
@@ -1053,7 +1048,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     private void jBtnChooseSourceFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnChooseSourceFolderActionPerformed
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
-        String folder=RSC.selectFolder("Select the source folder for this item","sourcefolders");
+        String folder=RSC.guiTools.selectFolder("Select the source folder for this item","sourcefolders");
         // cancelled?
         if (folder!=null) {
             currentItem.putS("source",folder);
@@ -1066,7 +1061,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         Item currentItem=(Item)celsiusTable.getCurrentlySelectedRow();
         String fn=jLFiles2.getSelectedValue();
         if (fn!=null)  {
-            fn=currentItem.get("source")+ToolBox.filesep+fn;
+            fn=currentItem.get("source")+ToolBox.FILE_SEPARATOR+fn;
             CelsiusTable IT=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Cited in " + jLFiles2.getSelectedValue(),"search");
             RSC.guiStates.adjustState("mainFrame","itemSelected", false);
             SWShowCited swAP = new SWShowCited(IT,0,fn);
@@ -1127,10 +1122,9 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     private void jBtnRelabelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRelabelActionPerformed
         Item item=getItem();
         Attachment attachment=item.linkedAttachments.get(jLAttachments.getSelectedIndex());
-        SingleLineEditor SLE=new SingleLineEditor(RSC,"Enter a new name",attachment.get("name"),true);
-        SLE.setVisible(true);
-        if (!SLE.cancelled) {
-            attachment.put("name", SLE.text);
+        String newName=RSC.guiTools.askQuestionString("Enter a new name",attachment.get("name"),true);
+        if (newName!=null) {
+            attachment.put("name", newName);
             try {
                 attachment.save();
             } catch (Exception e) {
@@ -1164,7 +1158,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
         Item item=getItem();
-        int i=RSC.askQuestionYN("Are you sure you want to delete this attachement?", "Warning:");
+        int i=RSC.guiTools.askQuestionYN("Are you sure you want to delete this attachement?", "Warning:");
         if (i==JOptionPane.NO_OPTION) return;
         Attachment attachment=item.linkedAttachments.get(jLAttachments.getSelectedIndex());
         attachment.delete();
@@ -1335,7 +1329,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (mode==tabMode) return;
         jTPItem.removeAll();
         switch (mode) {
-            case InformationPanel.TabMode_ITEM:
+            case InformationPanel.TABMODE_ITEM:
                 addToPanel("Summary",Resources.infoTabIcon,jSP3);
                 if (!library.hideFunctionality.contains("Tab:Bibliography")) addToPanel("Bibliography", Resources.bibliographyTabIcon, jPBibData);
                 addToPanel("Remarks",Resources.remarksTabIcon,jPRemarks);
@@ -1346,14 +1340,14 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
                 if (!library.hideFunctionality.contains("Tab:Thumbnail")) addToPanel("Image", Resources.thumbTabIcon,jPThumb);
                 addToPanel("Internal",Resources.internalTabIcon,jPItemRaw);
                 break;
-            case InformationPanel.TabMode_PERSON:
+            case InformationPanel.TABMODE_PERSON:
                 addToPanel("Summary",Resources.infoTabIcon,jSP3);
                 addToPanel("Remarks",Resources.remarksTabIcon,jPRemarks);
                 addToPanel("Edit",Resources.editTabIcon,jPEdit);
                 if (!library.hideFunctionality.contains("Tab:Thumbnail")) addToPanel("Image", Resources.thumbTabIcon,jPThumb);
                 addToPanel("Internal",Resources.internalTabIcon,jPItemRaw);
                 break;
-            case InformationPanel.TabMode_CATEGORY:
+            case InformationPanel.TABMODE_CATEGORY:
                 addToPanel("Summary",Resources.infoTabIcon,jSP3);
                 addToPanel("Remarks",Resources.remarksTabIcon,jPRemarks);
                 break;
@@ -1386,10 +1380,10 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             library=RSC.getCurrentlySelectedLibrary();
             updateCSS();
             RSC.plugins.updateExportPlugins();
-        };
+        }
         jHTMLview.setContentType("text/html");
         if (!RSC.guiStates.getState("mainFrame","librarySelected")) {
-            switchToTabMode(InformationPanel.TabMode_EMPTY);
+            switchToTabMode(InformationPanel.TABMODE_EMPTY);
             jHTMLview.setText(RSC.stdHTMLstring);
             jHTMLview.setCaretPosition(0);
             return;
@@ -1445,7 +1439,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToItemSearchResults() {
-        switchToTabMode(InformationPanel.TabMode_ITEM_SEARCH);
+        switchToTabMode(InformationPanel.TABMODE_ITEM_SEARCH);
         CelsiusTemplate template=library.getHTMLTemplate(5);
         currentTemplate=5;
         RSC.getCurrentTable().updateStats();
@@ -1454,7 +1448,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
     
     private void guiToNoTab() {
-        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        switchToTabMode(InformationPanel.TABMODE_EMPTY);
         CelsiusTemplate template = library.htmlTemplates.get("-1");
         currentTemplate = -1;
         jHTMLview.setText(template.fillIn(RSC.getCurrentlySelectedLibrary().getDataHash()));
@@ -1462,7 +1456,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
     
     private void guiToCategory() {
-        switchToTabMode(InformationPanel.TabMode_CATEGORY);
+        switchToTabMode(InformationPanel.TABMODE_CATEGORY);
         Category category=(Category)currentObject;
         CelsiusTemplate template=library.getHTMLTemplate(2);
         currentTemplate=2;
@@ -1473,7 +1467,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToKeyword() {
-        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        switchToTabMode(InformationPanel.TABMODE_EMPTY);
         CelsiusTemplate template=library.getHTMLTemplate(6);
         currentTemplate=6;
         RSC.getCurrentTable().updateStats();
@@ -1482,7 +1476,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
     
     private void guiToHistory() {
-        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        switchToTabMode(InformationPanel.TABMODE_EMPTY);
         CelsiusTemplate template=library.getHTMLTemplate(8);
         currentTemplate=8;
         RSC.getCurrentTable().updateStats();
@@ -1491,7 +1485,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
     
     private void guiToMultiItem() {
-        switchToTabMode(InformationPanel.TabMode_EMPTY);
+        switchToTabMode(InformationPanel.TABMODE_EMPTY);
         CelsiusTemplate template=library.getHTMLTemplate(3);
         currentTemplate=3;
         RSC.getCurrentTable().updateStats();
@@ -1500,7 +1494,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToMultiPerson() {
-        switchToTabMode(InformationPanel.TabMode_PERSON_SEARCH);
+        switchToTabMode(InformationPanel.TABMODE_PERSON_SEARCH);
         CelsiusTemplate template=library.getHTMLTemplate(9);
         currentTemplate=9;
         RSC.getCurrentTable().updateStats();
@@ -1509,7 +1503,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
     
     private void guiToSinglePerson() {
-        switchToTabMode(InformationPanel.TabMode_PERSON);
+        switchToTabMode(InformationPanel.TABMODE_PERSON);
         Person person=(Person)celsiusTable.getCurrentlySelectedRow();
         person.loadLevel(2);
         person.loadCollaborators();
@@ -1527,7 +1521,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
     }
 
     private void guiToSingleItem() {
-        switchToTabMode(InformationPanel.TabMode_ITEM);
+        switchToTabMode(InformationPanel.TABMODE_ITEM);
         Item item = (Item)celsiusTable.getCurrentlySelectedRow();
         item.loadLevel(3);
         CelsiusTemplate template=library.getHTMLTemplate(0);
@@ -1535,7 +1529,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         jHTMLview.setText(template.fillIn(item,false));
         jTARaw1.setText(item.getRawData());
         jTARaw1.setCaretPosition(0);
-        celsiusTable.updateRow(item);
+        //celsiusTable.updateRow(item);
         jPEdit.setEditable(item);
         jLAttachments.setModel(item.getAttachmentListModel());
 
@@ -1548,7 +1542,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             } else {
                 jTABibTeX.setText(item.get("bibtex"));
                 if (bibtex.parseError < 250) {
-                    RSC.showWarning("BibTeX parsing error: " + BibTeXRecord.status[bibtex.parseError], "Warning:");
+                    RSC.guiTools.showWarning("Warning:","BibTeX parsing error: " + BibTeXRecord.status[bibtex.parseError]);
                 }
             }
             jTABibTeX.setCaretPosition(0);
@@ -1601,25 +1595,30 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         adjustAttachmentButtons();
     }
     
+    @Override
     public void dragEnter(DropTargetDragEvent dtde) {
         if (!acceptData(dtde.getTransferable()))
             dtde.rejectDrag();
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {
         if (!acceptData(dtde.getTransferable()))
             dtde.rejectDrag();
     }
 
+    @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
         System.out.println("Drop action changed");
     }
 
+    @Override
     public void dragExit(DropTargetEvent dte) {
         System.out.println("Drag exit");
         System.out.println("Drop3:"+dte.toString());
     }
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY);
         System.out.println("Drop1");
@@ -1665,7 +1664,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
             if (t == null) {
                 return (false);
             }
-            if ((tabMode != InformationPanel.TabMode_ITEM) && (tabMode != InformationPanel.TabMode_PERSON)) {
+            if ((tabMode != InformationPanel.TABMODE_ITEM) && (tabMode != InformationPanel.TABMODE_PERSON)) {
                 return (false);
             }
             ret=true;
@@ -1685,18 +1684,13 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         if (RSC.guiStates.getState("mainFrame","tabAvailable")) {
             Library library = RSC.getCurrentlySelectedLibrary();
             Item item=(Item)RSC.getCurrentTable().getSelectedRows().get(0);
-            String filename = RSC.selectFile("Indicate the file to be associated with the selected record", "associate", "_ALL", "All files");
+            String filename = RSC.guiTools.selectFileForOpen("Indicate the file to be associated with the selected record", "associate", "_ALL", "All files");
             if (filename != null) {
                 String name = null;
                 if (item.linkedAttachments.isEmpty()) {
                     name = "";
                 } else {
-                    final SingleLineEditor DSLE = new SingleLineEditor(RSC, "Please enter a description for the associated file", "", true);
-                    DSLE.setVisible(true);
-                    if (!DSLE.cancelled) {
-                        name = DSLE.text.trim();
-                    }
-                    DSLE.dispose();
+                    name=RSC.guiTools.askQuestionString("Please enter a description for the associated file", "", true);
                 }
                 if (name != null) {
                     if (name.length() == 0) {
@@ -1721,7 +1715,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         DefaultListModel DLM=new DefaultListModel();
         TableRow tableRow=celsiusTable.getCurrentlySelectedRow();
         ArrayList<Item> linkedItems=tableRow.linkedItems.get(jCBLinkType.getSelectedIndex());
-        if ((linkedItems!=null) && (linkedItems.size()>0)) DLM.addAll(linkedItems);
+        if ((linkedItems!=null) && (!linkedItems.isEmpty())) DLM.addAll(linkedItems);
         jLLinkedItems.setModel(DLM);
     }
     
@@ -1740,7 +1734,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         adjustLinkedItemsList();        
         addLinkSQL = "INSERT INTO item_item_links (item1_id,item2_id) VALUES (?,?)";
         removeLinkSQL = "DELETE FROM item_item_links WHERE item1_id=? AND item2_id IN (?);";
-        setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
+        setPreferredSize(new Dimension(RSC.guiTools.guiScale(500),RSC.guiTools.guiScale(600)));
         jBtnAdd1.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
     }
 
@@ -1753,7 +1747,7 @@ public final class InformationPanel extends javax.swing.JPanel implements GuiEve
         adjustLinkedItemsList();        
         addLinkSQL = "INSERT INTO person_item_links (person_id,item_id) VALUES (?,?)";
         removeLinkSQL = "DELETE FROM person_item_links WHERE person_id=? AND item_id IN (?);";
-        setPreferredSize(new Dimension(RSC.guiScale(500),RSC.guiScale(600)));
+        setPreferredSize(new Dimension(RSC.guiTools.guiScale(500),RSC.guiTools.guiScale(600)));
         jBtnAdd1.setEnabled((RSC.lastItemSelection!=null) && (RSC.lastItemSelection.library==tableRow.library));
     }
     

@@ -1,13 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.search;
 
 import celsius.Resources;
-import celsius.components.search.SWSearch;
-import celsius.components.library.Library;
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.MainFrame;
 import java.awt.event.KeyEvent;
@@ -35,9 +28,10 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
 
     /**
      * Creates new form SearchPanel
+     * @param MF
      */
-    public SearchPanel(MainFrame mf) {
-        MF=mf;
+    public SearchPanel(MainFrame MF) {
+        this.MF=MF;
         RSC=MF.RSC;
         initComponents();
         RSC.adjustComponents(this.getComponents());
@@ -56,7 +50,6 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        searchBtnGrp = new javax.swing.ButtonGroup();
         jTFMainSearch = new celsius.gui.jExtTextField();
         jPanel22 = new javax.swing.JPanel();
         jCBSearchMode = new javax.swing.JComboBox<>();
@@ -99,7 +92,6 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
     private javax.swing.JComboBox<String> jCBSearchMode;
     private javax.swing.JPanel jPanel22;
     public celsius.gui.jExtTextField jTFMainSearch;
-    private javax.swing.ButtonGroup searchBtnGrp;
     // End of variables declaration//GEN-END:variables
 
     public void focus() {
@@ -133,7 +125,6 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
     
     public void startSearch(String srch,int mode) {
         RSC.MF.clearCategorySelection();
-        CelsiusTable cels=RSC.getCurrentTable();
         int tableType=CelsiusTable.TABLETYPE_ITEM_SEARCH;
         if (mode==2) tableType=CelsiusTable.TABLETYPE_PERSON_SEARCH;
         CelsiusTable celsiusTable=RSC.guaranteeTableAvailable(tableType,srch,"search");
@@ -169,6 +160,7 @@ public class SearchPanel extends javax.swing.JPanel implements DocumentListener 
         }
     }
     
+    @Override
     public void setEnabled(boolean state) {
         jTFMainSearch.setEnabled(state);
         jCBSearchMode.setEnabled(state);

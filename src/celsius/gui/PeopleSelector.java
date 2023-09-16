@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
 import celsius.Resources;
-import celsius.components.library.Library;
 import celsius.data.PeopleListModel;
 import atlantis.tools.Parser;
 import java.awt.event.KeyEvent;

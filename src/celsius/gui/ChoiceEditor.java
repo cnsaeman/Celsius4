@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
 import celsius.Resources;
@@ -28,7 +23,7 @@ public class ChoiceEditor extends javax.swing.JDialog {
     public ChoiceEditor(Resources RSC, String title, ArrayList<String> choices, String selection) {
         super(RSC.MF, true);
         this.RSC=RSC;
-        setIconImage(RSC.getAppIcon());
+        setIconImage(RSC.guiTools.appIcon);
         this.setTitle(title);
         DCBM=new DefaultComboBoxModel();
         DCBM.addAll(choices);
@@ -36,7 +31,7 @@ public class ChoiceEditor extends javax.swing.JDialog {
         jCBChoices.setSelectedItem(selection);
         this.selection=selection;
         pre=selection;
-        GUIToolBox.centerDialog(this,RSC.MF);
+        RSC.guiTools.centerDialog(this);
     }
 
     /**

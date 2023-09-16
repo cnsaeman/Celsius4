@@ -125,7 +125,7 @@ public final class Configurator {
     
     public void libraryOpened(Library library) {
         if (lastLibraries.containsKey(library.name)) {
-            if (lastLibraries.get(library.name).equals(library.baseFolder)) {
+            if (lastLibraries.get(library.name).equals(library.basefolder)) {
                 // TODO: remove jMenu and put to invisible if changedRSC.MF.jMRecent.remove(lastLibraries.keySet().);
                 lastLibraries.remove(library.name);
             }
@@ -133,8 +133,8 @@ public final class Configurator {
     }
     
     public void libraryClosed(Library library) {
-        lastLibraries.put(library.name,library.baseFolder);
-        addRecentLib(library.name, library.baseFolder);
+        lastLibraries.put(library.name,library.basefolder);
+        addRecentLib(library.name, library.basefolder);
     }
     
     public void addRecentLib(String name, final String source) {
@@ -149,7 +149,7 @@ public final class Configurator {
                         try {
                             RSC.loadLibrary(source,true);
                         } catch (Exception e) {
-                            RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
+                            RSC.guiTools.showWarning("Warning:","Loading library failed:\n" + e.toString());
                         }
                         RSC.MF.setThreadMsg("Ready.");
                         RSC.MF.jPBSearch.setIndeterminate(false);
@@ -171,7 +171,7 @@ public final class Configurator {
             for(Library library : RSC.libraries) {
                 statement=dbConnection.prepareStatement("INSERT INTO libraries_init (name,path,status) VALUES (?,?,?);");
                 statement.setString(1, library.name);
-                statement.setString(2, library.baseFolder);
+                statement.setString(2, library.basefolder);
                 if (library==RSC.getCurrentlySelectedLibrary()) {
                     statement.setInt(3,2);
                 } else {
@@ -300,7 +300,7 @@ public final class Configurator {
     }
 
     public void setProxy() {
-        if (Boolean.valueOf(configuration.get("proxy"))) {
+        if (Boolean.parseBoolean(configuration.get("proxy"))) {
             String proxyadd = configuration.get("proxy_address");
             if (proxyadd.startsWith("http://")) {
                 proxyadd = proxyadd.substring(7);
@@ -363,7 +363,7 @@ public final class Configurator {
             if ((fileTypeProperties.get("ident") != null) && (fileTypeProperties.get("ident").length() == 0)) {
                 if ((fileTypeProperties.get("Ident")!=null) && (!tmp.startsWith(fileTypeProperties.get("Ident")))) {
                     // File type does not seem to match
-                    RSC.showWarning("The file " + s + " is not of type " + fileType + ".", "Incorrect File Type Assignment");
+                    RSC.guiTools.showWarning("Incorrect File Type Assignment","The file " + s + " is not of type " + fileType + ".");
                     RSC.out(TI + "Identification of filetype failed.");
                     RSC.out(TI + fileTypeProperties.get("Ident") + "  :: vs ::  " + tmp.substring(0, 10));
                 }
@@ -405,7 +405,7 @@ public final class Configurator {
      */
     public void view(String fileType, String location) {
         if (!location.startsWith("http://") && !location.startsWith("https://") && !(new File(location)).exists()) {
-            RSC.showWarning("The file "+location+" does not exist.", "Warning: Cannot open file");
+            RSC.guiTools.showWarning("Warning: Cannot open file","The file "+location+" does not exist.");
             return;
         }
         if (fileType=="---") {
@@ -414,13 +414,13 @@ public final class Configurator {
                     java.awt.Desktop.getDesktop().browse(new URI(location));
                     else java.awt.Desktop.getDesktop().open(new File(location));
             } catch (Exception ex) {
-                RSC.showWarning("Standard viewer for " + fileType + " reports an error!", "Warning");
+                RSC.guiTools.showWarning("Warning","Standard viewer for " + fileType + " reports an error!");
                 RSC.outEx(ex);
             }
             return;
         } else {
             if (!supportedFileTypes.containsKey(fileType)) {
-                RSC.showWarning("No viewer for " + fileType + " installed!", "Warning");
+                RSC.guiTools.showWarning("Warning","No viewer for " + fileType + " installed!");
                 return;
             }
             String viewer=supportedFileTypes.get(fileType).get("viewer");
@@ -430,7 +430,7 @@ public final class Configurator {
                         java.awt.Desktop.getDesktop().browse(new URI(location));
                         else java.awt.Desktop.getDesktop().open(new File(location));
                 } catch (IOException | URISyntaxException ex) {
-                    RSC.showWarning("Standard viewer for " + fileType + " reports an error!", "Warning");
+                    RSC.guiTools.showWarning("Warning","Standard viewer for " + fileType + " reports an error!");
                     RSC.outEx(ex);
                 }
             } else {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
 import atlantis.gui.MultiLineEditor;
@@ -29,7 +24,6 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -50,12 +44,12 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
     /**
      * Creates new form editorPanel
      */
-    public EditorPanel(Resources rsc, boolean wB) {
+    public EditorPanel(Resources RSC, boolean writeBack) {
         initComponents();        
         jTabEdit.getSelectionModel().addListSelectionListener(this);
         DropTarget dt = (new DropTarget(jTabEdit, DnDConstants.ACTION_COPY_OR_MOVE,this,true,null));
-        RSC=rsc;
-        writeBack=wB;
+        this.RSC=RSC;
+        this.writeBack=writeBack;
         guiEventListeners=new ArrayList<>();
         type=-1;
     }
@@ -168,7 +162,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
 
     private void jBtnNewRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNewRowActionPerformed
         String key;
-        MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit new row name", "");
+        MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit new row name", "");
         MLE.setVisible(true);
         if (MLE.cancelled) return;
         key=MLE.text.toLowerCase();
@@ -238,7 +232,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
         } else {
             // standard text editor
             String value=editable.get(key);
-            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit value", value);
+            MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit value", value);
             MLE.setVisible(true);
             if (!MLE.cancelled) {
                 value=MLE.text;
@@ -251,7 +245,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
     }
     
     public void removeCurrentlySelectedKey() {
-        final int i = RSC.askQuestionOC("Are you sure you want to delete the current key?", "Warning");
+        final int i = RSC.guiTools.askQuestionOC("Are you sure you want to delete the current key?", "Warning");
         if (i == JOptionPane.YES_OPTION) {
             String key=((String)jTabEdit.getModel().getValueAt(jTabEdit.getSelectedRow(),0));
             editable.put(key,null);
@@ -301,6 +295,7 @@ public class EditorPanel extends javax.swing.JPanel implements ListSelectionList
         System.out.println("Drop3:"+dte.toString());
     }
 
+    @Override
     public void drop(DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY);
         if (acceptData(dtde.getTransferable())) {

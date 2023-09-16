@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package celsius.components.categories;
 
 import celsius.components.library.Library;
@@ -30,7 +25,7 @@ public class StructureNode implements MutableTreeNode {
         this.id=id;
         this.library=library;
         this.category=category;
-        childNodes=new ArrayList<StructureNode>();
+        childNodes=new ArrayList<>();
         parent=null;
     }
 
@@ -239,7 +234,7 @@ public class StructureNode implements MutableTreeNode {
     }
     
     public StructureNode next() {
-        if (childNodes.size()>0) return(childNodes.get(0));
+        if (!childNodes.isEmpty()) return(childNodes.get(0));
         return(parent.next(parent.getIndex(this)));
     }
     
@@ -250,7 +245,7 @@ public class StructureNode implements MutableTreeNode {
 
     public String getChildListString() {
         if (childNodes.size()<1) return("");
-        StringBuffer childrenList=new StringBuffer();
+        StringBuilder childrenList=new StringBuilder();
         for (StructureNode node : childNodes) {
             childrenList.append(",").append(String.valueOf(node.id));
         }

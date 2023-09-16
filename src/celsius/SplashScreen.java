@@ -33,30 +33,30 @@ public class SplashScreen extends JFrame implements FocusListener{
         setIconImage(Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/main_icon.png")));
         ImageIcon imageIcon = new ImageIcon(getClass().getResource("images/splash.jpg"));
         Image preimage = imageIcon.getImage(); // transform it 
-        Image newimg = preimage.getScaledInstance(RSC.guiScale(preimage.getWidth(null)),RSC.guiScale(preimage.getHeight(null)), java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+        Image newimg = preimage.getScaledInstance(RSC.guiTools.guiScale(preimage.getWidth(null)),RSC.guiTools.guiScale(preimage.getHeight(null)), java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
         imageIcon = new ImageIcon(newimg);  // transform it back
         JLabel image = new JLabel(imageIcon);
         Status= new JLabel("Starting Celsius");
         Status.setOpaque(true);
         Status.setForeground(Color.white);
         Status.setBackground(new Color(0x1B468B));
-        Status.setFont(new java.awt.Font("SansSerif",1,RSC.guiScale(16)));
+        Status.setFont(new java.awt.Font("SansSerif",1,RSC.guiTools.guiScale(16)));
         Title1= new JLabel("Celsius Library System");
         Title1.setOpaque(false);
         Title1.setForeground(new Color(10,10,30));
-        Title1.setFont(new java.awt.Font("Serif",1,RSC.guiScale(28)));
+        Title1.setFont(new java.awt.Font("Serif",1,RSC.guiTools.guiScale(28)));
         Title2= new JLabel(version+" (w) by Christian Saemann");
         Title2.setOpaque(false);
         Title2.setForeground(new Color(10,10,30));
-        Title2.setFont(new java.awt.Font("Serif",1,RSC.guiScale(18)));
+        Title2.setFont(new java.awt.Font("Serif",1,RSC.guiTools.guiScale(18)));
         Title1S= new JLabel("Celsius Library System");
         Title1S.setOpaque(false);
         Title1S.setForeground(new Color(210,210,230));
-        Title1S.setFont(new java.awt.Font("Serif",1,RSC.guiScale(28)));
+        Title1S.setFont(new java.awt.Font("Serif",1,RSC.guiTools.guiScale(28)));
         Title2S= new JLabel(version+" (w) by Christian Saemann");
         Title2S.setOpaque(false);
         Title2S.setForeground(new Color(210,210,230));
-        Title2S.setFont(new java.awt.Font("Serif",1,RSC.guiScale(18)));
+        Title2S.setFont(new java.awt.Font("Serif",1,RSC.guiTools.guiScale(18)));
         FontMetrics f = Status.getFontMetrics(Status.getFont());
         
         // Add widgets to content pane
@@ -73,22 +73,22 @@ public class SplashScreen extends JFrame implements FocusListener{
         setSize(ImageSize);
         image.setBounds( 0, 0, ImageSize.width, ImageSize.height );
         
-        Status.setLocation( 0 , RSC.guiScale(5));
+        Status.setLocation( 0 , RSC.guiTools.guiScale(5));
         Dimension statusSize = new Dimension( getSize().width, f.getHeight());
         Status.setSize( statusSize );
         Status.setHorizontalAlignment(SwingConstants.CENTER);
         
-        Title1.setLocation(0,RSC.guiScale(360));
-        Title2.setLocation(0,RSC.guiScale(390));
-        Title1.setSize(new Dimension(getSize().width,RSC.guiScale(35)));
+        Title1.setLocation(0,RSC.guiTools.guiScale(360));
+        Title2.setLocation(0,RSC.guiTools.guiScale(390));
+        Title1.setSize(new Dimension(getSize().width,RSC.guiTools.guiScale(35)));
         Title1.setHorizontalAlignment(SwingConstants.CENTER);
-        Title2.setSize(new Dimension(getSize().width,RSC.guiScale(30)));
+        Title2.setSize(new Dimension(getSize().width,RSC.guiTools.guiScale(30)));
         Title2.setHorizontalAlignment(SwingConstants.CENTER);
-        Title1S.setLocation(0,RSC.guiScale(360));
-        Title2S.setLocation(0,RSC.guiScale(390));
-        Title1S.setSize(new Dimension(getSize().width+4,RSC.guiScale(35+4)));
+        Title1S.setLocation(0,RSC.guiTools.guiScale(360));
+        Title2S.setLocation(0,RSC.guiTools.guiScale(390));
+        Title1S.setSize(new Dimension(getSize().width+4,RSC.guiTools.guiScale(35+4)));
         Title1S.setHorizontalAlignment(SwingConstants.CENTER);
-        Title2S.setSize(new Dimension(getSize().width+4,RSC.guiScale(30+4)));
+        Title2S.setSize(new Dimension(getSize().width+4,RSC.guiTools.guiScale(30+4)));
         Title2S.setHorizontalAlignment(SwingConstants.CENTER);
         addFocusListener(this);
 

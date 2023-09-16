@@ -24,7 +24,6 @@ import celsius.components.plugins.Plugin;
 import atlantis.tools.TextFile;
 import celsius.components.infopanel.InformationPanel;
 import celsius.gui.EditorPanel;
-import celsius.gui.GUIToolBox;
 import celsius.gui.GuiEventListener;
 import celsius.gui.TabLabel;
 import celsius.tools.ToolBox;
@@ -96,7 +95,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         library = RSC.getCurrentlySelectedLibrary();
         library.addLibraryChangeListener(this);
         standardKeys=(new Item(library)).getEditableFields();
-        setIconImage(RSC.getAppIcon());
+        setIconImage(RSC.guiTools.appIcon);
         preparedItems = new ArrayList<>();
         addedItems = new ArrayList<>();
         getDetailsSWs = new ArrayList<>();
@@ -127,7 +126,8 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
         this.setSize((int)(0.8*dm.getWidth()), (int)(0.8*dm.getHeight()));
         RSC.adjustComponents(this.getComponents());
-        GUIToolBox.centerDialog(this,RSC.MF);
+        jTABibTeX.setFont(RSC.stdFontMono());
+        RSC.guiTools.centerDialog(this);
         initializing = false;
         ThreadStatus.setText("No item selected. No threads running.");
     }
@@ -178,10 +178,10 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             String[] fileList = (new File(dir)).list();
             java.util.Arrays.sort(fileList);
             for (String fileNameShort : fileList) {
-                if ((new File(dir + ToolBox.filesep + fileNameShort)).isDirectory()) {
-                    addFilesFromFolder(dir + ToolBox.filesep + fileNameShort);
+                if ((new File(dir + ToolBox.FILE_SEPARATOR + fileNameShort)).isDirectory()) {
+                    addFilesFromFolder(dir + ToolBox.FILE_SEPARATOR + fileNameShort);
                 } else {
-                    String fn=dir + ToolBox.filesep + fileNameShort;
+                    String fn=dir + ToolBox.FILE_SEPARATOR + fileNameShort;
                     boolean found=library.doesAttachmentExist(fn);
                     if (!found) {
                         try {
@@ -914,7 +914,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnSelectFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSelectFolderActionPerformed
-        String folderName=RSC.selectFolder("Select the directory in which the files are located.", "toinclude");
+        String folderName=RSC.guiTools.selectFolder("Select the directory in which the files are located.", "toinclude");
         if (folderName!=null) {
             jTFFolder.setText(folderName);
         }
@@ -1051,10 +1051,10 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
 
         // look for all available files
         String dir = jTFFolder.getText();
-        if (dir.endsWith(ToolBox.filesep)) dir=dir.substring(0,dir.length()-1);
+        if (dir.endsWith(ToolBox.FILE_SEPARATOR)) dir=dir.substring(0,dir.length()-1);
         String[] flist = (new File(dir)).list();
         if (flist==null) {
-            RSC.showWarning("The selected folder is empty.", "Warning");
+            RSC.guiTools.showWarning("Warning","The selected folder is empty.");
             return;
         }
         String msg = "";
@@ -1068,7 +1068,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             }
         }
         if (msg.length() != 0) {
-            int i = RSC.askQuestionYN("This folder contains the following subfolders, which will also be scanned:\n" + msg + "Are you sure about this?", "Warning:");
+            int i = RSC.guiTools.askQuestionYN("This folder contains the following subfolders, which will also be scanned:\n" + msg + "Are you sure about this?", "Warning:");
             if (i == JOptionPane.NO_OPTION) {
                 return;
             }
@@ -1076,7 +1076,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         // recursively add files
         addFilesFromFolder(dir);
         if (preparedItems.isEmpty()) {
-            RSC.showWarning("There are no files of supported type in the selected folder.", "Warning");
+            RSC.guiTools.showWarning("Warning","There are no files of supported type in the selected folder.");
             return;
         }
         jBtnAddRec.setEnabled(true);
@@ -1119,23 +1119,13 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         BibTeXRecord bibtex = new BibTeXRecord(jTABibTeX.getText());
         if (bibtex.parseError == 0) {
             Item item = new Item(library); //createEntry();
-            String bibtitle=bibtex.get("title");
-            if (bibtitle.startsWith("{")) {
-                bibtitle = bibtitle.substring(1, bibtitle.length() - 1);
-            }
-            item.put("title", bibtitle);
-            item.put("authors", BibTeXRecord.convertBibTeXAuthorsToCelsius(bibtex.get("author")));
-            item.put("citation-tag",bibtex.getTag());
-            item.put("identifier",bibtex.getIdentifier());
-            if (bibtex.get("journal")!=null) {
-                item.put("type","Paper");
-            }
             item.put("bibtex",bibtex.toString());
+            item.enhanceByBibTeXData();
             preparedItems.add(item);
             currentEntry = 0;
             updateItemInformation();
         } else {
-            RSC.showWarning("The BibTeX record is inconsistent:\n" + BibTeXRecord.status[bibtex.parseError], "Warning:");
+            RSC.guiTools.showWarning("Warning","The BibTeX record is inconsistent:\n" + BibTeXRecord.status[bibtex.parseError]);
         }
 }//GEN-LAST:event_jBtnAdd1ActionPerformed
 
@@ -1146,7 +1136,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     private void jBtnNormalize1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNormalize1ActionPerformed
         String tmp = BibTeXRecord.sanitize(BibTeXRecord.normalizeBibTeX(jTABibTeX.getText()));
         if (!tmp.startsWith("@")) {
-            RSC.showWarning(tmp, "BibTeX Error");
+            RSC.guiTools.showWarning(tmp, "BibTeX Error");
         } else {
             jTABibTeX.setText(tmp);
             jTABibTeX.setCaretPosition(0);
@@ -1185,52 +1175,36 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
     }//GEN-LAST:event_jBtnCreateManualEntryActionPerformed
 
     private void jBtnSelectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSelectFileActionPerformed
-        String filename=RSC.selectFile("Select the file which you want to add.", "addsingledoc", "_ALL", "All Files");
+        String filename=RSC.guiTools.selectFileForOpen("Select the file which you want to add.", "addsingledoc", "_ALL", "All Files");
         if (filename!=null) {
             jTFFile.setText(filename);
         }
     }//GEN-LAST:event_jBtnSelectFileActionPerformed
 
     private void jBtnFileOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnFileOKActionPerformed
-        /* TODO String fn=jTFFile.getText();
-        if (!(new File(fn)).exists()) return;
-        boolean found=false;
-        for (Item item : library)
-            if (item.getCompleteDirS("location").equals(fn)) {
-                found=true;
-                break;
-            }
-        if (found) {
-            RSC.showWarning("This file is already contained in the current library!", "Reading file cancelled...");
+        String filename=jTFFile.getText();
+        if (!(new File(filename)).exists()) return;
+        if (library.doesAttachmentExist(filename)) {
+            RSC.guiTools.showWarning("This file is already contained in the current library!", "Reading file cancelled...");
             return;
         }
-        entries.clear();
-        GetDetailsThreads.clear();
+        preparedItems.clear();
+        getDetailsSWs.clear();
         try {
-            String tmp=RSC.Configuration.correctFileType(fn);
-            if (!tmp.equals(fn))
-                (new File(fn)).renameTo(new File(tmp));
-            createItemFromFile(tmp);
+            Item item = library.createItemFromFile(filename);
+            preparedItems.add(item);
+            currentEntry = 0;
+            SWGetDetails swGD = new SWGetDetails(RSC, item, jCBPlugins.isSelected(), this);
+            getDetailsSWs.add(swGD);
+            TPE.execute(swGD);
+            TPE.awaitTermination(10, TimeUnit.SECONDS);
+            updateItemInformation();
+            jBtnView2.setEnabled(true);
         } catch(Exception e) {
             RSC.outEx(e);
             return;
         }
-        if (entries.isEmpty()) {
-            RSC.showWarning("This filetype is not supported.", "Warning:");
-            return;
-        }
-        currentEntry=0;
-        ThreadGetDetails TGD=new ThreadGetDetails(entries.get(currentEntry),RSC,jCBPlugins2.isSelected());
-        TGD.start();
-        try {
-            TGD.join();
-        } catch (InterruptedException ex) {
-            RSC.outEx(ex);
-        }
-        jTAFileText.setText(ToolBox.getFirstPage(entries.get(currentEntry)));
-        jTAFileText.setCaretPosition(0);
-        updateItemInformation();
-        jBtnView2.setEnabled(true);*/
+
     }//GEN-LAST:event_jBtnFileOKActionPerformed
 
     private void jCBAddPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBAddPropertyActionPerformed
@@ -1238,7 +1212,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         if (!val.equals("add property")) {
             String bib=jTABibTeX.getText();
             if (bib.length()==0) {
-                RSC.showWarning("Please create a BibTeX entry first with the \"Create\" button.", "Cancelled...");
+                RSC.guiTools.showWarning("Cancelled...","Please create a BibTeX entry first with the \"Create\" button.");
             } else {
                 int i=Parser.cutFrom(bib,"\n").trim().indexOf("=");
                 String tmp=Parser.cutUntilLast(Parser.cutUntilLast(bib,"}"),"\n");
@@ -1259,7 +1233,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         importMode=0;
         String imptype="bib";
         String impname="BibTeX-file";
-        String filename=RSC.selectFile("Indicate the source of the "+impname,"import"+imptype,"."+imptype, impname+"s");
+        String filename=RSC.guiTools.selectFileForOpen("Indicate the source of the "+impname,"import"+imptype,"."+imptype, impname+"s");
         if (filename!=null) {
             jTFFileNameImp.setText(filename);
             jBtnImport.setEnabled(true);
@@ -1416,7 +1390,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     if (always) {
                         toDelete.add(item);
                     } else {
-                        int j = RSC.askQuestionABCD("Exact file doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Warning","Delete all exact doublettes","Delete this one","No","Cancel");
+                        int j = RSC.guiTools.askQuestionABCD("Exact file doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Warning","Delete all exact doublettes","Delete this one","No","Cancel");
                         if (j == 0) {
                             always=true;
                             toDelete.add(item);
@@ -1430,7 +1404,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     }
                 }
                 if (doubletteResult.type == 100) {
-                    int j = RSC.askQuestionYNC("Item with overlapping unique fields: \n"+doubletteResult.message+"\n found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
+                    int j = RSC.guiTools.askQuestionYNC("Item with overlapping unique fields: \n"+doubletteResult.message+"\n found in library:\n"+doubletteResult.item.toText(false)+"\nDelete the file " + item.linkedAttachments.get(0).get("path") + "?", "Confirm");
                     if (j == JOptionPane.YES_OPTION) toDelete.add(item);
                     if (j == JOptionPane.CANCEL_OPTION) return;
                 }
@@ -1442,7 +1416,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             item.deleteFilesOfAttachments();
             removeFromTable(item);
         }
-        RSC.showInformation("Information","Doublette search complete.");        
+        RSC.guiTools.showInformation("Information","Doublette search complete.");        
     }
 
     public void eliminateDoublettes2() {
@@ -1455,7 +1429,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                     if (always) {
                         toDelete.add(item);
                     } else {
-                        int j = RSC.askQuestionABCD("Exact doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the item " + item.toText(false) + "?", "Confirm","Delete all exact doublettes","Delete this one","No","Cancel");
+                        int j = RSC.guiTools.askQuestionABCD("Exact doublette found in current library.\nItem in library: " + doubletteResult.item.toText(false) + "\nDelete the item " + item.toText(false) + "?", "Confirm","Delete all exact doublettes","Delete this one","No","Cancel");
                         if (j == 0) {
                             always=true;
                             toDelete.add(item);
@@ -1476,7 +1450,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             item.deleteFilesOfAttachments();
             removeFromTable(item);
         }
-        RSC.showInformation("Information","Doublette search complete.");        
+        RSC.guiTools.showInformation("Information","Doublette search complete.");        
     }
     
     public void updateItemInformation() {
@@ -1500,11 +1474,16 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             Item item = preparedItems.get(currentEntry);
             editorPanel.setEditable(item);
             String firstPage="";
-            if (item.linkedAttachments.size()>0) {
+            if (!item.linkedAttachments.isEmpty()) {
                 firstPage=ToolBox.getFirstPage(item.linkedAttachments.get(0).get("$plaintext"));
             }
-            jTFirstPage.setText(firstPage.replaceAll("^[^\\P{C}]", "?"));
-            jTFirstPage.setCaretPosition(0);
+            if (jTPane.getSelectedIndex()==0) {
+                jTFirstPage.setText(firstPage.replaceAll("^[^\\P{C}]", "?"));
+                jTFirstPage.setCaretPosition(0);
+            } else {
+                jTAFileText.setText(firstPage.replaceAll("^[^\\P{C}]", "?"));
+                jTAFileText.setCaretPosition(0);
+            }
         }
     }
 
@@ -1606,7 +1585,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             }
             if (doubletteResult.type==10) {
                 if (!autoDelete) {
-                    res[0]=RSC.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+doubletteResult.item.toText(false)+" with id: "+doubletteResult.item.id+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
+                    res[0]=RSC.guiTools.askQuestionABCD("An exact copy of the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library:\n"+doubletteResult.item.toText(false)+" with id: "+doubletteResult.item.id+"\nDelete the file "+item.get("location")+"?","Warning","Yes","No","Always","Cancel");
                 } else res[0]=0;
                 item.put("$$beingadded", null);
                 if (res[0]==0) {
@@ -1622,7 +1601,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
                 return;
             }
             if (doubletteResult.type==5) {
-                res[0]=RSC.askQuestionYN("A file with exactly the same length as the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library.\nProceed anyway?","Warning");
+                res[0]=RSC.guiTools.askQuestionYN("A file with exactly the same length as the item\n"+library.itemRepresentation.fillIn(item,true)+"\nis already existing in the library.\nProceed anyway?","Warning");
                 if (res[0]==JOptionPane.NO_OPTION) {
                     return;
                 }
@@ -1652,7 +1631,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
         if (item.linkedAttachments.size()>0) {
             Attachment attachment = item.linkedAttachments.get(0);
             if (!confirmed) {
-                confirmed=(RSC.askQuestionOC("Really delete the file " + attachment.get("path") + "?", "Warning")!=JOptionPane.NO_OPTION);
+                confirmed=(RSC.guiTools.askQuestionOC("Really delete the file " + attachment.get("path") + "?", "Warning")!=JOptionPane.NO_OPTION);
             } 
             if (confirmed) {
                 item.deleteFilesOfAttachments();
@@ -1674,7 +1653,7 @@ public class AddItems extends javax.swing.JDialog implements HasManagedStates, L
             if (currentItemIndex==selectedItemIndex)
                 toNext(currentItemIndex - 1);
         }
-        if (getDetailsSWs.size()>0) {
+        if (!getDetailsSWs.isEmpty()) {
             getDetailsSWs.remove(currentItemIndex);
         }
         if (preparedItems.isEmpty()) {

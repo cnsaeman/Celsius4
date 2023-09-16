@@ -61,7 +61,7 @@ public class SWLibraryCheck extends SwingWorker<Void,Void> {
             ids.append(rs.getString(1));
             paths.add(rs.getString(2));
         }
-        if (paths.size()>0) {
+        if (!paths.isEmpty()) {
             out.append("Some attachments were not linked to items. The ones removed from the database pointed to the following files:\n");
             for (String path : paths) {
                 out.append(path);
@@ -81,15 +81,15 @@ public class SWLibraryCheck extends SwingWorker<Void,Void> {
                 String id=rs.getString(1);
                 library.executeEX("DELETE FROM attachments WHERE id="+id+";");
                 library.executeEX("DELETE FROM item_attachment_links WHERE attachment_id="+id+";");
-                out.append("Attachment with path "+path+" not found. Removed from library.\n");
+                out.append("Attachment with path ").append(path).append(" not found. Removed from library.\n");
             }
         }
         out.append("Verifying attachments completed\n---\n");
-        if (fileNames.size()>0) {
+        if (!fileNames.isEmpty()) {
             out.append("The following files were not linked in attachments and moved to the base folder of the library:\n");
             for (String fn : fileNames) {
-                out.append(fn+"\n");
-                FileTools.moveFile(itemFolder+"/"+fn,library.baseFolder+"/"+fn);
+                out.append(fn).append("\n");
+                FileTools.moveFile(itemFolder+"/"+fn,library.basefolder+"/"+fn);
             }
             out.append("---\n");
         }
@@ -99,7 +99,7 @@ public class SWLibraryCheck extends SwingWorker<Void,Void> {
     @Override
     protected void done() {
         try {
-            RSC.showLongInformation("Result for Library Check", out.toString());
+            RSC.guiTools.showLongInformation("Result for Library Check", out.toString());
         } catch (Exception ignore) {
         }
     }

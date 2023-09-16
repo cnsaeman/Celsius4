@@ -21,12 +21,9 @@ import celsius.components.categories.CategoryTreePanel;
 import atlantis.tools.FileTools;
 import atlantis.gui.HasManagedStates;
 import atlantis.tools.TextFile;
-import celsius.components.SWFinalizer;
-import celsius.components.plugins.SWApplyPlugin;
 import celsius.components.integrity.SWBibTeXIntegrity;
 import celsius.components.bibliography.SWShowCited;
 import experimental.AddTransferHandler;
-import celsius.CelsiusMain;
 import celsius.components.categories.StructureNode;
 import celsius3.Library3;
 import celsius.components.library.Library;
@@ -40,21 +37,16 @@ import celsius.components.categories.Category;
 import celsius.components.addItems.DoubletteResult;
 import celsius.data.ItemSelection;
 import celsius.data.KeywordListModel;
-import celsius.data.PeopleListModel;
 import celsius.data.Person;
-import celsius.components.library.RecentLibraryCache;
 import celsius.components.tableTabs.CelsiusTableModel;
 import celsius.data.TableRow;
 import celsius.tools.*;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
@@ -66,10 +58,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.swing.*;
@@ -77,10 +66,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -150,8 +135,6 @@ public class MainFrame extends javax.swing.JFrame implements
         jPanel9.setBorder(RSC.stdBorder());
         jCE3=new ClearEdit(RSC,"Enter a keyword (CTRL+C)");
         jPanel9.add(jCE3, java.awt.BorderLayout.NORTH);
-        dialogExportBibliography=new ExportBibliography(RSC);
-        dialogConfiguration = new EditConfiguration(this, RSC.configuration);
         initFurther();
     }
 
@@ -165,9 +148,9 @@ public class MainFrame extends javax.swing.JFrame implements
         jTBAdd.setTransferHandler(new AddTransferHandler(this));
         StartUp.setStatus("Ready...");
         RSC.adjustComponents(this.getComponents());
-        jSPMain3.setMinimumSize(new Dimension(RSC.guiScale(280),RSC.guiScale(0)));
+        jSPMain3.setMinimumSize(new Dimension(RSC.guiTools.guiScale(280),RSC.guiTools.guiScale(0)));
         jSPMain3.setDividerLocation(jSPMain3.getMaximumDividerLocation());
-        guiInfoPanel.setMinimumSize(new Dimension(RSC.guiScale(0),RSC.guiScale(280)));
+        guiInfoPanel.setMinimumSize(new Dimension(RSC.guiTools.guiScale(0),RSC.guiTools.guiScale(280)));
         jSPMain.setDividerLocation(jSPMain.getMaximumDividerLocation());
         jSPMain3.setDividerLocation(0.7);
         pack();
@@ -207,7 +190,9 @@ public class MainFrame extends javax.swing.JFrame implements
         RSC.guiStates.registerListener("mainFrame", this);
         RSC.guiStates.adjustStates("mainFrame");
 
-        setIconImage(RSC.getAppIcon());
+        setIconImage(RSC.guiTools.appIcon);
+        dialogExportBibliography = new ExportBibliography(RSC);
+        dialogConfiguration = new EditConfiguration(RSC);
    }
 
     public void setShortCuts() {
@@ -268,7 +253,7 @@ public class MainFrame extends javax.swing.JFrame implements
 
     /** 
      * Switch to library Lib, if Lib==null, then to the currently selected one.
-     * @param i
+     * @param library
      */
     public void switchToLibrary(Library library) {
         // Library already selected
@@ -316,23 +301,24 @@ public class MainFrame extends javax.swing.JFrame implements
                 boolean add=true;
                 if (dr.type==12) {
                     add=false;
-                    RSC.showWarning("I/O Error while checking for doublettes.", "Error:");
+                    RSC.guiTools.showWarning("Error:","I/O Error while checking for doublettes.");
                 }
                 if (dr.type==10) {
-                    int j=RSC.askQuestionOC("An exact copy of the item "+item.toText(false)+"\nalready exists in the library. Should another copy be added?", "Warning:");
+                    int j=RSC.guiTools.askQuestionOC("An exact copy of the item "+item.toText(false)+"\nalready exists in the library. Should another copy be added?", "Warning:");
                     if (j==JOptionPane.NO_OPTION) add=false;
                 }
                 if (dr.type==4) {
-                    int j=RSC.askQuestionOC("A paper with the same key information as the item "+item.toText(false)+"\nalready exists in the library. Should another copy be added?", "Warning:");
+                    int j=RSC.guiTools.askQuestionOC("A paper with the same key information as the item "+item.toText(false)+"\nalready exists in the library. Should another copy be added?", "Warning:");
                     if (j==JOptionPane.NO_OPTION) add=false;
                 }
                 if (add) targetLibrary.acquireCopyOfItem(item);
             }
         } else {
-            RSC.showWarning("Items can only be copied to different libraries.", "Warning!");
+            RSC.guiTools.showWarning("Warning!","Items can only be copied to different libraries.");
         }
     }
     
+    @Override
     public void adjustStates() {
         if (RSC.guiStates.getState("mainFrame","librarySelected")) {
             if (RSC.getCurrentlySelectedLibrary().hideFunctionality.contains("Menu:Bibliography")) {
@@ -355,6 +341,7 @@ public class MainFrame extends javax.swing.JFrame implements
 
     /**
      * Set thread message
+     * @param s
      */
     public void setThreadMsg(final String s) {
         jLThreadStatus.setText(s);
@@ -725,7 +712,7 @@ public class MainFrame extends javax.swing.JFrame implements
         flowLayout1.setAlignOnBaseline(true);
         jPanel20.setLayout(flowLayout1);
 
-        jTBAdd.setIcon(RSC.getScaledIcon("Add Icon"));
+        jTBAdd.setIcon(RSC.icons.getScaledIcon("Add Icon"));
         jTBAdd.setToolTipText("Add items to current library");
         jTBAdd.setEnabled(false);
         jTBAdd.setPreferredSize(new java.awt.Dimension(RSC.guiScale(42), RSC.guiScale(42)));
@@ -1333,7 +1320,7 @@ public class MainFrame extends javax.swing.JFrame implements
         final JScrollPane scrollpane = new JScrollPane(DT.jtable);
         jTPTabList.add(scrollpane);
         TabLabel TL=(TabLabel)jTPTabList.getTabComponentAt(jTPTabList.getSelectedIndex());
-        jTPTabList.setTabComponentAt(jTPTabList.getTabCount() - 1, new TabLabel(TL.title + "'",TL.II,RSC,DT,true));
+        jTPTabList.setTabComponentAt(jTPTabList.getTabCount() - 1, new TabLabel(TL.title + "'",TL.icon,RSC,DT,true));
         DT.title=TL.title + "'";
         jTPTabList.setSelectedComponent(scrollpane);
         jTPTabList.setSelectedIndex(jTPTabList.getTabCount() - 1);
@@ -1352,7 +1339,7 @@ public class MainFrame extends javax.swing.JFrame implements
     }//GEN-LAST:event_jMIRenameCatActionPerformed
 
     private void jMIShowCitedinFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIShowCitedinFileActionPerformed
-        String filename=RSC.selectFile("Indicate the LaTeX source file", "showcited", ".tex", "LaTeX files");
+        String filename=RSC.guiTools.selectFileForOpen("Indicate the LaTeX source file", "showcited", ".tex", "LaTeX files");
         if (filename!=null) {
             CelsiusTable celsiusTable=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_SEARCH, "Cited in " + filename,"search");
             celsiusTable.resizeTable(true);
@@ -1377,7 +1364,7 @@ public class MainFrame extends javax.swing.JFrame implements
     private void jMIEditDSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditDSActionPerformed
         Library library = RSC.getCurrentlySelectedLibrary();
         String tmp = library.getHTMLTemplate(guiInfoPanel.currentTemplate).templateString;
-        MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML template", tmp);
+        MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit HTML template", tmp);
         MLE.setVisible(true);
         if (!MLE.cancelled) {
             library.setHTMLTemplate(guiInfoPanel.currentTemplate,MLE.text);
@@ -1429,7 +1416,7 @@ public class MainFrame extends javax.swing.JFrame implements
         if (!RSC.guiStates.getState("mainFrame","tabAvailable")) {
             return;
         }
-        String folder=RSC.selectFolder("Select the target folder for exporting","exportTab");
+        String folder=RSC.guiTools.selectFolder("Select the target folder for exporting","exportTab");
         if (folder!=null) {
             try {
                 if (!(new File(folder)).exists()) {
@@ -1438,7 +1425,7 @@ public class MainFrame extends javax.swing.JFrame implements
                 for (TableRow tableRow : RSC.getCurrentTable().getSelectedRows()) {
                     Item item=(Item)tableRow;
                     item.loadLevel(3);
-                    if (item.linkedAttachments.size()>0) {
+                    if (!item.linkedAttachments.isEmpty()) {
                         Attachment attachment=item.linkedAttachments.get(0);
                         String filename = attachment.standardFileName();
                         (new InteractiveFileCopy(this,attachment.getFullPath(), folder + "/" + filename,RSC)).go();
@@ -1454,7 +1441,7 @@ public class MainFrame extends javax.swing.JFrame implements
                 }
             } catch (Exception ex) {
                 RSC.outEx(ex);
-                RSC.showWarning("Error while exporting files:\n" + ex.toString(), "Exception:");
+                RSC.guiTools.showWarning("Exception:","Error while exporting files:\n" + ex.toString());
             }
         }
     }//GEN-LAST:event_jMIExportTabActionPerformed
@@ -1469,13 +1456,13 @@ public class MainFrame extends javax.swing.JFrame implements
                 boolean doit=false;
                 int h=0;
                 for (TableRow tableRow : DT.getSelectedRows()) {
-                    if (!doit) h=RSC.askQuestionABCD("Remove the item \n" + tableRow.toText(false) + "\nfrom the current category?",
+                    if (!doit) h=RSC.guiTools.askQuestionABCD("Remove the item \n" + tableRow.toText(false) + "\nfrom the current category?",
                             "Warning","Yes","No","Yes to all","Cancel");
                     if (h==3) break;
                     if (h==2) doit=true;
                     if (doit || (h == 0)) {
                         try {
-                            library.unRegisterItem((Item)tableRow,Integer.valueOf(category.id));
+                            library.unRegisterItem((Item)tableRow,Integer.parseInt(category.id));
                         } catch (Exception e) {
                             RSC.outEx(e);
                         }
@@ -1494,7 +1481,7 @@ public class MainFrame extends javax.swing.JFrame implements
             boolean doit=false;
             int h=0;
             for (TableRow tableRow : DT.getSelectedRows()) {
-                if (!doit) h=RSC.askQuestionABCD("Delete the item \n" + tableRow.toText(false) + "\nand all related information?",
+                if (!doit) h=RSC.guiTools.askQuestionABCD("Delete the item \n" + tableRow.toText(false) + "\nand all related information?",
                                 "Warning","Yes","No","Yes to all","Cancel");
                 if (h==3) break;
                 if (h==2) doit=true;
@@ -1515,7 +1502,7 @@ public class MainFrame extends javax.swing.JFrame implements
 
     private void jMIFullBibToFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIFullBibToFileActionPerformed
         Library library=RSC.getCurrentlySelectedLibrary();
-        String filename=RSC.selectFile("Indicate the target bib file", "export", "_ALL", "All files");
+        String filename=RSC.guiTools.selectFileForOpen("Indicate the target bib file", "export", "_ALL", "All files");
         boolean completed=false;
         if (filename!=null) {
             try {
@@ -1532,7 +1519,7 @@ public class MainFrame extends javax.swing.JFrame implements
                 RSC.outEx(ex);
             }
             if (completed) {
-                RSC.showInformation("Task completed:", "BibTeX file exported");
+                RSC.guiTools.showInformation("Task completed:", "BibTeX file exported");
             }
         }
     }//GEN-LAST:event_jMIFullBibToFileActionPerformed
@@ -1618,10 +1605,10 @@ public class MainFrame extends javax.swing.JFrame implements
     }//GEN-LAST:event_jMICloseLibActionPerformed
     // Load Current Library
     private void jMILoadLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMILoadLibActionPerformed
-        String filename=RSC.selectFolder("Select the folder of the library you wish to open.", "loadlibraries");
+        String filename=RSC.guiTools.selectFolder("Select the folder of the library you wish to open.", "loadlibraries");
         if (filename!=null) {
             // check the folder is valid
-            boolean libraryFolder=(new File(filename+ToolBox.filesep+"CelsiusLibrary.sql")).exists();
+            boolean libraryFolder=(new File(filename+ToolBox.FILE_SEPARATOR+"CelsiusLibrary.sql")).exists();
             if (libraryFolder) {
                 final MainFrame MF = this;
                 (new Thread("LoadingLib") {
@@ -1633,7 +1620,7 @@ public class MainFrame extends javax.swing.JFrame implements
                         try {
                             RSC.loadLibrary(filename,true);
                         } catch (Exception e) {
-                            RSC.showWarning("Loading library failed:\n" + e.toString(), "Warning:");
+                            RSC.guiTools.showWarning("Warning:","Loading library failed:\n" + e.toString());
                         }
                         setThreadMsg("Ready.");
                         MF.jPBSearch.setIndeterminate(false);
@@ -1683,9 +1670,13 @@ public class MainFrame extends javax.swing.JFrame implements
                 tableRow.loadLevel(2);
                 ref += "," + tableRow.get("citation-tag");
             }
-            ref = ref.substring(1);
-            StringSelection cont = new StringSelection(ref);
-            Clp.setContents(cont, this);
+            ref = ref.substring(1).trim();
+            if (ref.equals("null")) {
+                RSC.guiTools.showWarning("Warning", "No citation tags found for selected items.");
+            } else {
+                StringSelection cont = new StringSelection(ref);
+                Clp.setContents(cont, this);
+            }
         }
     }//GEN-LAST:event_jMICitationTagClipboardActionPerformed
     // Window closing with x
@@ -1707,7 +1698,7 @@ public class MainFrame extends javax.swing.JFrame implements
 
 private void jMIDeleteLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIDeleteLibActionPerformed
     Library Lib=RSC.getCurrentlySelectedLibrary();
-    if (RSC.askQuestionYN("Do you really want to delete the Library "+Lib.name+"?\nWarning: all files in the library's directory will be erased!", "Confirm:")==0) {
+    if (RSC.guiTools.askQuestionYN("Do you really want to delete the Library "+Lib.name+"?\nWarning: all files in the library's directory will be erased!", "Confirm:")==0) {
         closeCurrentLibrary(false);
         Lib.deleteLibrary();
     }
@@ -1728,13 +1719,13 @@ private void jMITab2Cat2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_jMITab2Cat2ActionPerformed
 
 private void jMIEditLibTemplatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditLibTemplatesActionPerformed
-    (new celsius.components.library.EditLibraryTemplates(this,RSC)).setVisible(true);
+    (new celsius.components.library.EditLibraryTemplates(RSC)).setVisible(true);
 }//GEN-LAST:event_jMIEditLibTemplatesActionPerformed
 
 private void jMIAddToLibActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAddToLibActionPerformed
         AddItems DA=new AddItems(RSC);
         DA.setVisible(true);
-        if (DA.addedItems.size()>0) {
+        if (!DA.addedItems.isEmpty()) {
             CelsiusTable celsiusTable=RSC.makeNewTabAvailable(CelsiusTable.TABLETYPE_ITEM_WHEN_ADDED, "Last added","search");
             celsiusTable.addRows(DA.addedItems);
             celsiusTable.resizeTable(true);
@@ -1761,7 +1752,7 @@ private void jMIRemoveHalfActionPerformed(java.awt.event.ActionEvent evt) {//GEN
             int h=0;
             for (TableRow tableRow : IT.getSelectedRows()) {
                 Item item=(Item)tableRow;
-                if (!doit) h=RSC.askQuestionABCD("Delete the document \n" + item.toText(false) + ",\nkeeping the associated file?",
+                if (!doit) h=RSC.guiTools.askQuestionABCD("Delete the document \n" + item.toText(false) + ",\nkeeping the associated file?",
                                 "Warning","Yes","No","Yes to all","Cancel");
                 if (h==3) break;
                 if (h==2) doit=true;
@@ -1848,7 +1839,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     }//GEN-LAST:event_jMIShowItemsActionPerformed
 
     private void jMIConvertLibraryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIConvertLibraryActionPerformed
-        String filename=RSC.selectFile("Select the main file of the library you wish to open.", "loadlibraries", "_ALL", "All Files");
+        String filename=RSC.guiTools.selectFileForOpen("Select the main file of the library you wish to open.", "loadlibraries", "_ALL", "All Files");
         if (filename!=null) {
             jPBSearch.setIndeterminate(true);
             Thread DoIt = (new Thread() {
@@ -1859,7 +1850,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
                         @Override
                         public void run() {
                             jPBSearch.setIndeterminate(false);
-                            RSC.showInformation("The library has been converted.", "Action completed.");
+                            RSC.guiTools.showInformation("The library has been converted.", "Action completed.");
                         }
                     });
                 }
@@ -1877,9 +1868,9 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     private void jMIDeletePersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIDeletePersonActionPerformed
         Person person=RSC.getCurrentlySelectedPerson();
         if (person.hasLinkedItems()) {
-            RSC.showInformation("Cannot delete person", "The currently selected person still has linked items in the library. Cancelling.");
+            RSC.guiTools.showInformation("Cannot delete person", "The currently selected person still has linked items in the library. Cancelling.");
         } else {
-            int i=RSC.askQuestionOC("Should the person "+person.toText(false)+" really be deleted?","Confirm");
+            int i=RSC.guiTools.askQuestionOC("Should the person "+person.toText(false)+" really be deleted?","Confirm");
             if (i==JOptionPane.YES_OPTION) {
                 String id=person.id;
                 person.destroy();
@@ -2095,10 +2086,10 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     public void performPeopleMerge() {
         String ids=RSC.getCurrentTable().getSelectedIDsString();
         if ((ids.length()>0) && (ids.contains(","))) {
-            MergePeople MP=new MergePeople(RSC,ids);
+            MergePeopleDialog MP=new MergePeopleDialog(RSC,ids);
             MP.setVisible(true);
         } else {
-            RSC.showWarning("You have to selected more than one person to merge.", "Cancelled:");
+            RSC.guiTools.showWarning("Cancelled:","You have to selected more than one person to merge.");
         }
     }
         
@@ -2108,7 +2099,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             MergeItems MI=new MergeItems(RSC,ids);
             MI.setVisible(true);
         } else {
-            RSC.showWarning("You have to selected exactly two items to merge.", "Cancelled:");
+            RSC.guiTools.showWarning("Cancelled:","You have to selected exactly two items to merge.");
         }
     }
     
@@ -2143,7 +2134,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
     public void drop(DropTargetDropEvent dtde) {
         final Point p = dtde.getLocation();
         if (categoryTreePanel.structureTree.getPathForLocation(p.x,p.y)==null) {
-            RSC.showWarning("Could not find category to drop into. Cancelling...", "Warning");
+            RSC.guiTools.showWarning("Warning","Could not find category to drop into. Cancelling...");
         } else {
             StructureNode structureNode = (StructureNode) ((categoryTreePanel.structureTree.getPathForLocation(p.x,p.y)).getLastPathComponent());
             CelsiusTable DT = RSC.getCurrentTable();
@@ -2267,7 +2258,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
                         }
                     }
                 } else if (!item1.get(tag).equals(item2.get(tag))) {
-                    int i = RSC.askQuestionABC("Which information should be kept for the tag:\n" + tag + "?\nA: " + item1.get(tag) + "\nB: " + item2.get(tag), "Please decide:", "A", "B", "Cancel");
+                    int i = RSC.guiTools.askQuestionABC("Which information should be kept for the tag:\n" + tag + "?\nA: " + item1.get(tag) + "\nB: " + item2.get(tag), "Please decide:", "A", "B", "Cancel");
                     if (i == 2) {
                         return(false);
                     }
@@ -2345,7 +2336,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             return(false);
         }*/ //TODO
         item1.save();
-        if (item1.error==6) RSC.showWarning("Error writing back information", "Warning");
+        if (item1.error==6) RSC.guiTools.showWarning("Warning","Error writing back information");
         item2.put("location", null);
         // TODO item2.library.deleteItem(item2.id);
         return(true);
@@ -2455,7 +2446,7 @@ private void jTFMainSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:eve
             jLStatusBar.setText("No Library loaded.");
             return;
         }
-        jLStatusBar.setText(RSC.getCurrentlySelectedLibrary().Status(pagenumber));
+        jLStatusBar.setText(RSC.getCurrentlySelectedLibrary().getStatusString(pagenumber));
     }
 
     public void setTempStatus(String status) {

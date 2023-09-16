@@ -6,6 +6,7 @@ import java.io.*;
 import celsius.data.*;
 import celsius.components.bibliography.BibTeXRecord;
 import atlantis.tools.*;
+import atlantis.JSON.*;
 import celsius.tools.ToolBox;
 
 /**
@@ -240,7 +241,7 @@ public class PluginUniversalItems extends Thread {
         try {
             Msgs.add("Getting data from arXiv :: "+tmp);
             
-            oai=TextFile.ReadOutURL("http://export.arxiv.org/oai2?verb=GetRecord&identifier=oai:arXiv.org:"+tmp+"&metadataPrefix=arXiv");
+            oai=TextFile.readOutURL("http://export.arxiv.org/oai2?verb=GetRecord&identifier=oai:arXiv.org:"+tmp+"&metadataPrefix=arXiv");
             //System.out.println(oai);
             
             if (!oai.startsWith("##??")) {
@@ -354,20 +355,27 @@ public class PluginUniversalItems extends Thread {
                     Msgs.add("Inspire key missing, identified as "+inspirekey);
                     item.put("inspirekey",inspirekey);
                 }
+                TextFile.writeStringToFile(inspireRecord, "inspire-PUI-paper.json");
                 JSONParser jp=new JSONParser(inspireRecord);                
-                jp.moveToNextTag("authors");
-                ArrayList<JSONParser> authorsArray=jp.extractArray();
-                Msgs.add("XXF Found "+String.valueOf(authorsArray.size())+" authors");
+                jp.parse();
+                JSONObject jt=jp.root;
+                JSONObject authorsList=jt.get("metadata").get("authors");
                 String authors = "";
-                for (JSONParser author : authorsArray) {
-                    String bai = author.extractStringFromNextTag("value");
-                    // ref for author could be empty
-                    String ref=author.extractStringFromNextTag("$ref");
+                for (JSONObject entry : authorsList) {
+                    String bai="";
+                    String orcid="";
+                    JSONObject idList=entry.get("ids");
+                    for (JSONObject subentry : idList) {
+                        if (subentry.get("schema").equals("ORCID")) orcid=subentry.get("value").toString();
+                        if (subentry.get("schema").equals("INSPIRE BAI")) bai=subentry.get("value").toString();
+                    }
+                    String ref=entry.get("record").get("$ref").toString();
                     String inspirekey=null;
                     if (ref!=null) {
                         inspirekey=Parser.cutFrom(ref, "https://inspirehep.net/api/authors/");
                     }
-                    String fullname = author.extractStringFromTag("full_name");
+                    String fullname = entry.get("full_name").toString();
+                    
                     authors += "|" + fullname;
                     if (bai!=null) {
                         authors += "#inspirebai::" + bai;
@@ -383,36 +391,31 @@ public class PluginUniversalItems extends Thread {
                     Msgs.add("authors written: "+item.getS("authors"));
                 }
                 
-                jp.moveToFirstTag("references");
-                jp.restrictLevel();
+                JSONObject referencesList=jt.get("metadata").get("references");
                 String refs="";
-                while (jp.moveToNextTag("$ref")) {
-                    String ref=jp.extractStringFromNextTag("$ref");
-                    refs+="|inspirekey:"+ref.substring(38);
+                for (JSONObject entry : referencesList) {
+                    String ref=entry.get("record").get("$ref").toString();
+                    if ((ref!=null) && (ref.length()>0)) refs+="|inspirekey:"+ref.substring(38);
                 }
                 if (refs.length()>1) {
                     refs=refs.substring(1);
                     putS("references",refs);
                 }
-                jp.releaseLevel();
 
-                jp.moveToFirstTag("keywords");
-                jp.restrictLevel();
+                JSONObject keywordList=jt.get("metadata").get("keywords");
                 String keys="";
-                while (jp.moveToNextTag("value")) {
-                    String key=jp.extractStringFromNextTag("value");
+                for (JSONObject entry : keywordList) {
+                    String key=entry.get("value").toString();
                     keys+="|"+key;
                 }
                 if (keys.length()>0) {
                     keys=keys.substring(1);
                     putS("keywords",keys);
                 }
-                jp.releaseLevel();
                 
-                jp.moveToFirstTag("abstracts");
                 //Abstract
                 if (item.isEmpty("abstract")) {
-                    String abs=jp.extractStringFromNextTag("value");                
+                    String abs=jt.get("metadata").get("abstracts").get(0).get("value").toString();                
                     putS("abstract",abs);
                 }
                 
@@ -498,32 +501,23 @@ public class PluginUniversalItems extends Thread {
                 String doi = item.get("doi");
                 BTR.put("doi",doi);
                 StringBuffer rtn=new StringBuffer(4000);
-                String dataPage=TextFile.ReadOutURL("https://api.crossref.org/works/"+doi);
-                try {
-                    TextFile tf=new TextFile("Plugin.Universal.ReturnedData.txt.tmp",false);
-                    tf.putString(dataPage);
-                    tf.close();
-                } catch (Exception e) { 
-                    StringWriter errors = new StringWriter();
-                    e.printStackTrace(new PrintWriter(errors));
-                    Msgs.add("Error writing: "+errors.toString());
-                }
-                String title=Parser.cutUntil(Parser.cutFrom(dataPage,"\"title\":[\""),"\"");
-                String year=Parser.cutFrom(dataPage,"\"published-print\":{\"date-parts\":[[").substring(0,4);
-                String volume=Parser.cutUntil(Parser.cutFrom(dataPage,"\"volume\":\""),"\"");
-                String pages=Parser.cutUntil(Parser.cutFrom(dataPage,"\"page\":\""),"\"");
-                String journal=Parser.cutUntil(Parser.cutFrom(dataPage,"\"container-title\":[\""), "\"");
-                if (dataPage.indexOf("\"short-container-title\":[\"")>-1) {
-                    journal=Parser.cutUntil(Parser.cutFrom(dataPage,"\"short-container-title\":[\""), "\"");
+                String json=TextFile.readOutURL("https://api.crossref.org/works/"+doi);
+                TextFile.writeStringToFile(json, "crossref-PUI-paper.json");
+                JSONParser jp=new JSONParser(json);
+                jp.parse();
+                JSONObject jt=jp.root;
+                String title=jt.get("message").get("title").get(0).toString();
+                String year=jt.get("message").get("published").get("date-parts").get(0).get(0).toString();
+                String volume=jt.get("message").get("issue").toString();
+                String pages=jt.get("message").get("page").toString();
+                String journal=jt.get("message").get("short-container-title").get(0).toString();
+                if (journal==null) {
+                    journal=jt.get("message").get("container-title").get(0).toString();
                 }
                 String authors="";
-                String res3=Parser.cutFrom(dataPage,"\"author\":");
-                while (res3.indexOf("\"given\"")>-1) {
-                    int i=res3.indexOf("\"family\":\"");
-                    int j=res3.indexOf("\"given\":\"");
-                    if (i<j) i=j;
-                    String author = Parser.cutUntil(Parser.cutFrom(res3,"\"family\":\""),"\"")+", "+Parser.cutUntil(Parser.cutFrom(res3,"\"given\":\""),"\"");
-                    res3=res3.substring(i+1);
+                JSONObject authorList=jt.get("message").get("author");
+                for (JSONObject entry : authorList) {
+                    String author = entry.get("family")+", "+entry.get("given");
                     authors+="|"+author;
                 }
                 authors=authors.substring(1);
@@ -613,35 +607,15 @@ public class PluginUniversalItems extends Thread {
     
     public void completeIdentifier() {
         String tmp="";
-        
-        String arxref=item.get("arxiv-ref");
-        String arxname=item.get("arxiv-name");
-        if ((arxref!=null) && (arxname!=null)) {
-            if (arxref.indexOf(arxname)>-1) {
-                tmp=arxref;
-            } else {
-                tmp=arxref+" ["+arxname+"]";
-            }
-        }
-        if (!blank(BTR.get("journal"))) {
-            if (item.get("type").equals("Preprint")) putS("type", "Paper");
-            String identifier=new String("");
-            identifier=BTR.get("journal");
-            if (!blank(BTR.get("volume"))) identifier+=" "+BTR.get("volume");
-            if (!blank(BTR.get("year"))) identifier+=" ("+BTR.get("year")+")";
-            if (!blank(BTR.get("pages"))) identifier+=" "+BTR.get("pages");
-            tmp+=" "+identifier.trim();
-        }
         if (blank(BTR.get("doi")) && !blank(getS("doi"))) BTR.put("doi",getS("doi"));
-        
-        if (BTR.get("year")!=null) tmp=BTR.get("year")+" "+tmp;
-        putS("identifier", tmp.trim());
+        // Identifier format etc. now handled by BibTeXRecord
+        putS("identifier",BTR.getIdentifier());
     }
     
     public void getFromProjectEuclid() {
         String url="https://projecteuclid.org/euclid."+getS("projecteuclid");
         Msgs.add("Reading out from Project Euclid: "+url);
-        String info=TextFile.ReadOutURL(url);
+        String info=TextFile.readOutURL(url);
         if (!info.startsWith("##??")) {
             if (invalid("title")) {
                 putS("title",Parser.cutUntil(Parser.cutFrom(info,"<meta name=\"citation_title\" content=\""),"\""));

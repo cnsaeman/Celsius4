@@ -29,12 +29,12 @@ public class webToolsHEP {
      */
     public static String getInspireRecord(String inspirebase, String inspirekey) {
         String srchstring = "https://inspirehep.net/api/literature/" + inspirekey;
-        return(TextFile.ReadOutURL(srchstring));
+        return(TextFile.readOutURL(srchstring));
     }
     
     public static String getInspireDetails(String inspirebase, String inspirekey) {
         String srchstring = inspirebase + "record/" + inspirekey + "?of=xm&ot=100,700,84,37,245,260,300,520,773";
-        String tmp=TextFile.ReadOutURL(srchstring);
+        String tmp=TextFile.readOutURL(srchstring);
         if (!tmp.startsWith("<?xml version")) return(null);
         HashMap data=new HashMap<String,String>();
         return(Parser.cutUntil(Parser.cutFrom(tmp,"<controlfield tag=\"001\">"),"</controlfield>"));
@@ -42,7 +42,7 @@ public class webToolsHEP {
     
     public static String getInspireJson(String inspirebase, String inspirekey) {
         String srchstring = inspirebase + "record/" + inspirekey + "?of=recjson&ot=comment,title,system_number,abstract,authors,doi,primary_report_number,publication_info,physical_description,number_of_citations,thesaurus_terms";
-        String tmp=TextFile.ReadOutURL(srchstring);
+        String tmp=TextFile.readOutURL(srchstring);
         if (!tmp.startsWith("[{")) return(null);
         return(tmp);
     }
@@ -128,7 +128,7 @@ public class webToolsHEP {
     
     public static String linksFromInspire(String inspirebase, String lnk) {
         String srchstring = inspirebase + "record/" + lnk + "/references";
-        String tmp2 = TextFile.ReadOutURL(srchstring);
+        String tmp2 = TextFile.readOutURL(srchstring);
         String links = new String("");
         tmp2 = Parser.cutFrom(tmp2, "<table><tr><td valign=\"top\">");
         while (tmp2.indexOf("</tr><tr>") > -1) {
@@ -142,7 +142,7 @@ public class webToolsHEP {
             tmp2 = Parser.cutFrom(tmp2, "</tr><tr>");
         }
         srchstring = inspirebase + "search?ln=en&p=refersto%3Arecid%3A" + lnk;
-        tmp2 = TextFile.ReadOutURL(srchstring);
+        tmp2 = TextFile.readOutURL(srchstring);
         tmp2 = Parser.cutFrom(tmp2, "<!C-START");
         while (tmp2.indexOf("<div class=\"record_body\">") > -1) {
             tmp2 = Parser.cutFrom(tmp2, "<div class=\"record_body\">");
@@ -156,7 +156,7 @@ public class webToolsHEP {
     public static String arXivRefFromInspire(String inspirebase, String lnk) {
         String links = new String("");
         String srchstring = inspirebase + "search?ln=en&p=refersto%3Arecid%3A" + lnk + "&rg=100";
-        String tmp2 = TextFile.ReadOutURL(srchstring);
+        String tmp2 = TextFile.readOutURL(srchstring);
         tmp2 = Parser.cutFrom(tmp2, "<!C-START");
         while (tmp2.indexOf("<div class=\"record_body\">") > -1) {
             tmp2 = Parser.cutFrom(tmp2, "<div class=\"record_body\">");
@@ -168,7 +168,7 @@ public class webToolsHEP {
     }
     
     public static String inspireRecordJSON(String rec) {
-      String tmp2 = TextFile.ReadOutURL("https://inspirehep.net/api/literature/"+rec);
+      String tmp2 = TextFile.readOutURL("https://inspirehep.net/api/literature/"+rec);
       return tmp2;
     }
     

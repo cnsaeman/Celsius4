@@ -113,7 +113,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
 
         jLabel1.setText("Currently available plugins:");
 
-        jBMPlugins.setIcon(RSC.getScaledIcon(Resources.pluginSetupIcon));
+        jBMPlugins.setIcon(RSC.icons.getScaledIcon(Resources.pluginSetupIcon));
         jBMPlugins.setMaximumSize(new java.awt.Dimension(60, 60));
         jBMPlugins.setMinimumSize(new java.awt.Dimension(6, 6));
         jBMPlugins.setPreferredSize(new java.awt.Dimension(RSC.guiScale(25),RSC.guiScale(25)));
@@ -130,7 +130,7 @@ public class PluginPanel extends javax.swing.JPanel implements HasManagedStates 
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jBMPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(

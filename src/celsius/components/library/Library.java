@@ -1,6 +1,6 @@
 /*
 
- Celsius Person Class - Atlantis Software 
+ Celsius Library Class - Atlantis Software 
 
 */
 
@@ -69,7 +69,7 @@ public final class Library { //implements Iterable<Item> {
 
     // Metainformation on the Library
     public String name;
-    public String baseFolder;
+    public String basefolder;
     public String[] itemSearchFields;
     public String[] personSearchFields;
     public String[] itemEditFields;
@@ -105,7 +105,7 @@ public final class Library { //implements Iterable<Item> {
     public HashSet<String> itemPropertyKeys;
     public ArrayList<String> orderedPersonPropertyKeys; 
     public HashSet<String> personPropertyKeys;
-    public final HashSet<String> attachmentPropertyKeys=new HashSet<String>((List<String>)Arrays.asList("name","filetype","path","pages","source","md5","createdTS"));     
+    public final HashSet<String> attachmentPropertyKeys=new HashSet<>((List<String>)Arrays.asList("name","filetype","path","pages","source","md5","createdTS"));     
     
     public final ArrayList<LibraryChangeListener> libraryChangeListeners;
     
@@ -128,22 +128,28 @@ public final class Library { //implements Iterable<Item> {
      * Creates a new Library 
      * 
      * TODO fix adjust
+     * @param basefolder
+     * @param mainfile
+     * @param name
+     * @param RSC
+     * @param template
+     * @throws java.lang.Exception
      */
-    public Library(String bd,String mainfile,String nm,Resources rsc, String template) throws Exception {
+    public Library(String basefolder,String mainfile,String name,Resources RSC, String template) throws Exception {
         addItemMode = 0;
         currentStatus=0;
         peopleFields=null;
-        RSC=rsc;
+        this.RSC=RSC;
         //celsiusBaseDir=Parser.cutUntilLast((new File(".")).getAbsolutePath(),".");
-        baseFolder=bd;
-        //if (!celsiusBaseDir.endsWith(ToolBox.filesep)) celsiusBaseDir+=ToolBox.filesep;
-        if (!baseFolder.endsWith(ToolBox.filesep)) baseFolder+=ToolBox.filesep;
-        name=nm;
+        this.basefolder=basefolder;
+        //if (!celsiusBaseDir.endsWith(ToolBox.FILE_SEPARATOR)) celsiusBaseDir+=ToolBox.FILE_SEPARATOR;
+        if (!this.basefolder.endsWith(ToolBox.FILE_SEPARATOR)) this.basefolder+=ToolBox.FILE_SEPARATOR;
+        this.name=name;
         
-        (new File(baseFolder)).mkdir();
-        (new File(baseFolder+"items")).mkdir();
-        (new File(baseFolder+"item-thumbnails")).mkdir();
-        (new File(baseFolder+"person-thumbnails")).mkdir();
+        (new File(this.basefolder)).mkdir();
+        (new File(this.basefolder+"items")).mkdir();
+        (new File(this.basefolder+"item-thumbnails")).mkdir();
+        (new File(this.basefolder+"person-thumbnails")).mkdir();
 
         getFieldsFromConfig();
 
@@ -151,13 +157,15 @@ public final class Library { //implements Iterable<Item> {
         addingMode=1;
     }
     
-    /** Loads an existing library, standard method to open Library */
-    public Library(String folderName,Resources rsc) {
+    /** Loads an existing library, standard method to open Library
+     * @param basefolder
+     * @param RSC */
+    public Library(String basefolder,Resources RSC) {
         addItemMode = 0;
         currentStatus=0;
         peopleFields=null;
         libraryChangeListeners=new ArrayList<>();
-        RSC=rsc;
+        this.RSC=RSC;
         try {
             // check that library is not open already
             for (Library lib : RSC.libraries) {
@@ -169,16 +177,16 @@ public final class Library { //implements Iterable<Item> {
             }
 
             // set base folder and file 
-            baseFolder=folderName;
-            if (!baseFolder.endsWith(ToolBox.filesep)) baseFolder+=ToolBox.filesep;
+            if (!basefolder.endsWith(ToolBox.FILE_SEPARATOR)) basefolder+=ToolBox.FILE_SEPARATOR;
+            this.basefolder=basefolder;
             
             // ensure thumnail folders
-            if (!(new File(baseFolder+"items")).exists()) (new File(baseFolder+"items")).mkdir();
-            if (!(new File(baseFolder+"item-thumbnails")).exists()) (new File(baseFolder+"item-thumbnails")).mkdir();
-            if (!(new File(baseFolder+"person-thumbnails")).exists()) (new File(baseFolder+"person-thumbnails")).mkdir();
+            if (!(new File(basefolder+"items")).exists()) (new File(basefolder+"items")).mkdir();
+            if (!(new File(basefolder+"item-thumbnails")).exists()) (new File(basefolder+"item-thumbnails")).mkdir();
+            if (!(new File(basefolder+"person-thumbnails")).exists()) (new File(basefolder+"person-thumbnails")).mkdir();
 
             // open main database
-            mainLibraryFile=baseFolder+"CelsiusLibrary.sql";
+            mainLibraryFile=basefolder+"CelsiusLibrary.sql";
             String url="jdbc:sqlite:"+mainLibraryFile;
             dbConnection = DriverManager.getConnection(url);
             // check if connection locked
@@ -203,7 +211,7 @@ public final class Library { //implements Iterable<Item> {
             getFieldsFromConfig();
             
             // open search database
-            String surl="jdbc:sqlite:"+baseFolder+"CelsiusSearchIndex.sql";
+            String surl="jdbc:sqlite:"+basefolder+"CelsiusSearchIndex.sql";
             searchDBConnection = DriverManager.getConnection(surl);
             RSC.out("Lib>Connection established to index database "+surl);
 
@@ -259,7 +267,7 @@ public final class Library { //implements Iterable<Item> {
             orderedPersonPropertyKeys=new ArrayList<>();
             orderedPersonPropertyKeys.addAll(Arrays.asList(ToolBox.stringToArray(tmpKeys.toString())));
 
-            if ((name.length()==0) || (baseFolder.length()==0)) {
+            if ((name.length()==0) || (basefolder.length()==0)) {
                 (new SafeMessage("The library file seems to be corrupt. Cancelling...","Warning:",0)).showMsg();
                 name="??##Library file corrupt.";
                 return;
@@ -422,7 +430,7 @@ public final class Library { //implements Iterable<Item> {
                         itemTableColumnSizes.add(1);
                 }
             } else {
-                for (String list1 : list) {
+                for (String element : list) {
                     itemTableColumnSizes.add(1);
                 }
             }
@@ -458,7 +466,7 @@ public final class Library { //implements Iterable<Item> {
                         personTableColumnSizes.add(1);
                 }
             } else {
-                for (String list1 : list) {
+                for (String element : list) {
                     personTableColumnSizes.add(1);
                 }
             }
@@ -468,7 +476,7 @@ public final class Library { //implements Iterable<Item> {
                     personTableColumnTypes.add("text");
                 }
             } else {
-                for (String list1 : list) {
+                for (String element : list) {
                     personTableColumnTypes.add("text");
                 }
             }
@@ -479,7 +487,7 @@ public final class Library { //implements Iterable<Item> {
             personTableSQLTags += "," + tag;
         }
         linkTypes=configToArrayList("link-types");
-        if (linkTypes.size()==0) linkTypes.add("Links");
+        if (linkTypes.isEmpty()) linkTypes.add("Links");
     }
     
     public void setStyleSheet() {
@@ -502,8 +510,7 @@ public final class Library { //implements Iterable<Item> {
     }
     
     public void close() {
-        FileTools.deleteIfExists(baseFolder + "/lock");
-        FileTools.deleteIfExists(baseFolder + "/modified");
+        FileTools.deleteIfExists(basefolder + "lock");
         try { 
             dbConnection.close();
             searchDBConnection.close();
@@ -569,12 +576,13 @@ public final class Library { //implements Iterable<Item> {
      * Deletes all files associated with library
      * 
      * TODO: adjust to new files
+     * @return 
      */
     public int deleteLibrary() {
         String TI = "LIB" + name + ">";
         try {
-            RSC.out(TI + "Removing base folder " + baseFolder);
-            if (!(FileTools.removeFolder(baseFolder))) {
+            RSC.out(TI + "Removing base folder " + basefolder);
+            if (!(FileTools.removeFolder(basefolder))) {
                 RSC.out(TI + "failed!");
                 return (8);
             }
@@ -601,7 +609,7 @@ public final class Library { //implements Iterable<Item> {
     }
     
     // Status string for status bar.
-    public String Status(boolean count) {
+    public String getStatusString(boolean count) {
         String tmp = "Current library "+name+": ";
         updateSizeInfo();
         if (numberOfItems==0) return("No items in current library.");
@@ -630,13 +638,15 @@ public final class Library { //implements Iterable<Item> {
     public void registerItem(Item item, String catID, int linkType) throws SQLException {
         String[] data={item.id, catID, String.valueOf(linkType)};
         executeEX("INSERT OR IGNORE INTO item_category_links (item_id, category_id, link_type) VALUES (?,?,?);", data);
+        item.loadCategories();
+        item.notifyChanged();
     }
     
     public void unRegisterItem(Item item, int catID) throws SQLException {
         if (catID<1) return;
         String sql="DELETE FROM item_category_links WHERE item_id=? AND category_id=?;";
         PreparedStatement statement= dbConnection.prepareStatement(sql);
-        statement.setInt(1,Integer.valueOf(item.id));
+        statement.setInt(1,Integer.parseInt(item.id));
         statement.setInt(2,catID);
         statement.execute();
     }
@@ -654,11 +664,14 @@ public final class Library { //implements Iterable<Item> {
      *
      * Return values: 100 : unique-fields not unique, 10 : exact doublette, 5: file might be doublette, 4 : apparent Doublette,  0 : no doublette
      * 
+     * @param item
+     * @return 
+     * @throws java.io.IOException
      */
     public DoubletteResult isDoublette(Item item) throws IOException {
         // Look for doublettes
         Attachment attachment=null;
-        if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
+        if (!item.linkedAttachments.isEmpty()) attachment=item.linkedAttachments.get(0);
         try {
             String[] uniqueFields = configToArray("item-unique-fields");
             String sql = "SELECT "+itemTableSQLTags+" FROM items WHERE ";
@@ -711,7 +724,7 @@ public final class Library { //implements Iterable<Item> {
         sourceItem.loadLinkedPeople();
         for (int i=0; i<essentialFields.length;i++) {
             if (!sourceItem.isPropertySet(essentialFields[i])) {
-                RSC.showWarning("The item "+sourceItem.toText(false)+"\ncould not be copied, as the field "+essentialFields[i]+",\nrequired by the library "+this.name+" is not set.", "Copying cancelled...");
+                RSC.guiTools.showWarning("Copying cancelled...","The item "+sourceItem.toText(false)+"\ncould not be copied, as the field "+essentialFields[i]+",\nrequired by the library "+this.name+" is not set.");
                 return;
             }
         }
@@ -765,7 +778,7 @@ public final class Library { //implements Iterable<Item> {
     }
     
     public String compressFilePath(String s) {
-        if (s.startsWith(baseFolder)) return("LD::"+Parser.cutFrom(s,baseFolder));
+        if (s.startsWith(basefolder)) return("LD::"+Parser.cutFrom(s,basefolder));
         if (s.startsWith(RSC.celsiusBaseFolder)) return("BD::"+Parser.cutFrom(s,RSC.celsiusBaseFolder));
         return(s);
     }
@@ -908,8 +921,8 @@ public final class Library { //implements Iterable<Item> {
     
     public int getNumberOfItemsForPeople(ArrayList<TableRow> tableRows) {
         int total=0;
-        if (tableRows.size()>0) {
-            StringBuffer ids = new StringBuffer();
+        if (!tableRows.isEmpty()) {
+            StringBuilder ids = new StringBuilder();
             for (TableRow item : tableRows) {
                 ids.append(",");
                 ids.append(item.id);
@@ -929,8 +942,8 @@ public final class Library { //implements Iterable<Item> {
     
     public int getPagesForItems(ArrayList<TableRow> tableRows) {
         int pages=0;
-        if (tableRows.size()>0) {
-            StringBuffer ids = new StringBuffer();
+        if (!tableRows.isEmpty()) {
+            StringBuilder ids = new StringBuilder();
             for (TableRow item : tableRows) {
                 ids.append(",");
                 ids.append(item.id);
@@ -1282,8 +1295,8 @@ public final class Library { //implements Iterable<Item> {
         String sig=Parser.cutUntil(s,"::");
         s=Parser.cutFrom(s,"::");
         String s2=s;
-        if (s2.startsWith(ToolBox.filesep)) s2=s2.substring(1);
-        if (sig.equals("LD")) return(baseFolder+s2);
+        if (s2.startsWith(ToolBox.FILE_SEPARATOR)) s2=s2.substring(1);
+        if (sig.equals("LD")) return(basefolder+s2);
         if (sig.equals("BD")) return(RSC.celsiusBaseFolder+s2);
         return(s);
     }
@@ -1294,8 +1307,8 @@ public final class Library { //implements Iterable<Item> {
         String sig=Parser.cutUntil(s,"::");
         s=Parser.cutFrom(s,"::");
         String s2=s;
-        if (s2.startsWith(ToolBox.filesep)) s2=s2.substring(1);
-        if (sig.equals("LD")) return(baseFolder+s2);
+        if (s2.startsWith(ToolBox.FILE_SEPARATOR)) s2=s2.substring(1);
+        if (sig.equals("LD")) return(basefolder+s2);
         if (sig.equals("BD")) return(RSC.celsiusBaseFolder+s2);
         return(s);
     }
@@ -1601,10 +1614,10 @@ public final class Library { //implements Iterable<Item> {
             newIDs.removeAll(oldIDs);
             
             // Delete ids, adjust idField in case there's a , for categories
-            if (toDelete.size()>0) executeEX("DELETE FROM " + table + " WHERE item_id=" + itemID + " AND " + Parser.cutUntil(idField, ",") + " IN " + arrayListToSQLiteList(toDelete) + ";");
+            if (!toDelete.isEmpty()) executeEX("DELETE FROM " + table + " WHERE item_id=" + itemID + " AND " + Parser.cutUntil(idField, ",") + " IN " + arrayListToSQLiteList(toDelete) + ";");
 
             // Insert new ids:
-            StringBuffer sql=new StringBuffer();
+            StringBuilder sql=new StringBuilder();
             for (String id : newIDs) {
                 sql.append(',');
                 sql.append('(');
@@ -1629,7 +1642,6 @@ public final class Library { //implements Iterable<Item> {
     }
     
     public Category findOrCreateCategory(String description) throws SQLException {
-        HashMap<String,String> describedAttributes=new HashMap<>();
         Category category=null;
         String[] split = description.split("::");
         String key="label";
@@ -1672,9 +1684,8 @@ public final class Library { //implements Iterable<Item> {
     /**
      * Find or create person by from a given Person
      * 
-     * @param description
-     * @return
-     * @throws SQLException 
+     * @param person
+     * @return 
      */
     public Person findOrCreatePerson(Person person) {
         Person out=null;
@@ -1709,7 +1720,7 @@ public final class Library { //implements Iterable<Item> {
             itemDescription = Parser.cutFrom(description, "#").trim();
             if (itemDescription.length()>1) descList=itemDescription.split("#");
             description = Parser.cutUntil(description, "#").trim();
-            StringBuffer sql=new StringBuffer("SELECT * FROM persons WHERE ");
+            StringBuilder sql=new StringBuilder("SELECT * FROM persons WHERE ");
             for (String descEntry : descList) {
                 String[] descPair=descEntry.split("::");
                 if (descPair.length>1) {
@@ -1782,9 +1793,9 @@ public final class Library { //implements Iterable<Item> {
 
     class ObjectComparatorText implements Comparator<TableRow> {
 
-        private String tag;
-        private boolean forwards;
-        private int type;
+        private final String tag;
+        private final boolean forwards;
+        private final int type;
 
         public ObjectComparatorText(final String t,boolean f, int ty) {
             tag=t;forwards=f;type=ty;
@@ -1794,10 +1805,10 @@ public final class Library { //implements Iterable<Item> {
             if (type==1) {
                 int i=0;
                 while ((i<a.length()) && (!Character.isLetter(a.charAt(i)))) i++;
-                double d1=Double.valueOf(a.substring(0,i).trim());
+                double d1=Double.parseDouble(a.substring(0,i).trim());
                 i=0;
                 while ((i<b.length()) && (!Character.isLetter(b.charAt(i)))) i++;
-                double d2=Double.valueOf(b.substring(0,i).trim());
+                double d2=Double.parseDouble(b.substring(0,i).trim());
                 if (d1>d2) return(1);
                 if (d1<d2) return(-1);
                 return(0);

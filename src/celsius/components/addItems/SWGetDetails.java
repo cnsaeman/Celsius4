@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.addItems;
 
 import celsius.components.plugins.SWApplyPlugin;
@@ -10,7 +5,6 @@ import celsius.Resources;
 import celsius.data.Attachment;
 import celsius.data.Item;
 import celsius.components.library.Library;
-import celsius.components.addItems.AddItems;
 import atlantis.tools.Parser;
 import celsius.components.plugins.Plugin;
 import celsius.tools.ToolBox;
@@ -41,7 +35,7 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
         this.plugins=plugins;
         this.addItems=addItems;
         attachment=null;
-        if (item.linkedAttachments.size()>0) attachment=item.linkedAttachments.get(0);
+        if (!item.linkedAttachments.isEmpty()) attachment=item.linkedAttachments.get(0);
         state=-1;
         library=RSC.getCurrentlySelectedLibrary();
         TI="SWGetDetails>";
@@ -69,11 +63,8 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
         state=0;
         // update information
         if (addItems!=null) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    addItems.updateItemInformation();
-                }
+            java.awt.EventQueue.invokeLater(() -> {
+                addItems.updateItemInformation();
             });
         }
         return null;
@@ -93,7 +84,7 @@ public class SWGetDetails extends SwingWorker<Void,Void> {
         try {
             // plaintxt already existing? Otherwise create it
             String filePath=attachment.get("path");
-            String fileNameText=Parser.cutUntilLast(filePath,ToolBox.filesep)+ToolBox.filesep+"."+Parser.cutFromLast(filePath,ToolBox.filesep);
+            String fileNameText=Parser.cutUntilLast(filePath,ToolBox.FILE_SEPARATOR)+ToolBox.FILE_SEPARATOR+"."+Parser.cutFromLast(filePath,ToolBox.FILE_SEPARATOR);
             attachment.put("$plaintext",fileNameText+".txt.gz");
             if (!(new File(attachment.get("$plaintext"))).exists()) {
                 RSC.out(TI + "Getting Plain Txt :: " + filePath);

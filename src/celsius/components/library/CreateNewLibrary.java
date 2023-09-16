@@ -16,18 +16,10 @@ package celsius.components.library;
 
 import celsius.Resources;
 import atlantis.gui.FFilter;
-import atlantis.tools.FileTools;
-import atlantis.tools.Parser;
-import atlantis.tools.TextFile;
-import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
-import celsius.tools.ToolBox;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.File;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -38,7 +30,6 @@ import javax.swing.event.DocumentListener;
 public class CreateNewLibrary extends javax.swing.JDialog {
 
     private final Resources RSC;
-    private final MainFrame MF;
     private final DefaultComboBoxModel DCBM;
     public  Library Lib;
 
@@ -49,8 +40,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
         super(parent, true);
         changed=false;
         RSC=rsc;
-        setIconImage(RSC.getAppIcon());
-        MF=parent;
+        setIconImage(RSC.guiTools.appIcon);
         initComponents();
         jTFLibDir.setText(RSC.celsiusBaseFolder+"/Libraries/NewLibrary");
         Lib=null;
@@ -80,7 +70,7 @@ public class CreateNewLibrary extends javax.swing.JDialog {
                 change();
             }
         });
-        GUIToolBox.centerDialog(this,parent);
+        RSC.guiTools.centerDialog(this);
     }
     
     /** This method is called from within the constructor to

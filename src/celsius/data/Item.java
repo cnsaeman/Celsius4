@@ -12,6 +12,7 @@ import celsius.components.categories.Category;
 import atlantis.tools.FileTools;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
+import celsius.components.bibliography.BibTeXRecord;
 import celsius.tools.ToolBox;
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public final class Item extends TableRow implements Editable {
     /**
      * Load item at loadLevel 1 with data in ResultSet
      * 
-     * @param lib
+     * @param library
      * @param rs 
      */
     public Item(Library library, ResultSet rs) {
@@ -103,6 +104,7 @@ public final class Item extends TableRow implements Editable {
      * 
      * @param targetLoadLevel 
      */
+    @Override
     public void loadLevel(int targetLoadLevel) {
         super.loadLevel(targetLoadLevel);
         try {
@@ -132,6 +134,21 @@ public final class Item extends TableRow implements Editable {
             linkType++;
         }
     }
+    
+    /**
+     * Reload the registrations
+     */
+    public void loadCategories() {
+        try {
+            String sql = "SELECT GROUP_CONCAT(label || '$' || item_categories.id, ' | ') AS result FROM item_category_links INNER JOIN item_categories on item_categories.id=category_id  WHERE item_id=" + id + " ORDER BY label ASC";
+            ResultSet rs = library.executeResEX(sql);
+            if (rs.next()) {
+                properties.put("$categories", rs.getString(1));
+            }
+        } catch (Exception e) {
+            library.RSC.outEx(e);
+        }
+    }
             
     /**
      *  Loads all the data, including linked data from other tables
@@ -151,16 +168,8 @@ public final class Item extends TableRow implements Editable {
             library.RSC.outEx(e);
         }
         
-        // read in registration
-        try {
-            String sql = "SELECT GROUP_CONCAT(label || '$' || item_categories.id, ' | ') AS result FROM item_category_links INNER JOIN item_categories on item_categories.id=category_id  WHERE item_id=" + id + " ORDER BY label ASC";
-            ResultSet rs = library.executeResEX(sql);
-            if (rs.next()) {
-                properties.put("$categories", rs.getString(1));
-            }
-        } catch (Exception e) {
-            library.RSC.outEx(e);
-        }
+        // read in associated categories
+        loadCategories();
 
         // read in attachments
         String sql = "SELECT attachments.* FROM item_attachment_links INNER JOIN attachments on attachments.id=attachment_id  WHERE item_id=" + id + " ORDER BY ord ASC;";
@@ -203,7 +212,7 @@ public final class Item extends TableRow implements Editable {
         boolean isSet = false;
         isSet = isSet
                 || (get(key) != null)
-                || (library.isPeopleField(key) && (linkedPersons.get(key) != null) && (linkedPersons.get(key).size() > 0));
+                || (library.isPeopleField(key) && (linkedPersons.get(key) != null) && (!linkedPersons.get(key).isEmpty()));
         return(isSet);
     }
             
@@ -296,9 +305,10 @@ public final class Item extends TableRow implements Editable {
     /**
      * Save an item. Note that this should only be done if loadlevel is maximal
      */
+    @Override
     public void save() {
         
-        if (dirtyFields.size()==0) {
+        if (dirtyFields.isEmpty()) {
             library.RSC.out("Nothing to save for item "+id);
             return;
         }
@@ -428,7 +438,7 @@ public final class Item extends TableRow implements Editable {
                             attachment.saveAttachmentLinkToDatabase();
                             StringBuffer search = new StringBuffer();
                             if (attachment.get("$plaintext")!=null) {
-                                search=TextFile.ReadOutZipFile(library.completeDir(library.completeDir(attachment.get("$plaintext")), id));
+                                search=TextFile.readOutZipFile(library.completeDir(library.completeDir(attachment.get("$plaintext")), id));
                             }
                             search.append("\n");
                             for (String tag : library.itemSearchFields) {
@@ -542,8 +552,8 @@ public final class Item extends TableRow implements Editable {
         loadLevel(3);
         try {
             for (Attachment attachment : linkedAttachments) {
-                library.RSC.configuration.extractText("LIBAF>", attachment.get("path"), library.baseFolder + "/tmp.txt");
-                StringBuffer search = TextFile.ReadOutZipFile(library.baseFolder + "/tmp.txt.gz");
+                library.RSC.configuration.extractText("LIBAF>", attachment.get("path"), library.basefolder + "/tmp.txt");
+                StringBuffer search = TextFile.readOutZipFile(library.basefolder + "/tmp.txt.gz");
                 search.append("\n");
                 for (String tag : library.itemSearchFields) {
                     search.append(getS(tag));
@@ -560,7 +570,7 @@ public final class Item extends TableRow implements Editable {
                         library.RSC.outEx(ex);
                     }
                 }
-                attachment.put("pages",Integer.toString(ToolBox.readNumberOfPagesOf(library.RSC, "RedoTXT", attachment.get("path"), library.baseFolder+"/tmp.txt.gz")));
+                attachment.put("pages",Integer.toString(ToolBox.readNumberOfPagesOf(library.RSC, "RedoTXT", attachment.get("path"), library.basefolder+"/tmp.txt.gz")));
                 attachment.save();
             }
         } catch (Exception ex) {
@@ -572,8 +582,8 @@ public final class Item extends TableRow implements Editable {
         loadLevel(3);
         String filetype=library.RSC.configuration.getFileType(path);
         // get plain text
-        library.RSC.configuration.extractText("LIBAF>",path,library.baseFolder+"/tmp.txt");
-        StringBuffer search = TextFile.ReadOutZipFile(library.baseFolder+"/tmp.txt.gz");
+        library.RSC.configuration.extractText("LIBAF>",path,library.basefolder+"/tmp.txt");
+        StringBuffer search = TextFile.readOutZipFile(library.basefolder+"/tmp.txt.gz");
         search.append("\n");
         for (String tag : library.itemSearchFields) {
             search.append(getS(tag));
@@ -584,7 +594,7 @@ public final class Item extends TableRow implements Editable {
         attachment.put("name",name);
         attachment.put("path",path);
         attachment.put("filetype",filetype);
-        attachment.put("pages",Integer.toString(ToolBox.readNumberOfPagesOf(library.RSC, "AssocFile", path, library.baseFolder+"/tmp.txt.gz")));
+        attachment.put("pages",Integer.toString(ToolBox.readNumberOfPagesOf(library.RSC, "AssocFile", path, library.basefolder+"/tmp.txt.gz")));
         if (attachment.moveToStandardLocation(true)==0) {
             // save attachment
             attachment.attachToParent();
@@ -727,6 +737,7 @@ public final class Item extends TableRow implements Editable {
     /**
      * Create a string representation of item for output
      * 
+     * @param renew
      * @return the string
      */
     @Override
@@ -806,7 +817,7 @@ public final class Item extends TableRow implements Editable {
         out.append("Attachments:\n");
         out.append("------------------\n");
         for (Attachment attachment : linkedAttachments) {
-            out.append(attachment.id+" | "+attachment.get("name")+" | "+attachment.get("filetype")+" | "+attachment.get("path")+" | "+attachment.get("pages")+" | "+attachment.get("source")+" | "+attachment.get("createdTS")+" | "+attachment.get("md5")+"\n");
+            out.append(attachment.id).append(" | ").append(attachment.get("name")).append(" | ").append(attachment.get("filetype")).append(" | ").append(attachment.get("path")).append(" | ").append(attachment.get("pages")).append(" | ").append(attachment.get("source")).append(" | ").append(attachment.get("createdTS")).append(" | ").append(attachment.get("md5")).append("\n");
         }
         return(out.toString());
     }
@@ -828,9 +839,9 @@ public final class Item extends TableRow implements Editable {
     public void replaceAttachment(Item source) {
         try {
             // copy over first attachment if attachments exist
-            if (source.linkedAttachments.size()>0) {
+            if (!source.linkedAttachments.isEmpty()) {
                 Attachment newAttachment = source.linkedAttachments.get(0);
-                if (linkedAttachments.size() > 0) {
+                if (!linkedAttachments.isEmpty()) {
                     Attachment oldAttachment = linkedAttachments.get(0);
                     FileTools.deleteIfExists(oldAttachment.getFullPath());
                     oldAttachment.put("path", newAttachment.getFullPath());
@@ -860,7 +871,7 @@ public final class Item extends TableRow implements Editable {
     public void insertAsFirstAttachment(Item source) {
         try {
             // copy over first attachment if attachments exist
-            if (source.linkedAttachments.size()>0) {
+            if (!source.linkedAttachments.isEmpty()) {
                 Attachment newAttachment = source.linkedAttachments.get(0);
                 newAttachment.parent=this;
                 newAttachment.moveToStandardLocation(true);
@@ -948,6 +959,41 @@ public final class Item extends TableRow implements Editable {
     
     public void logView() {
         library.executeEX("INSERT INTO item_views (item_id,timestamp) VALUES ("+this.id+","+ToolBox.now()+");");
+    }
+    
+    public boolean isEmpty(String key) {
+        return((get(key)==null) || (get(key).isEmpty()));
+    }
+    
+    /**
+     * Add data from bibtex record to item.
+     * 
+     * @param bibtex 
+     */
+    public void enhanceByBibTeXData() {
+        BibTeXRecord bibtex = new BibTeXRecord(get("bibtex"));
+        if (bibtex.parseError == 0) {
+            if (isEmpty("title")) {
+                String bibtitle = bibtex.get("title");
+                if (bibtitle.startsWith("{")) {
+                    bibtitle = bibtitle.substring(1, bibtitle.length() - 1);
+                }
+                put("title", bibtitle);
+            }
+            if (isEmpty("authors")) {
+                put("authors", BibTeXRecord.convertBibTeXAuthorsToCelsius(bibtex.get("author")));
+            }
+            put("citation-tag",bibtex.getTag());
+            put("identifier",bibtex.getIdentifier());
+            if (bibtex.get("journal")!=null) {
+                put("type","Paper");
+            } 
+            if (bibtex.type.toLowerCase().equals("book")) {
+                put("type","Book");
+            }
+        } else {
+            library.RSC.guiTools.showWarning("Warning","The BibTeX record is inconsistent:\n" + BibTeXRecord.status[bibtex.parseError]);
+        }
     }
     
     class CompareItems implements Comparator<Item> {

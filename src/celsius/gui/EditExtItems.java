@@ -41,7 +41,7 @@ public class EditExtItems extends javax.swing.JDialog {
         }
         jTAList.setText(list.substring(1));
         jTAList.setCaretPosition(0);
-        GUIToolBox.centerDialog(this,RSC.MF);
+        RSC.guiTools.centerDialog(this);
     }
 
     @SuppressWarnings("unchecked")

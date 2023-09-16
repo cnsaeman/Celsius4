@@ -12,24 +12,16 @@
 package celsius.components.library;
 
 import atlantis.gui.KeyValueTableModel;
-import celsius.components.library.Library;
 import celsius.Resources;
-import celsius.components.library.LibraryTemplate;
 import atlantis.tools.FileTools;
-import atlantis.tools.Parser;
-import atlantis.tools.TextFile;
-import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
 import atlantis.gui.MultiLineEditor;
-import atlantis.gui.SingleLineEditor;
 import celsius.gui.TabLabel;
 import celsius.components.tableTabs.TableTTRenderer;
-import celsius.tools.ToolBox;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import javax.swing.DefaultListModel;
 import javax.swing.table.DefaultTableModel;
 
@@ -39,17 +31,14 @@ import javax.swing.table.DefaultTableModel;
  */
 public class EditLibraryTemplates extends javax.swing.JDialog implements MouseListener, KeyListener {
 
-    private final MainFrame MF;
     private final Resources RSC;
     private final DefaultListModel DLM;
-    private KeyValueTableModel KVTM;
     private LibraryTemplate libraryTemplate;
 
     /** Creates new form EditLibraryTemplates */
-    public EditLibraryTemplates(MainFrame mf, Resources rsc) {
-        super(mf, true);
-        MF=mf;
-        RSC=rsc;
+    public EditLibraryTemplates(Resources RSC) {
+        super(RSC.MF, true);
+        this.RSC=RSC;
         initComponents();
         DLM=new DefaultListModel();
         for (LibraryTemplate template : RSC.libraryTemplates)
@@ -66,9 +55,9 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
         jTabbedPane.setTabComponentAt(1,new TabLabel("HTML templates",Resources.editTabIcon,RSC,null,false));        
         jTabbedPane.setTabComponentAt(2,new TabLabel("Creation Instructions",Resources.editTabIcon,RSC,null,false));        
         this.pack();
-        this.setSize(RSC.guiScale(600), RSC.guiScale(500));
+        this.setSize(RSC.guiTools.guiScale(600), RSC.guiTools.guiScale(500));
         goToSelected();
-        GUIToolBox.centerDialog(this,mf);
+        RSC.guiTools.centerDialog(this);
     }
 
     public void goToSelected() {
@@ -77,7 +66,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
             libraryTemplate = (LibraryTemplate) jLTemplates.getSelectedValue();
             jTabConfiguration.setModel(libraryTemplate.getConfigurationModel());
             jTabHTMLTemplates.setModel(libraryTemplate.getHTMLTemplatesModel());
-            jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiScale(40));
+            jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiTools.guiScale(40));
             jTabHTMLTemplates.getColumnModel().getColumn(1).setCellRenderer(new TableTTRenderer(RSC));
             jTabCreationInstructions.setModel(libraryTemplate.getCreationInstructionsModel());
         } else {
@@ -86,18 +75,6 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
             jTabHTMLTemplates.setModel(new DefaultTableModel());
             jTabCreationInstructions.setModel(new DefaultTableModel());
         }
-    }
-
-    public void updateTable() {
-        /*goToSelected();
-        KVTM=new KeyValueTableModel("Property","Value");
-        int j=jLTemplates.getSelectedIndex();
-        for (String t : Library.LibraryFields) {
-            KVTM.addRow(Parser.lowerEndOfWords(t), xml.get(t));
-        }
-        jTLibTemplates.setModel(KVTM);
-        jTLibTemplates.getColumnModel().getColumn(0).setPreferredWidth(150);
-        jTLibTemplates.getColumnModel().getColumn(0).setMaxWidth(150);*/
     }
 
     /** This method is called from within the constructor to
@@ -258,19 +235,19 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
         Library library = RSC.getCurrentlySelectedLibrary();
         if (library != null) {
-            int i = RSC.askQuestionOC("This will create a new library template from the currently active library.", "Add a new library template");
+            int i = RSC.guiTools.askQuestionOC("This will create a new library template from the currently active library.", "Add a new library template");
             if (i == 0) {
                 LibraryTemplate libraryTemplate=new LibraryTemplate(RSC,library);
                 DLM.addElement(libraryTemplate);
                 RSC.libraryTemplates.add(libraryTemplate);
             }
         } else {
-            RSC.showWarning("There is currently no library open.", "Cancelled...");
+            RSC.guiTools.showWarning("Cancelled...","There is currently no library open.");
         }
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
-        int i=RSC.askQuestionYN("Do you really want to delete this library template?", "Please confirm:");
+        int i=RSC.guiTools.askQuestionYN("Do you really want to delete this library template?", "Please confirm:");
         if (i==0) {
             LibraryTemplate libraryTemplate=(LibraryTemplate)jLTemplates.getSelectedValue();
             DLM.removeElement(libraryTemplate);
@@ -297,10 +274,9 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
 
     private void jBtnRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnRenameActionPerformed
         String name=libraryTemplate.name;
-        SingleLineEditor SLE = new SingleLineEditor(RSC, "Rename template", name,true);
-        SLE.setVisible(true);
-        if (!SLE.cancelled && (!SLE.text.equals(name))) {
-            libraryTemplate.rename(SLE.text);
+        String newName=RSC.guiTools.askQuestionString("Rename template", name,true);
+        if ((newName!=null) && (!newName.equals(name))) {
+            libraryTemplate.rename(newName);
             // update UI
             int i=DLM.indexOf(libraryTemplate);
             DLM.setElementAt(libraryTemplate, i);
@@ -381,7 +357,7 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
     public void editLine(Object source) {
         if (source==jTabConfiguration) {
            String key=(String)jTabConfiguration.getModel().getValueAt(jTabConfiguration.getSelectedRow(),0);
-            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit configuration string", libraryTemplate.configuration.get(key));
+            MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit configuration string", libraryTemplate.configuration.get(key));
             MLE.setVisible(true);
             if (!MLE.cancelled) {
                 libraryTemplate.setConfiguration(key,MLE.text);
@@ -389,18 +365,17 @@ public class EditLibraryTemplates extends javax.swing.JDialog implements MouseLi
             }
         } else if (source==jTabHTMLTemplates) {
            String key=(String)jTabHTMLTemplates.getModel().getValueAt(jTabHTMLTemplates.getSelectedRow(),0);
-            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit HTML Template", libraryTemplate.htmlTemplates.get(key));
+            MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit HTML Template", libraryTemplate.htmlTemplates.get(key));
             MLE.setVisible(true);
             if (!MLE.cancelled) {
                 libraryTemplate.setHTMLTemplate(key,MLE.text);
                 jTabHTMLTemplates.setModel(libraryTemplate.getHTMLTemplatesModel());
-                jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiScale(40));
+                jTabHTMLTemplates.getColumnModel().getColumn(0).setMaxWidth(RSC.guiTools.guiScale(40));
                 jTabHTMLTemplates.getColumnModel().getColumn(1).setCellRenderer(new TableTTRenderer(RSC));
             }
         } else if (source==jTabCreationInstructions) {
             int row=jTabCreationInstructions.getSelectedRow();
-            String value=(String)jTabCreationInstructions.getModel().getValueAt(row,0);
-            MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit SQLite Instructions", libraryTemplate.creationInstructions.get(row));
+            MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit SQLite Instructions", libraryTemplate.creationInstructions.get(row));
             MLE.setVisible(true);
             if (!MLE.cancelled) {
                 libraryTemplate.setCreationInstruction(row,MLE.text);

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
 import celsius.Resources;
@@ -45,7 +40,7 @@ public class PeopleEditor extends javax.swing.JDialog implements GenericCelsiusE
         cancelled=true;
         modified=false;
         this.pack();
-        GUIToolBox.centerDialog(this, RSC.MF);
+        RSC.guiTools.centerDialog(this);
     }
 
     /**

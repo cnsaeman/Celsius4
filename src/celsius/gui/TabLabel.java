@@ -26,34 +26,33 @@ import javax.swing.JPanel;
  */
 public class TabLabel extends javax.swing.JPanel implements ActionListener {
 
-    public final String II;
+    public final String icon;
     public final String title;
     public final Resources RSC;
-    public final CelsiusTable DT;
+    public final CelsiusTable celsiusTable;
 
     /** Creates new form TabLabel */
-    public TabLabel(String t, String i, Resources rsc, CelsiusTable dt, boolean btn) {
-        RSC=rsc;
+    public TabLabel(String title, String icon, Resources RSC, CelsiusTable celsiusTable, boolean btn) {
+        this.RSC=RSC;
+        this.icon=icon;
+        this.title=title;
+        this.celsiusTable=celsiusTable;
         initComponents();
-        II=i;
-        title=t;
-        DT=dt;
-        //jLbl.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(12)));
-        jLbl.setText(t);
-        jLbl.setIcon(RSC.getScaledIcon(II));
-        jLbl.setIconTextGap(RSC.guiScale(5));
+        jLbl.setText(title);
+        jLbl.setIcon(RSC.icons.getScaledIcon(this.icon));
+        jLbl.setIconTextGap(RSC.guiTools.guiScale(5));
         if (btn) {
             JButton BtnSwitch=new JButton();
-            BtnSwitch.setIcon(RSC.getScaledIcon("iconmonstr-picture-1.svg.24"));
-            BtnSwitch.setPreferredSize(new Dimension(RSC.guiScale(16),RSC.guiScale(15)));
+            BtnSwitch.setIcon(RSC.icons.getScaledIcon("iconmonstr-picture-1.svg.24"));
+            BtnSwitch.setPreferredSize(new Dimension(RSC.guiTools.guiScale(16),RSC.guiTools.guiScale(15)));
             BtnSwitch.setBorderPainted(false);
             BtnSwitch.setOpaque(false);
             BtnSwitch.setContentAreaFilled(false);
             BtnSwitch.addActionListener(this);
             BtnSwitch.setName("switch");
             JButton BtnClose=new JButton();
-            BtnClose.setIcon(RSC.getScaledIcon("closebtn_sm"));
-            BtnClose.setPreferredSize(new Dimension(RSC.guiScale(16),RSC.guiScale(15)));
+            BtnClose.setIcon(RSC.icons.getScaledIcon("closebtn_sm"));
+            BtnClose.setPreferredSize(new Dimension(RSC.guiTools.guiScale(16),RSC.guiTools.guiScale(15)));
             BtnClose.setBorderPainted(false);
             BtnClose.setOpaque(false);
             BtnClose.setContentAreaFilled(false);
@@ -66,10 +65,10 @@ public class TabLabel extends javax.swing.JPanel implements ActionListener {
             this.add(panel,BorderLayout.EAST);
             
         } else {
-            if (t.equals(""))
+            if (title.equals(""))
                 jLbl.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
             else
-                jLbl.setBorder(javax.swing.BorderFactory.createEmptyBorder(RSC.guiScale(2), RSC.guiScale(3), 0, RSC.guiScale(3)));
+                jLbl.setBorder(javax.swing.BorderFactory.createEmptyBorder(RSC.guiTools.guiScale(2), RSC.guiTools.guiScale(3), 0, RSC.guiTools.guiScale(3)));
         }
     }
 
@@ -100,10 +99,10 @@ public class TabLabel extends javax.swing.JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (((JButton)e.getSource()).getName().equals("switch")) {
-            DT.switchView();
+            celsiusTable.switchView();
         }
         if (((JButton)e.getSource()).getName().equals("close")) {
-            DT.close();
+            celsiusTable.close();
         }
     }
 

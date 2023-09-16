@@ -6,6 +6,7 @@ import java.net.*;
 import java.io.*;
 import celsius.data.*;
 import atlantis.tools.*;
+import atlantis.JSON.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
@@ -69,16 +70,15 @@ public class PluginUniversalPeople extends Thread {
                 if (rs.next()) {
                     System.out.println("Database result 1");
                     String inspireRecord=webToolsHEP.jsonFromInspire("literature",rs.getString(2));
+                    TextFile.writeStringToFile(inspireRecord,"inspire-PUP-paper.json");
                     if (inspireRecord.length()>2) {
                         System.out.println("Length of returned data:");
                         System.out.println(inspireRecord.length());
                         JSONParser jp = new JSONParser(inspireRecord);
-                        jp.moveToNextTag("authors");
-                        for (int i = 0; i <= rs.getInt(1); i++) {
-                            System.out.println("mm");
-                            jp.moveToNextTag("ids");
-                        }
-                        String inspirekey = Parser.cutFrom(jp.extractStringFromNextTag("$ref"), "https://inspirehep.net/api/authors/");
+                        jp.parse();
+                        JSONObject jt=jp.root;
+                        String ref=jt.get("metadata").get("authors").get(rs.getInt(1)).get("record").get("$ref").toString();
+                        String inspirekey = Parser.cutFrom(ref, "https://inspirehep.net/api/authors/");
                         System.out.println(inspirekey);
                         person.put("inspirekey", inspirekey);
                     }
@@ -89,44 +89,38 @@ public class PluginUniversalPeople extends Thread {
                 String inspireRecord = webToolsHEP.jsonFromInspire("authors", person.getS("inspirekey"));
                 System.out.println(inspireRecord.substring(0,10));
                 if (inspireRecord.length() > 2) {
+                    TextFile.writeStringToFile(inspireRecord,"inspire-PUP-author.json");
                     JSONParser jp = new JSONParser(inspireRecord);
-                    jp.moveToNextTag("email_addresses");
-                    jp.restrictLevel();
-                    String email = jp.extractStringFromNextTag("value");
-                    while (email != null) {
-                        Boolean current = jp.extractBooleanFromNextTag("current");
-                        if (current) {
-                            person.put("email", email);
-                            System.out.println("Email found " + email);
-                        }
-                        email = jp.extractStringFromNextTag("value");
-                    }
-                    jp.releaseLevel();
-                    jp.moveToFirstTag("advisors");
-                    jp.restrictLevel();
-                    String advisor = jp.extractStringFromNextTag("name");
+                    jp.parse();
+                    JSONObject jt=jp.root;
+                    String email = jt.get("metadata").get("email_addresses").get(0).get("value").toString();
+                    person.put("email", email);
+                    
+                    JSONObject advisorsList=jt.get("metadata").get("advisors");
                     String advisors = "";
-                    while (advisor != null) {
-                        System.out.println("Advisor: " + advisor);
-                        advisors += ", " + advisor;
-                        advisor = jp.extractStringFromNextTag("name");
+                    for (JSONObject entry : advisorsList) {
+                        String advisor=entry.get("name").toString();
+                        advisors += "|" + advisor;
                     }
-                    if (advisors.length() > 2) {
-                        person.put("advisors", advisors.substring(2));
+                    if (advisors.length() > 1) {
+                        person.put("advisors", advisors.substring(1));
                     }
-                    jp.releaseLevel();
-                    jp.moveToFirstTag("positions");
-                    String rank = jp.extractStringFromNextTag("rank");
-                    String institution = jp.extractStringFromNextTag("institution");
-                    person.put("last_rank", rank);
-                    person.put("last_institution", institution);
-                    System.out.println("Last rank: " + rank);
-                    System.out.println("Last institution: " + institution);
-                    jp.moveToNextTag("ids");
-                    String value = jp.extractStringFromNextTag("value");
-                    jp.restrictLevel();
-                    while (value != null) {
-                        String schema = jp.extractStringFromNextTag("schema");
+                    
+                    JSONObject positionsList=jt.get("metadata").get("positions");
+                    for (int i=0;i<positionsList.size();i++) {
+                        String rank = positionsList.get(i).get("rank").toString();
+                        String institution = positionsList.get(i).get("institution").toString();
+                        if (i==0) {
+                            person.put("last_rank", rank);
+                            person.put("last_institution", institution);
+                        }
+                        // do something with rest?
+                    }
+
+                    JSONObject idsList=jt.get("metadata").get("ids");
+                    for (JSONObject entry : idsList) {
+                        String value = entry.get("value").toString();
+                        String schema = entry.get("schema").toString();
                         if (schema.toLowerCase().equals("orcid")) {
                             person.put("orcid", value);
                         }
@@ -134,22 +128,21 @@ public class PluginUniversalPeople extends Thread {
                             person.put("inspirebai", value);
                         }
                         System.out.println("Schema: " + schema + " :: " + value);
-                        value = jp.extractStringFromNextTag("value");
                     }
-                    jp.releaseLevel();
-                    if (jp.moveToFirstTag("urls")) {
-                        jp.restrictLevel();
-                        String homepage = jp.extractStringFromNextTag("value");
-                        if (homepage != null) {
-                            person.put("homepage", homepage);
-                            System.out.println("Homepage: " + homepage);
-                        }
-                        jp.releaseLevel();
+
+                    String homepage=jt.get("metadata").get("urls").get(0).get("value").toString();
+                    if (homepage != null) {
+                        person.put("homepage", homepage);
+                        System.out.println("Homepage: " + homepage);
                     }
-                    String categories = jp.extractStringFromNextTag("arxiv_categories");
-                    if (categories != null) {
-                        person.put("categories", categories);
-                        System.out.println("Categories: " + categories);
+
+                    JSONObject arxivCategoryList=jt.get("metadata").get("arxiv_categories");
+                    String categories="";
+                    for (JSONObject entry : arxivCategoryList) {
+                        categories+="|"+entry.toString();
+                    }
+                    if (categories.length()>1) {
+                        person.put("categories", categories.substring(1));
                     }
                 }
             }

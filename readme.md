@@ -1,6 +1,6 @@
 ## Installation
 
-Please download the latest release from GitHub and unpack it in a folder. After installing java, you can start Celsius it with java -jar Celsius4.jar.
+Please download the latest release from GitHub and unpack it in a folder. If Java is installed, you can start Celsius with java -jar Celsius4.jar.
 
 ## Introduction
 

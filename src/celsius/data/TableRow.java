@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.data;
 
 import celsius.components.library.Library;
@@ -27,7 +22,7 @@ import java.util.HashSet;
 public class TableRow {
     
     public Library library;
-    public String table; 
+    public String tableName; 
     public String id;
     public String lastError;
     public HashMap<String,String> properties;
@@ -41,7 +36,7 @@ public class TableRow {
     
     public TableRow(Library library, String table, String id, HashSet<String> pF) {
         this.library=library;
-        this.table=table;
+        this.tableName=table;
         this.id=id;
         lastError=null;
         properties = new HashMap<>();
@@ -55,28 +50,28 @@ public class TableRow {
     /**
      * Load item at loadLevel 1 with data in ResultSet
      * 
-     * @param lib
-     * @param tab
-     * @param rs
-     * @param pF 
+     * @param library
+     * @param tableName
+     * @param RS
+     * @param propertyKeys 
      */
-    public TableRow(Library lib, String tab, ResultSet rs, HashSet<String> pF) {
-        library=lib;
-        table=tab;
+    public TableRow(Library library, String tableName, ResultSet RS, HashSet<String> propertyKeys) {
+        this.library=library;
+        this.tableName=tableName;
         lastError=null;
         try {
             currentLoadLevel=1;
-            readIn(rs);
+            readIn(RS);
         } catch (Exception e) {
             e.printStackTrace();
             lastError="E2:"+e.toString();
         }
-        propertyKeys=pF;
+        this.propertyKeys=propertyKeys;
     }
 
     public TableRow(Library lib, String tab, HashSet<String> pF) {
         library=lib;
-        table=tab;
+        tableName=tab;
         lastError=null;
         properties=new HashMap<>();
         currentLoadLevel=0;
@@ -115,7 +110,7 @@ public class TableRow {
         if (currentLoadLevel>=targetLoadLevel) return;
         try {
             if (((currentLoadLevel<2) && (targetLoadLevel >= 2)) || ((currentLoadLevel<1) && (targetLoadLevel >= 1))) {
-                ResultSet rs = library.executeResEX("SELECT * FROM " + table + " where id = " + id + " LIMIT 1;");
+                ResultSet rs = library.executeResEX("SELECT * FROM " + tableName + " where id = " + id + " LIMIT 1;");
                 if (rs.next()) {
                     readIn(rs);
                     currentLoadLevel=2;
@@ -194,7 +189,7 @@ public class TableRow {
     public void save() throws Exception {
         library.RSC.out("Saving tablerow: "+toString());
         if (this.needsSaving()) {
-            if ((library.dbConnection!=null) && (table!=null) && (!table.isBlank())) {
+            if ((library.dbConnection!=null) && (tableName!=null) && (!tableName.isBlank())) {
                 
                 boolean saveAttributes = false;
                 Long l = ToolBox.now();
@@ -235,7 +230,7 @@ public class TableRow {
                         fieldsList += ",attributes";
                         qmarks += ",?";
                     }
-                    String sql="INSERT INTO "+table+" ("+fieldsList.substring(1)+") VALUES ("+qmarks.substring(1)+");";
+                    String sql="INSERT INTO "+tableName+" ("+fieldsList.substring(1)+") VALUES ("+qmarks.substring(1)+");";
                     System.out.println("Writing new Using SQL: "+sql);
                     PreparedStatement pstmt=library.dbConnection.prepareStatement(sql);
                     int i=1;
@@ -259,7 +254,7 @@ public class TableRow {
                     if (saveAttributes) {
                         fieldsList += ", `attributes` = ?";
                     }
-                    String sql="UPDATE "+table+" SET "+fieldsList.substring(1)+" WHERE id="+id;
+                    String sql="UPDATE "+tableName+" SET "+fieldsList.substring(1)+" WHERE id="+id;
                     library.RSC.out("DB::"+sql);
                     PreparedStatement pstmt=library.dbConnection.prepareStatement(sql);
                     int i=1;
@@ -318,7 +313,7 @@ public class TableRow {
             tmp.append(key.replaceAll("\\p{C}", "?"));
             tmp.append(": ");
             tmp.append(value.replaceAll("\\p{C}", "?"));
-            tmp.append(ToolBox.linesep);
+            tmp.append(ToolBox.LINE_SEPERATOR);
         }
         tmp.append("\n");
         tmp.append("Other properties:\n");
@@ -330,7 +325,7 @@ public class TableRow {
                 tmp.append(key.replaceAll("\\p{C}", "?"));
                 tmp.append(": ");
                 tmp.append(value.replaceAll("\\p{C}", "?"));
-                tmp.append(ToolBox.linesep);
+                tmp.append(ToolBox.LINE_SEPERATOR);
             }
         }
         return(tmp.toString());
@@ -375,7 +370,7 @@ public class TableRow {
     
     public String getLinkListString() {
         if (linkedItems.isEmpty()) return("");
-        StringBuffer out=new StringBuffer();
+        StringBuilder out=new StringBuilder();
         for (Integer i : linkedItems.keySet()) {
             out.append("<p><b>");
             out.append(library.linkTypes.get(i));

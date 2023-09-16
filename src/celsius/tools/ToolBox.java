@@ -33,12 +33,13 @@ public class ToolBox {
     
     private static int threadindex=0;
     
-    public final static String linesep = System.getProperty("line.separator");  // EndOfLine signal
-    public final static String filesep = System.getProperty("file.separator");  // EndOfLine signal
-    public final static String EOP=String.valueOf((char)12);   // EndOfPage signal
+    public final static String LINE_SEPERATOR = System.getProperty("line.separator");  // EndOfLine signal
+    public final static String FILE_SEPARATOR = System.getProperty("file.separator");  // EndOfLine signal
+    public final static String END_OF_PAGE=String.valueOf((char)12);   // EndOfPage signal
     
     /**
      * Returns a new index for each thread, for debugging in Msg1
+     * @return 
      */
     public static String getThreadIndex() {
         return(Integer.toString(threadindex++));
@@ -63,6 +64,7 @@ public class ToolBox {
     
     /**
      *  Returns current timestamp
+     * @return 
      */
     public static String getCurrentDate() {
         Date ActD=new Date();
@@ -75,6 +77,8 @@ public class ToolBox {
      * @param TI: Thread indicator
      * @param s : original file path
      * @param t : plaintext path
+     * @return 
+     * @throws java.io.IOException
      */
     public static int readNumberOfPagesOf(Resources RSC,String TI,String s,String t) throws IOException {
         RSC.out(TI+"Reading Number of Pages :: "+s);
@@ -99,7 +103,7 @@ public class ToolBox {
                 if (tmp.contains("%%Pages")) {
                     tmp=Parser.cutUntil(Parser.cutFrom(tmp," ")," ");
                     try {
-                        pages=Integer.valueOf(tmp);
+                        pages=Integer.parseInt(tmp);
                     } catch (NumberFormatException e) {
                         // %%Pages entry not working.
                         // Looking for another entry
@@ -110,7 +114,7 @@ public class ToolBox {
                         if (tmp.contains("%%Pages")) {
                             tmp=Parser.cutUntil(Parser.cutFrom(tmp," ")," ");
                             try {
-                                pages=Integer.valueOf(tmp);
+                                pages=Integer.parseInt(tmp);
                             } catch (NumberFormatException f) {
                                 // doesn't work either
                                 RSC.out(TI+"Unknown %%Pages format."); pages=-1;
@@ -145,7 +149,7 @@ public class ToolBox {
                 InputStreamReader isr = new InputStreamReader(fis);
                 BufferedReader br=new BufferedReader(isr);
                 while (((tmp=br.readLine())!=null))
-                    if (tmp.indexOf(ToolBox.EOP)>-1) pages++;
+                    if (tmp.contains(ToolBox.END_OF_PAGE)) pages++;
                 br.close(); isr.close(); fis.close();
             }
         } catch (IOException e) { RSC.out(TI+"Error reading pages: "+e.toString()); }
@@ -203,7 +207,7 @@ public class ToolBox {
     public static int intvalue(String s) {
         int i;
         try {
-            i=Integer.valueOf(s);
+            i=Integer.parseInt(s);
         } catch (Exception e) { i=0; }
         return(i);
     }
@@ -231,6 +235,8 @@ public class ToolBox {
 
     /**
      * Creates a Celsius author string from a BibTeX one
+     * @param tmp
+     * @return 
      */
     public static String authorsBibTeX2Cel(String tmp) {
         String authors="";

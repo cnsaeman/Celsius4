@@ -39,7 +39,7 @@ public class ChooseSearchResult extends javax.swing.JDialog {
         }
         jLSearchResults.setModel(DLM);
         result=-1;
-        GUIToolBox.centerDialog(this,parent);
+        RSC.guiTools.centerDialog(this);
     }
 
     /** This method is called from within the constructor to

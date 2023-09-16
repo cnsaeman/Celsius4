@@ -7,16 +7,14 @@
 
 package celsius;
 
-import atlantis.gui.FFilter;
 import atlantis.tools.ExecutionShell;
 import celsius.components.plugins.Plugin;
-import atlantis.gui.FillPainter;
 import atlantis.tools.FileTools;
 import atlantis.gui.GuiStates;
-import atlantis.gui.StandardResources;
+import atlantis.gui.GuiTools;
+import atlantis.gui.Icons;
 import atlantis.tools.TextFile;
 import atlantis.tools.Parser;
-import celsius.images.Icons;
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.MainFrame;
 import celsius.components.plugins.Plugins;
@@ -28,32 +26,25 @@ import celsius.data.ItemSelection;
 import celsius.components.library.Library;
 import celsius.components.library.LibraryTemplate;
 import celsius.data.Person;
-import celsius.components.library.RecentLibraryCache;
 import celsius.data.TableRow;
 import celsius.components.infopanel.InformationPanel;
-import atlantis.gui.MultiLineMessage;
+import atlantis.gui.StandardResources;
 import celsius.components.RegularWorker;
 import celsius.components.tableTabs.CelsiusTableModel;
 import celsius.tools.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,22 +53,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.nimbus.AbstractRegionPainter;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 /**
@@ -123,6 +104,9 @@ public class Resources implements StandardResources {
     public static final String pluginSetupIcon="iconmonstr-wrench-10.svg.16";
         
     public MainFrame MF;
+    public final GuiTools guiTools;
+    
+    public final Icons icons;
     public InformationPanel guiInformationPanel;
 
     public final ArrayList<CelsiusTable> celsiusTables;
@@ -136,7 +120,6 @@ public class Resources implements StandardResources {
     public ItemSelection lastItemSelection;
 
     public Plugins plugins;                    // protocol class
-    public Icons icons;       // class for all the icons
     public Configurator configuration;    // configuration handler
 
     public final ArrayList<LibraryTemplate> libraryTemplates;
@@ -154,7 +137,6 @@ public class Resources implements StandardResources {
     public GuiStates guiStates;
     
     public String celsiusBaseFolder;
-    private final Image appIcon;
 
     public boolean displayHidden;
 
@@ -162,12 +144,13 @@ public class Resources implements StandardResources {
     
     public final SimpleDateFormat SDF;
 
-    public Resources() {
+    public Resources(double guiScaleFactor) {
+        this.guiScaleFactor=guiScaleFactor;
         initLog();
         SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         celsiusBaseFolder = Parser.cutUntilLast((new File(".")).getAbsolutePath(), ".");
-        if (!celsiusBaseFolder.endsWith(ToolBox.filesep)) {
-            celsiusBaseFolder += ToolBox.filesep;
+        if (!celsiusBaseFolder.endsWith(ToolBox.FILE_SEPARATOR)) {
+            celsiusBaseFolder += ToolBox.FILE_SEPARATOR;
         }
         guiNotify=true;
         displayHidden=false;
@@ -186,15 +169,12 @@ public class Resources implements StandardResources {
         regularWorker=new RegularWorker(this);
         workerRunning=false;
         regularExecutor.scheduleAtFixedRate ( regularWorker, 0L , 15L , TimeUnit.SECONDS );
-        appIcon=Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif"));
+        icons = new Icons(CelsiusMain.class, "images", "celsius/images/", guiScaleFactor);
+        guiTools=new GuiTools(this,Toolkit.getDefaultToolkit().getImage(CelsiusMain.class.getResource("images/celsius.gif")),guiScaleFactor);
     }
     
     public MainFrame getMF() {
         return(MF);
-    }
-    
-    public Image getAppIcon() {
-        return(appIcon);
     }
     
     public void initResources() {
@@ -205,7 +185,7 @@ public class Resources implements StandardResources {
             if (!(new File("templates")).exists()) FileTools.makeDir("templates");
             out("RES>Loading configuration file...");
             configuration = new Configurator(this);
-            icons=new Icons(configuration.getConfigurationProperty("iconfolder"));
+            loadExternalIcons();
 
             out("RES>Loading library templates...");
             String templates[] = (new File("templates")).list();
@@ -215,11 +195,23 @@ public class Resources implements StandardResources {
         } catch (Exception e) {
             outEx(e);
             out("RES>Initializing of resources failed");
-            showWarning("Error while initializing of resources:\n" + e.toString()+"\nCelsius might not be started in the correct folder/directory.", "Exception:");
+            guiTools.showWarning("Exception:","Error while initializing of resources:\n" + e.toString()+"\nCelsius might not be started in the correct folder/directory.");
             System.exit(255);
         }
         out("RES>Setting Proxy server...");
         configuration.setProxy();
+    }
+    
+    public void loadExternalIcons() {
+        String baseFolder=configuration.getConfigurationProperty("iconfolder");
+        if (baseFolder.endsWith(ToolBox.FILE_SEPARATOR)) baseFolder.substring(0,baseFolder.length()-1);        
+        icons.readIn(baseFolder,"");
+    }
+    
+    public void reloadIcons() {
+        icons.clear();
+        icons.loadInternal();
+        loadExternalIcons();
     }
     
     public void emptyThreadPoolExecutor() {
@@ -245,7 +237,7 @@ public class Resources implements StandardResources {
         } catch (final Exception e) {
             outEx(e);
             out("Warning:Logging system initialization failed!");
-            showWarning("Logging system initialization failed!", "Warning!");
+            guiTools.showWarning("Warning!","Logging system initialization failed!");
             System.exit(100);
         }
     }
@@ -256,7 +248,7 @@ public class Resources implements StandardResources {
             FileTools.deleteIfExists(Resources.logFileName);
             initLog();
         } catch (Exception ex) {
-            showWarning("Error while resetting log file:\n" + ex.toString(), "Exception:");
+            guiTools.showWarning("Exception:","Error while resetting log file:\n" + ex.toString());
             outEx(ex);
         }
     }
@@ -298,7 +290,7 @@ public class Resources implements StandardResources {
     
     public String timestampToString(String ts) {
         if (ts==null) return "Not Set";
-        return(SDF.format(new Date(Long.valueOf(ts) * 1000)));        
+        return(SDF.format(new Date(Long.parseLong(ts) * 1000)));        
     }
 
     public Library getCurrentlySelectedLibrary() {
@@ -327,6 +319,7 @@ public class Resources implements StandardResources {
         out("");
     }
 
+    @Override
     public void out(String s) {
         try {
             logFile.putString(s);
@@ -337,9 +330,10 @@ public class Resources implements StandardResources {
     }
 
     public void out(int ll,String s) {
-        if (ll<=logLevel) out(s);
+        if (ll <= logLevel) out(s);
     }
     
+    @Override
     public void outEx(Exception e) {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
@@ -347,7 +341,7 @@ public class Resources implements StandardResources {
         if (MF!=null) {
             String out=sw.toString();
             if (out.length()>10001) out=out.substring(0,1000);
-            showLongInformation("Exception:", out);
+            guiTools.showLongInformation("Exception:", out);
         }
     }
 
@@ -358,7 +352,7 @@ public class Resources implements StandardResources {
         if (MF!=null) {
             String out=sw.toString();
             if (out.length()>10001) out=out.substring(0,1000);
-            showLongInformation("Exception:", out);
+            guiTools.showLongInformation("Exception:", out);
         }
     }
 
@@ -369,7 +363,7 @@ public class Resources implements StandardResources {
         if (MF!=null) {
             String out=msg+sw.toString();
             if (out.length()>10001) out=out.substring(0,1000);
-            showLongInformation("Exception:", out);
+            guiTools.showLongInformation("Exception:", out);
         }
     }
     
@@ -388,11 +382,10 @@ public class Resources implements StandardResources {
         try {
             out();
             out("RES>Application closed at: " + ToolBox.getCurrentDate());
-            //Msg1.finalize();
         } catch (final Exception e) {
             outEx(e);
             (new SafeMessage("Protocol file finalization failed:" + e.toString(), "Exception:", 0)).showMsg();
-            showWarning("RES>Messager finalization failed!", "Warning!");
+            guiTools.showWarning("Warning!","RES>Messager finalization failed!");
         }
         try {
             logFile.close();
@@ -444,75 +437,43 @@ public class Resources implements StandardResources {
         }
     }
     
-    public int guiScale(int v) {
-        return (int) (v*guiScaleFactor);
-    }
-    
-    public URL getImageURL(String s) {
-        if (guiScaleFactor>1.9) {
-            s=s+".2x";
-        }
-        return getClass().getResource("/celsius/images/"+s+".png") ;
-    }
-    
-    public Image getImage(String s) {
-        if (guiScaleFactor>1.9) {
-            s=s+".2x";
-        }
-        Image out=null;
-        try {
-            out=icons.getIcon(s).getImage();
-        } catch (Exception ex) {
-            out("ERROR!! Cannot load image "+s);
-        }
-        return out;
-    }
-    
-    public ImageIcon getScaledIcon(String s) {
-        if (guiScaleFactor>1.9) {
-            s=s+".2x";
-        }
-        //if (s==null) return(get("default"));
-        if (s==null) return(null);
-        if (s.equals("")) return(null);
-        if (s.length()==0) return(icons.get("default"));
-        if (!icons.containsKey(s)) return(icons.get("notavailable"));
-        return(icons.get(s));
-    }
-    
     public void adjustComponents(Component[] comp) {
-        for(int x = 0; x < comp.length; x++)
-        {
-          if(comp[x] instanceof Container) adjustComponents(((Container)comp[x]).getComponents());
-          try{
-              if (comp[x].getFont().getSize()<20) comp[x].setFont(new java.awt.Font("Arial", 0, guiScale(12)));
-              if (guiScaleFactor>1) {
-                  if (comp[x] instanceof JRadioButton) {
-                      ((JRadioButton)comp[x]).setIcon(getScaledIcon("iconmonstr-shape-20.svg.16"));
-                      ((JRadioButton)comp[x]).setSelectedIcon(getScaledIcon("iconmonstr-checkbox-28.svg.16"));
-                      ((JRadioButton)comp[x]).setRolloverIcon(getScaledIcon("iconmonstr-shape-20.svg.16"));
-                      ((JRadioButton)comp[x]).setIconTextGap(guiScale(3));
-                  }
-                  if (comp[x] instanceof JCheckBox) {
-                        ((JCheckBox)comp[x]).setIcon(getScaledIcon("iconmonstr-square-4.svg.16"));
-                        ((JCheckBox)comp[x]).setSelectedIcon(getScaledIcon("iconmonstr-checkbox-4.svg.16"));
-                        ((JCheckBox)comp[x]).setRolloverIcon(getScaledIcon("iconmonstr-square-4.svg.16"));
-                        ((JCheckBox)comp[x]).setIconTextGap(guiScale(3));
-                  }
-              }
-          }
-          catch(Exception e){}//do nothing
+        for (Component comp1 : comp) {
+            if (comp1 instanceof Container) {
+                adjustComponents(((Container) comp1).getComponents());
+            }
+            try {
+                if (comp1.getFont().getSize() < 20) {
+                    comp1.setFont(new java.awt.Font("Arial", 0, guiTools.guiScale(12)));
+                }
+                if (guiScaleFactor>1) {
+                    if (comp1 instanceof JRadioButton) {
+                        ((JRadioButton) comp1).setIcon(icons.getScaledIcon("iconmonstr-shape-20.svg.16"));
+                        ((JRadioButton) comp1).setSelectedIcon(icons.getScaledIcon("iconmonstr-checkbox-28.svg.16"));
+                        ((JRadioButton) comp1).setRolloverIcon(icons.getScaledIcon("iconmonstr-shape-20.svg.16"));
+                        ((JRadioButton) comp1).setIconTextGap(guiTools.guiScale(3));
+                    }
+                    if (comp1 instanceof JCheckBox) {
+                        ((JCheckBox) comp1).setIcon(icons.getScaledIcon("iconmonstr-square-4.svg.16"));
+                        ((JCheckBox) comp1).setSelectedIcon(icons.getScaledIcon("iconmonstr-checkbox-4.svg.16"));
+                        ((JCheckBox) comp1).setRolloverIcon(icons.getScaledIcon("iconmonstr-square-4.svg.16"));
+                        ((JCheckBox) comp1).setIconTextGap(guiTools.guiScale(3));
+                    }
+                }
+            }catch(Exception e){}//do nothing
         }
     }    
     
     /**
      * Create the journal link command
+     * @param item
+     * @return 
      */
     public String getJournalLinkCmd(Item item) {
         if (item == null)
             return("");
         BibTeXRecord BR=new BibTeXRecord(item.get("bibtex"));
-        String tag,gtag;
+        String gtag;
         String tmp1=journalLinks.get(BR.get("journal"));
         if (tmp1 == null)
             return("");
@@ -539,12 +500,14 @@ public class Resources implements StandardResources {
         rememberDir(dir,f.getAbsolutePath());
     }
 
+    @Override
     public void rememberDir(String dir, String folderPath) {
         if (getCurrentlySelectedLibrary()==null) return;
         getCurrentlySelectedLibrary().setConfiguration("dir::"+dir,folderPath);
     }
     
     
+    @Override
     public String getDir(String dir) {
         if (getCurrentlySelectedLibrary()==null) return(".");
         String ret=getCurrentlySelectedLibrary().config.get("dir::"+dir);
@@ -556,128 +519,7 @@ public class Resources implements StandardResources {
         getCurrentTable().title=title;
         MF.jTPTabList.setTabComponentAt(MF.jTPTabList.getSelectedIndex(), new TabLabel(title,icon,this,getCurrentTable(),true));
     }
-
-    // TODO: Can be deleted after sufficient testing
-    public void setLookAndFeelOld() {
-        try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        // Change Nimbus defaults
-        UIManager.put("nimbusBase", new Color(239,240,241));
-        UIManager.put("nimbusBlueGrey", new Color(239,240,241));
-        UIManager.put("control", new Color(239,240,241));
-        UIManager.put("nimbusFocus", new Color(115,164,209));
-        UIManager.put("nimbusSelectionBackground", new Color(61,174,233));
-        UIManager.put("nimbusSelection", new Color(61,174,233));
-        UIManager.put("textBackground", new Color(61,174,233));
-        UIManager.put("textHighlight", new Color(61,174,233));
-        UIManager.put("nimbusOrange", new Color(61,174,233));
-        // Below: Adjust font sizes for menus etc.
-        // For some reaons, the ofnt for menu change itself doesn't work, done manually in MainFrame.java
-        UIDefaults defaults = UIManager.getDefaults();
-        UIManager.getDefaults().put("MenuBar:Menu[Selected].backgroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("MenuBar:Menu[Enabled].textForeground",new Color(0,0,0));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Finished].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled+Indeterminate].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Disabled].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Finished].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled+Indeterminate].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        UIManager.getDefaults().put("ProgressBar[Enabled].foregroundPainter",new atlantis.gui.FillPainter(new Color(61,174,233)));
-        final FontUIResource fnt11 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(11)));
-        final FontUIResource fnt12 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(12)));
-        // Set all fonts to 12
-        Enumeration enumer = UIManager.getLookAndFeelDefaults().keys();
-        while (enumer.hasMoreElements()) {
-            Object key = enumer.nextElement();
-            Object value = UIManager.get(key);
-            if (value instanceof javax.swing.plaf.FontUIResource) {
-                //System.out.println("LAF:key:"+key);
-                UIManager.getDefaults().put(key, new javax.swing.plaf.FontUIResource(fnt12));
-                UIManager.put(key, new javax.swing.plaf.FontUIResource(fnt12));
-            }
-        }
-        UIManager.getLookAndFeelDefaults().put("MenuBar.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("Menu.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("MenuItem.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("RadioButtonMenuItem.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("CheckBoxMenuItem.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("Table.font", fnt12);
-        UIManager.getLookAndFeelDefaults().put("TableHeader.font", fnt12);
-        UIManager.getLookAndFeelDefaults().put("TextField.font", fnt12);
-        UIManager.getLookAndFeelDefaults().put("TextArea.font", fnt12);
-        UIManager.getLookAndFeelDefaults().put("PopupMenu.font",fnt12); 
-        UIManager.getLookAndFeelDefaults().put("PopupMenuItem.font",fnt12);
-        /*UIManager.getLookAndFeelDefaults().put("Button.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("ToggleButton.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("RadioButton.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("CheckBox.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("ComboBox.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("List.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("Label.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("EditorPane.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("Tree.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("TitledBorder.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("ToolTip.font", fnt11);*/
-        UIManager.put("Table.rowHeight", guiScale(18));
-        UIManager.getLookAndFeelDefaults().put("Menu.margin", new javax.swing.plaf.InsetsUIResource(guiScale(2),guiScale(2),guiScale(2),guiScale(2)));
-    }
-
-    public void setLookAndFeel() {
-        NimbusLookAndFeel laf = new NimbusLookAndFeel();
-        final FontUIResource fnt11 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(11)));
-        final FontUIResource fnt12 = new FontUIResource(new java.awt.Font("SansSerif", 0, guiScale(12)));
-        final ColorUIResource baseGrey = new ColorUIResource(new Color(239,240,241));
-        final ColorUIResource blue1 = new ColorUIResource(new Color(61,174,233));
-        final ColorUIResource blue2 = new ColorUIResource(new Color(115,164,209));
-        final ColorUIResource black = new ColorUIResource(new Color(0,0,0));
-        final FillPainter bluePainter = new atlantis.gui.FillPainter(blue1);
-        // adjust colors
-        String[] grey=new String[] {"nimbusBase","nimbusBlueGrey","control"};
-        for (String col : grey) { laf.getDefaults().put(col,baseGrey); }
-        String[] blue=new String[] {"nimbusFocus", "nimbusSelectionBackground","nimbusSelection", "textBackground", "textHighlight", "nimbusOrange"};
-        for (String col : blue) { laf.getDefaults().put(col,blue1); }
-        UIManager.getDefaults().put("MenuBar:Menu[Enabled].textForeground",black);
-        
-        // adjust painters
-        String[] fpainters=new String[] {"MenuBar:Menu[Selected].backgroundPainter","ProgressBar[Disabled+Finished].foregroundPainter",
-                                         "ProgressBar[Disabled+Indeterminate].foregroundPainter","ProgressBar[Disabled].foregroundPainter",
-                                         "ProgressBar[Enabled+Finished].foregroundPainter","ProgressBar[Enabled+Indeterminate].foregroundPainter","ProgressBar[Enabled].foregroundPainter"
-                                         };
-        for (String fp : fpainters) { laf.getDefaults().put(fp,bluePainter); }
-        
-        // adjust fonts
-        Enumeration enumer = laf.getDefaults().keys();
-        while (enumer.hasMoreElements()) {
-            Object key = enumer.nextElement();
-            Object value = UIManager.get(key);
-            if (value instanceof javax.swing.plaf.FontUIResource) {
-                System.out.println("LAF:key:"+key);
-                laf.getDefaults().put(key, new javax.swing.plaf.FontUIResource(fnt12));
-            }
-        }
-        UIManager.getLookAndFeelDefaults().put("PopupMenuItem.font",fnt12);
-        UIManager.getLookAndFeelDefaults().put("TableHeader[MouseOver].font",fnt12);
-        /*UIManager.getLookAndFeelDefaults().put(, fnt11);
-        UIManager.getLookAndFeelDefaults().put("ToggleButton.font", fnt11);
-        UIManager.getLookAndFeelDefaults().put("ToolTip.font", fnt11);*/
-        
-        laf.getDefaults().put("Table.rowHeight", guiScale(18));
-        laf.getDefaults().put("Menu.margin", new javax.swing.plaf.InsetsUIResource(guiScale(2),guiScale(2),guiScale(2),guiScale(2)));
-        try {
-            UIManager.setLookAndFeel(laf);        
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    
+   
     // guarantees tab and turns it into one with given description
     public CelsiusTable guaranteeTableAvailable(int tableType, String title, String icon) {
         CelsiusTable celsiusTable;
@@ -729,28 +571,32 @@ public class Resources implements StandardResources {
         return(celsiusTable);
     }
     
+    public int guiScale(int i) {
+        return(guiTools.guiScale(i));
+    }
+    
     public Font stdFontMono() {
-        return(new java.awt.Font("Monospaced", 0, guiScale(12)));        
+        return(new java.awt.Font("Monospaced", 0, guiTools.guiScale(12)));        
     }
     
     public Border stdBorder() {
-        return(BorderFactory.createEmptyBorder(guiScale(5), guiScale(5), guiScale(5), guiScale(5)));
+        return(BorderFactory.createEmptyBorder(guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(5)));
     }
 
     public Border stdBordermN() {
-        return(BorderFactory.createEmptyBorder(guiScale(0), guiScale(5), guiScale(5), guiScale(5)));
+        return(BorderFactory.createEmptyBorder(guiTools.guiScale(0), guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(5)));
     }
 
     public Border stdBordermS() {
-        return(BorderFactory.createEmptyBorder(guiScale(5), guiScale(5), guiScale(0), guiScale(5)));
+        return(BorderFactory.createEmptyBorder(guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(0), guiTools.guiScale(5)));
     }
     
     public Border stdBordermE() {
-        return(BorderFactory.createEmptyBorder(guiScale(5), guiScale(5), guiScale(5), guiScale(0)));
+        return(BorderFactory.createEmptyBorder(guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(5), guiTools.guiScale(0)));
     }
     
     public Border stdBordermW() {
-        return(BorderFactory.createEmptyBorder(guiScale(5), guiScale(0), guiScale(5), guiScale(5)));
+        return(BorderFactory.createEmptyBorder(guiTools.guiScale(5), guiTools.guiScale(0), guiTools.guiScale(5), guiTools.guiScale(5)));
     }
     
     public String getTableRowIDs(ArrayList<TableRow> tableRows) {
@@ -768,6 +614,7 @@ public class Resources implements StandardResources {
      */
     public void setMainFrame(MainFrame MF) {
         this.MF=MF;
+        guiTools.MF=MF;
     }
     
     public final static Object[] optionsYNC = { "Yes", "No", "Cancel" };
@@ -775,167 +622,6 @@ public class Resources implements StandardResources {
     public final static Object[] optionsYN = { "Yes", "No" };    
 
      
-   /**
-     * Center the current JDialog frame over main frame
-     */
-    public void centerDialog(JDialog frame) {
-        Point p=MF.getLocationOnScreen();
-        Dimension d=MF.getSize();
-        frame.setLocation(p.x+(d.width/2)-(frame.getWidth()/2),p.y+(d.height/2)-(frame.getHeight()/2));
-        /*Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-        DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
-        frame.setLocation(bounds.x+dm.getWidth()/2 - (frame.getWidth()/2),bounds.y+dm.getHeight()/2 - (frame.getHeight()/2));*/
-    }
-    
-    /**
-     * Shows an information message dialog
-     * 
-     * @param title : title of dialog
-     * @param msg : message to be displayed
-     */
-    public void showInformation(String title, String msg) {        
-        JOptionPane.showMessageDialog(MF,msg,title, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    /**
-     * Shows a long information message dialog
-     * 
-     * @param title : title of dialog
-     * @param msg : message to be displayed
-     */
-    public void showLongInformation(String title, String msg) {        
-        MultiLineMessage MLM=new MultiLineMessage(this,title,msg);
-        MLM.setVisible(true);
-    }
-    
-    /**
-     * Shows a warning message dialog
-     * 
-     * @param title : title of dialog
-     * @param msg : message to be displayed
-     */
-    public void showWarning(String message, String title) {
-        JOptionPane.showMessageDialog(MF, message, title, JOptionPane.WARNING_MESSAGE);
-    }
-    
-    /**
-     * Question dialog with options OC
-     * 
-     * @param msg
-     * @param head
-     * @return 
-     */
-    public int askQuestionOC(String msg,String head) {
-        return(JOptionPane.showOptionDialog(MF,msg, head, JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,null, optionsOC, optionsOC[0]));
-    }
-    
-    /**
-     * Question dialog with options YNC
-     * 
-     * @param msg
-     * @param head
-     * @return 
-     */
-    public int askQuestionYNC(String msg,String head) {
-        return(JOptionPane.showOptionDialog(MF, msg, head,
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, optionsYNC, optionsYNC[0]));
-    }
-    
-    /**
-     * Question dialog with options YN
-     * 
-     * @param msg
-     * @param head
-     * @return 
-     */
-    public int askQuestionYN(String msg,String head) {
-        return(JOptionPane.showOptionDialog(MF, msg, head,
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, optionsYN, optionsYN[0]));
-    }
-    
-    /**
-     * Question dialog with two choices: A,B
-     */
-    public int askQuestionAB(String msg,String head,String A,String B) {
-        Object[] options=new Object[2];
-        options[0]=A; options[1]=B;
-        return(JOptionPane.showOptionDialog(MF, msg, head,
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, options, options[0]));
-    }
-
-    /**
-     * Question dialog with three choices: A, B, C
-     */
-    public int askQuestionABC(String msg,String head,String A,String B,String C) {
-        Object[] options=new Object[3];
-        options[0]=A; options[1]=B; options[2]=C;
-        return(JOptionPane.showOptionDialog(MF, msg, head,
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, options, options[0]));
-    }
-            
-    /**
-     * Question dialog with three choices: A, B, C
-     */
-    public int askQuestionABCD(String msg,String head,String A,String B,String C,String D) {
-        Object[] options=new Object[4];
-        options[0]=A; options[1]=B; options[2]=C; options[3]=D;
-        return(JOptionPane.showOptionDialog(MF, msg, head,
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                null, options, options[0]));
-    }
-
-    /**
-     * Let user select folder
-     *
-     * @param RSC
-     * @param title : title of dialogue
-     * @param name : name to remember directory
-     * @return
-     */
-    public String selectFolder(String title, String name) {
-        JFileChooser FC = new JFileChooser();
-        FC.setDialogTitle(title);
-        FC.setCurrentDirectory(new File(getDir(name)));
-        FC.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        FC.setDialogType(JFileChooser.OPEN_DIALOG);
-        FC.setFileFilter(new FFilter("_DIR", "Folders"));
-        // cancelled?
-        if (!(FC.showOpenDialog(MF) == JFileChooser.CANCEL_OPTION)) {
-            rememberDir(name, FC.getSelectedFile().getAbsolutePath());
-            return FC.getSelectedFile().getAbsolutePath();
-        }
-        return null;
-    }
-
-    /**
-     * Let user select a file
-     *
-     * @param RSC
-     * @param title : title of dialogue
-     * @param name : name to remember directory
-     * @param fileTypeShort : e.g. .csv
-     * @param fileTypeLong : e.g. CSV-files
-     * @return
-     */
-    public String selectFile(String title, String name, String fileTypeShort, String fileTypeLong) {
-        JFileChooser FC = new JFileChooser();
-        FC.setDialogTitle(title);
-        FC.setCurrentDirectory(new File(getDir(name)));
-        FC.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        FC.setDialogType(JFileChooser.OPEN_DIALOG);
-        FC.setFileFilter(new FFilter(fileTypeShort, fileTypeLong));
-        // cancelled?
-        if (!(FC.showOpenDialog(MF) == JFileChooser.CANCEL_OPTION)) {
-            rememberDir(name, FC.getSelectedFile().getParent());
-            return FC.getSelectedFile().getAbsolutePath();
-        }
-        return null;
-    }
-
     public void setSelectedLibrary(int i) {
         if ((i > -1) && (i < MF.jCBLibraries.getItemCount())) {
             MF.jCBLibraries.setSelectedIndex(i);
@@ -948,12 +634,10 @@ public class Resources implements StandardResources {
             return "";
         }
         Plugin plugin = plugins.get(n);
-        String params = plugins.parameters.get(n);
-        Library Lib = getCurrentlySelectedLibrary();
         if (item == null) {
             return "";
         }
-        ArrayList<String> msg = new ArrayList<String>();
+        ArrayList<String> msg = new ArrayList<>();
         HashMap<String,String> communication=new HashMap<>();
         try {
             Thread tst = plugin.Initialize(item, communication, msg);
@@ -961,7 +645,7 @@ public class Resources implements StandardResources {
             tst.join();
         } catch (Exception ex) {
             out("jIP>Error while running BibPlugin: " + plugin.metaData.get("title") + ". Exception: " + ex.toString());
-            showWarning("Error while applying Bibplugins:\n" + ex.toString(), "Exception:");
+            guiTools.showWarning("Exception:","Error while applying Bibplugins:\n" + ex.toString());
             outEx(ex);
         }
         return communication.get("output");
@@ -975,7 +659,7 @@ public class Resources implements StandardResources {
         if (item == null) {
             return;
         }
-        if (item.linkedAttachments.size() > 0) {
+        if (!item.linkedAttachments.isEmpty()) {
             configuration.view(item, 0);
         } else {
             String cmdln = getJournalLinkCmd(item);
@@ -987,12 +671,12 @@ public class Resources implements StandardResources {
                     configuration.viewHTML(item.get("url"));
                 } else {
                     if (item.getS("links").length() > 0) {
-                        if (item.getS("links").indexOf("combines") > -1) {
+                        if (item.getS("links").contains("combines")) {
                             MF.showLinksOfType("combines");
                         }
                         MF.showLinksOfType("Available Links");
                     } else {
-                        showWarning("No file or journal link associated with this entry.", "Warning");
+                        guiTools.showWarning("Warning","No file or journal link associated with this entry.");
                     }
                 }
             }
@@ -1017,7 +701,7 @@ public class Resources implements StandardResources {
     }
 
     public void loadShortCuts() {
-        shortCuts = new HashMap<String, String>();
+        shortCuts = new HashMap<>();
         try {
             TextFile TD = new TextFile("celsius.shortcuts");
             String tmp;
@@ -1049,6 +733,16 @@ public class Resources implements StandardResources {
             for (TableRow tableRow : celsiusTable.getSelectedRows())
                 celsiusTable.removeRow(tableRow);
         }
+    }
+
+    @Override
+    public GuiTools getGuiTools() {
+        return(guiTools);
+    }
+    
+    @Override
+    public Icons getIcons() {
+        return(icons);
     }
     
 }

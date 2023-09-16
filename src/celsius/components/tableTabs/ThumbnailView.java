@@ -167,7 +167,7 @@ public class ThumbnailView extends javax.swing.JPanel implements TableModelListe
     @Override
     public void keyReleased(KeyEvent e) {
         // TODO: needs to be optimized for lines that are partially filled
-        int tx=(thumbnails.size()>0 ? getWidth()/(thumbnails.get(0).getWidth()) : 0);
+        int tx=(!thumbnails.isEmpty() ? getWidth()/(thumbnails.get(0).getWidth()) : 0);
         if (e.getKeyCode() == 36)
             modifySelection(0, e.isShiftDown());
         if (e.getKeyCode() == 37)

@@ -14,21 +14,16 @@
 package celsius.gui;
 
 import atlantis.gui.FFilter;
-import atlantis.gui.SingleLineEditor;
 import atlantis.gui.MultiLineEditor;
 import atlantis.tools.ExecutionShell;
 import atlantis.tools.FileTools;
 import atlantis.tools.TextFile;
 import celsius.components.plugins.Plugins;
-import celsius.components.plugins.Plugin;
-import celsius.images.Icons;
 import celsius.Resources;
-import atlantis.tools.Parser;
 import celsius.*;
 import celsius.tools.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.DefaultComboBoxModel;
@@ -43,23 +38,15 @@ import javax.swing.UIManager.LookAndFeelInfo;
  */
 public class EditConfiguration extends javax.swing.JDialog {
     
-    private MainFrame MF;
     private final Resources RSC;
     private Configurator configuration;
-    private String filename;
-
-    private DefaultListModel LM1,LM2,LM3;
-    private Plugins Plugins;
-
-    private String type,name;
 
     
     /** Creates new form DialogConfiguration */
-    public EditConfiguration(MainFrame parent, Configurator cfg) {
-        super(parent, true);
-        RSC=parent.RSC;
-        MF=parent;
-        configuration=cfg;
+    public EditConfiguration(Resources RSC) {
+        super(RSC.MF, true);
+        this.RSC=RSC;
+        configuration=RSC.configuration;
         
         initComponents();
         addWindowListener(new WindowAdapter() {
@@ -70,7 +57,7 @@ public class EditConfiguration extends javax.swing.JDialog {
         });
         jTabbedPane1.setTabComponentAt(0, new TabLabel("General Configuration",Resources.pluginSetupIcon,RSC,null,false));
         jTabbedPane1.setTabComponentAt(1, new TabLabel("File support","default",RSC,null,false));
-        setIconImage(RSC.getAppIcon());
+        setIconImage(RSC.guiTools.appIcon);
         jLFileTypes.setModel(configuration.getTypeDLM());
         jLFileTypes.setSelectedIndex(0);
         jTFIconFolder.setText(RSC.configuration.getConfigurationProperty("iconfolder"));
@@ -95,7 +82,7 @@ public class EditConfiguration extends javax.swing.JDialog {
         jTFproxyport.setEnabled(configuration.getConfigurationProperty("proxy").equals("true"));
         jCBproxy.setSelected(configuration.getConfigurationProperty("proxy").equals("true"));
     }
-
+    
     private void addPlugin(DefaultListModel LM, String type) {
         JFileChooser FC = new JFileChooser();
         FC.setDialogTitle("Please choose a plugin file");
@@ -556,20 +543,20 @@ public class EditConfiguration extends javax.swing.JDialog {
                 if (gzipped)
                 TextFile.GZip(location);
                 // Gebe die Meldungen des Extraktors aus
-                RSC.showInformation(ES.output+"\n"+ES.errorMsg,"Messages of extractor");
+                RSC.guiTools.showInformation(ES.output+"\n"+ES.errorMsg,"Messages of extractor");
                 // Gebe die ersten 60 Zeichen aus.
                 TextFile f1=new TextFile(location+".ttxxtt");
                 String output="";
-                while (f1.ready() && (output.length()<300) && (output.indexOf(ToolBox.EOP)==-1)) {
+                while (f1.ready() && (output.length()<300) && (!output.contains(ToolBox.END_OF_PAGE))) {
                     output+="\n"+f1.getString().trim();
                 }
                 f1.close();
                 if (output.length()>60) output=output.substring(0,60);
-                RSC.showInformation(output,"Results of extraction, first 60 characters");
+                RSC.guiTools.showInformation(output,"Results of extraction, first 60 characters");
                 FileTools.deleteIfExists(location+".ttxxtt");
             } catch (Exception e) {
                 RSC.outEx(e);
-                RSC.showWarning("Error Msg:"+e.toString(),"Error encountered!");
+                RSC.guiTools.showWarning("Error encountered!","Error Msg:"+e.toString());
             }
         }
     }//GEN-LAST:event_jBtnTest2ActionPerformed
@@ -589,14 +576,12 @@ public class EditConfiguration extends javax.swing.JDialog {
     }//GEN-LAST:event_jBtnRemoveActionPerformed
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        SingleLineEditor DSLE=new SingleLineEditor(RSC,"Please enter a new filetype","filetype, e.g. pdf",false);
-        DSLE.setVisible(true);
-        if (!DSLE.cancelled) {
-            configuration.addFileType(DSLE.text);
-            ((DefaultListModel)jLFileTypes.getModel()).addElement(DSLE.text);
+        String fileType=RSC.guiTools.askQuestionString("Please enter a new filetype","filetype, e.g. pdf",false);
+        if (fileType!=null) {
+            configuration.addFileType(fileType);
+            ((DefaultListModel)jLFileTypes.getModel()).addElement(fileType);
             jTFView.setText("use standard viewer");
         }
-        DSLE.dispose();
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jLFileTypesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLFileTypesValueChanged
@@ -630,7 +615,7 @@ public class EditConfiguration extends javax.swing.JDialog {
     }//GEN-LAST:event_jBtnChooseIconFolderActionPerformed
 
     private void jBtnReloadIconsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnReloadIconsActionPerformed
-        RSC.icons=new Icons(configuration.getConfigurationProperty("iconfolder"));
+        RSC.reloadIcons();
         jCBIcons.setModel(RSC.icons.getDCBM());
         jCBIcons.setRenderer(new CBRenderer(RSC.icons,RSC.getCurrentlySelectedLibrary().iconDictionary,RSC));
     }//GEN-LAST:event_jBtnReloadIconsActionPerformed
@@ -644,7 +629,7 @@ public class EditConfiguration extends javax.swing.JDialog {
             }
             SC.close();
             tmp = tmp.substring(1);
-            MultiLineEditor DMLE = new MultiLineEditor(RSC, "Edit Journallinks", tmp);
+            MultiLineEditor DMLE = new MultiLineEditor(RSC.guiTools, "Edit Journallinks", tmp);
             DMLE.setVisible(true);
             if (!DMLE.cancelled) {
                 SC = new TextFile("celsius.journallinks", false);
@@ -666,14 +651,14 @@ public class EditConfiguration extends javax.swing.JDialog {
             }
             SC.close();
             tmp = tmp.substring(1);
-            MultiLineEditor DMLE = new MultiLineEditor(RSC, "Edit Shortcuts", tmp);
+            MultiLineEditor DMLE = new MultiLineEditor(RSC.guiTools, "Edit Shortcuts", tmp);
             DMLE.setVisible(true);
             if (!DMLE.cancelled) {
                 SC = new TextFile("celsius.shortcuts", false);
                 SC.putString(DMLE.text);
                 SC.close();
                 RSC.loadShortCuts();
-                MF.setShortCuts();
+                RSC.MF.setShortCuts();
             }
         } catch (IOException ex) {
             RSC.outEx(ex);
@@ -682,7 +667,6 @@ public class EditConfiguration extends javax.swing.JDialog {
 
     private void jBtnTest4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTest4ActionPerformed
         if (jLFileTypes.getSelectedIndex()==-1) return;
-        String filetype=(String)jLFileTypes.getSelectedValue();
         JFileChooser FC=new JFileChooser();
         FC.setDialogTitle("Select a pdf-file to annotate");
         FC.setFileFilter(new FFilter("pdf","pdf-files"));
@@ -701,14 +685,13 @@ public class EditConfiguration extends javax.swing.JDialog {
     }//GEN-LAST:event_jBtnTest4ActionPerformed
 
     private void jCBproxyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBproxyActionPerformed
-        RSC.showInformation("Note that Celsius has to be restarted for the\nproxy settings to be changed.","Warning");
+        RSC.guiTools.showInformation("Note that Celsius has to be restarted for the\nproxy settings to be changed.","Warning");
         jTFproxyaddress.setEnabled(jCBproxy.isSelected());
         jTFproxyport.setEnabled(jCBproxy.isSelected());
     }//GEN-LAST:event_jCBproxyActionPerformed
 
     private void jBtnTest1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTest1ActionPerformed
         if (jLFileTypes.getSelectedIndex()==-1) return;
-        String filetype=(String)jLFileTypes.getSelectedValue();
         JFileChooser FC=new JFileChooser();
         FC.setDialogTitle("Select a document to add");
         FC.setFileFilter(new FFilter("","All files"));
@@ -783,7 +766,7 @@ public class EditConfiguration extends javax.swing.JDialog {
         } catch (Exception ex) {
             RSC.outEx(ex);
         }
-        GUIToolBox.centerDialog(this,RSC.MF);
+        RSC.guiTools.centerDialog(this);
         this.setVisible(true);
     }
 

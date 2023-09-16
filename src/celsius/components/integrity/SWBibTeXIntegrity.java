@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.integrity;
 
 import celsius.components.SWListItems;
@@ -10,7 +5,6 @@ import celsius.components.bibliography.BibTeXRecord;
 import celsius.data.Item;
 import celsius.components.tableTabs.CelsiusTable;
 import java.sql.ResultSet;
-import java.util.List;
 
 /**
  *

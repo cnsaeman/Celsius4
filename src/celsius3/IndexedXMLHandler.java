@@ -179,7 +179,7 @@ public class IndexedXMLHandler {
         while(dis.available()>0) {
             rl=dis.readUTF();
             if (rl.equals("<element>")) {
-                if (elt.size()>0) addElt(elt);
+                if (!elt.isEmpty()) addElt(elt);
                 elt=new ArrayList<String>();
                 for (int i=0;i<XMLTags.size();i++) elt.add(null);
             } else {

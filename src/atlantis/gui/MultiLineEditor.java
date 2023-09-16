@@ -14,18 +14,16 @@ public class MultiLineEditor extends javax.swing.JDialog {
     
     public String text;
     public boolean cancelled;
-    private final StandardResources RSC;
     
     private final AtlantisTextArea jText;
     
     /** Creates new form DialogMultiLineEditor */
-    public MultiLineEditor(StandardResources RSC, String title, String text) {
-        super(RSC.getMF(), true);
-        this.RSC=RSC;
-        setIconImage(RSC.getAppIcon());
+    public MultiLineEditor(GuiTools guiTools, String title, String text) {
+        super(guiTools.MF, true);
+        setIconImage(guiTools.appIcon);
         this.setTitle(title);
         initComponents();
-        jText = new AtlantisTextArea(RSC.guiScale(12));
+        jText = new AtlantisTextArea(guiTools.guiScale(12));
         jText.setColumns(20);
         jText.setRows(5);
         jScrollPane1.setViewportView(jText);
@@ -45,8 +43,8 @@ public class MultiLineEditor extends javax.swing.JDialog {
         this.text=text;
         jText.setText(text);
         jText.setCaretPosition(0);
-        this.setSize(RSC.guiScale(400), RSC.guiScale(300));
-        RSC.centerDialog(this);
+        this.setSize(guiTools.guiScale(400), guiTools.guiScale(300));
+        guiTools.centerDialog(this);
     }
 
     public void setLineWrapping(boolean b) {

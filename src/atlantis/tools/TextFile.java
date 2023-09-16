@@ -9,18 +9,21 @@ import java.util.Properties;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.text.DecimalFormat;
 import java.util.zip.*;
 
-// to be cleaned
 
+/**
+ * Convenience class for working with text files.
+ * 
+ * @author cnsaeman
+ */
 public class TextFile implements AutoCloseable {
-    private boolean VWrite;               // not (read only)
-    private String VName;                 // file name
-    private int line;                     // current line in file
-    private String lf;					  // linefeed
-    private FileReader fr=null;           // Readers for internal use.
+
+    private final boolean canWriteTo;           // not (read only)
+    private final String fileName;              // file name
+    private int line;                           // current line in file
+    private String lf;                          // linefeed
+    private FileReader fr=null;                 // Readers for internal use.
     private BufferedReader br=null;
     private OutputStream out=null;
     
@@ -29,197 +32,180 @@ public class TextFile implements AutoCloseable {
     private FileOutputStream fos=null;
     
     /**
-     * Open a compressed TextDatei for reading, name and compression.
+     * Open a text file for reading
+     * 
+     * @param fileName
+     * @throws IOException 
      */
-    public TextFile(String s,String z) throws IOException {
-        VName=s;
-        VWrite=false;
-        if (z.equals("GZIP")) {
-            fis  = new GZIPInputStream(new FileInputStream(new File(s)));
+    public TextFile(String fileName) throws IOException {
+        this.fileName=fileName;
+        canWriteTo=false;
+        fr=new FileReader(fileName);
+        br=new BufferedReader(fr);
+        line=1;
+    }
+
+    /**
+     * Create or append a text file for writing.
+     * 
+     * @param fileName
+     * @param append
+     * @throws IOException 
+     */
+    public TextFile(String fileName,boolean append) throws IOException {
+        this.fileName=fileName;
+        canWriteTo=true;
+        Properties p=System.getProperties();
+        lf=p.getProperty("line.separator");
+        out=new FileOutputStream(fileName,((new File(fileName)).exists() && append));
+    }
+
+    /**
+     * Opens a compressed TextFile for reading.: 
+     * 
+     * @param fileName
+     * @param compressionType - e.g. "GZIP"
+     * @throws IOException 
+     */
+    public TextFile(String fileName,String compressionType) throws IOException {
+        this.fileName=fileName;
+        canWriteTo=false;
+        if (compressionType.equals("GZIP")) {
+            fis  = new GZIPInputStream(new FileInputStream(new File(fileName)));
             isr = new InputStreamReader(fis);
             br=new BufferedReader(isr);
         }
     }
     
     /**
-     * Open a TextDatei for Reading
+     * Opens a compressed text file for writing, potentially appending
+     * 
+     * @param fileName
+     * @param compressionType
+     * @param append
+     * @throws IOException 
      */
-    public TextFile(String s) throws IOException {
-        VName=s;
-        VWrite=false;
-        fr=new FileReader(s);
-        br=new BufferedReader(fr);
-        line=1;
-    }
-    
-    /**
-     * Create a new compressed TextDatei for writing: filename, compression, append
-     */
-    public TextFile(String s,String z,boolean a) throws IOException {
-        VName=s;
-        VWrite=true;
+    public TextFile(String fileName,String compressionType,boolean append) throws IOException {
+        this.fileName=fileName;
+        canWriteTo=true;
         Properties p=System.getProperties();
         lf=p.getProperty("line.separator");
-        if (z.equals("GZIP")) {
-            fos=new FileOutputStream(s,((new File(s)).exists() && a));
+        if (compressionType.equals("GZIP")) {
+            fos=new FileOutputStream(fileName,((new File(fileName)).exists() && append));
             out=new GZIPOutputStream(fos);
         }
     }
     
     /**
-     * Create a new Textdatei for writing: filename, append
+     * Read a text from a URL
+     * 
+     * @param url
+     * @throws FileNotFoundException 
      */
-    public TextFile(String s,boolean a) throws IOException {
-        VName=s;
-        VWrite=true;
-        Properties p=System.getProperties();
-        lf=p.getProperty("line.separator");
-        out=new FileOutputStream(s,((new File(s)).exists() && a));
-    }
-    
-    /**
-     * Gzip a certain file and delete the original
-     */
-    public static void GZip(String s1) throws IOException {
-        FileInputStream fis  = new FileInputStream(new File(s1));
-        GZIPOutputStream fos = new GZIPOutputStream(new FileOutputStream(new File(s1+".gz")));
-        byte[] buf = new byte[1024];
-        int i = 0;
-        while((i=fis.read(buf))!=-1) {
-            fos.write(buf, 0, i);
-        }
-        fis.close();
-        fos.close();
-        (new File(s1)).delete();
-    }
-    
-    public static void GUnZip(String s1) throws IOException {
-        GZIPInputStream  fis = new GZIPInputStream(new FileInputStream(new File(s1)));
-        s1=s1.substring(0,s1.length()-3);
-        FileOutputStream fos = new FileOutputStream(new File(s1));
-        byte[] buf = new byte[1024];
-        int i = 0;
-        while((i=fis.read(buf))!=-1) {
-            fos.write(buf, 0, i);
-        }
-        fis.close();
-        fos.close();
-        (new File(s1+".gz")).delete();
-    }
-    
-    /**
-     * Open a zip file
-     */
-    public static ZipOutputStream OpenZip(String tos) throws IOException {
-        ZipOutputStream to=new ZipOutputStream(new FileOutputStream(tos,(new File(tos)).exists()));
-        return(to);
-    }
-    
-    /**
-     * Add a Zip entry to zip file
-     */
-    public static void AddToZip(ZipOutputStream to,String s) throws IOException {
-        FileInputStream from=new FileInputStream(s);
-        to.putNextEntry(new ZipEntry(s));
-        byte[] buffer=new byte[4096];
-        int bytes_read;
-        while((bytes_read=from.read(buffer))!=-1)
-            to.write(buffer,0,bytes_read);
-        from.close();
-        to.closeEntry();
-    }
-    
-    /**
-     * Close Zip-File
-     */
-    public static void CloseZip(ZipOutputStream to) throws IOException {
-        to.close();
-    }
-
     public TextFile(URL url) throws FileNotFoundException {
-        VName=url.getPath();
-        VWrite=false;
+        fileName=url.getPath();
+        canWriteTo=false;
         fr=new FileReader(url.getPath());
         br=new BufferedReader(fr);
         line=1;
     }
     
     /**
-     * write a string with linefeed
+     * Write a string to the text file with line feed.
+     * 
+     * @param string
+     * @throws IOException 
      */
-    public void putString(String s) throws IOException {
-        if (VWrite) {
-            String tmp=new String(s+lf);
+    public void putString(String string) throws IOException {
+        if (canWriteTo) {
+            String tmp=string+lf;
             out.write(tmp.getBytes());
         }
         line++;
     }
     
     /**
-     * write a string without linefeed
+     * Write a string to the text file without line feed.
+     * 
+     * @param string
+     * @throws IOException 
      */
-    public void putStringO(String s) throws IOException {
-        if (VWrite) {
-            String tmp=new String(s);
+    public void putStringO(String string) throws IOException {
+        if (canWriteTo) {
+            String tmp=string;
             out.write(tmp.getBytes());
         }
     }
     
     /**
-     * read a string
+     * Read a string from the text file.
+     * @return 
+     * @throws java.io.IOException
      */
     public String getString() throws IOException {
-        if (!VWrite) { line++;return(br.readLine()); }
+        if (!canWriteTo) { line++;return(br.readLine()); }
         return(null);
     }
 
     /**
-     * read a string
+     * Read a string from the text file without checks.
+     * @return 
+     * @throws java.io.IOException
      */
     public String getFastString() throws IOException {
         return(br.readLine());
     }
     
     /**
-     * read a string
+     * Read a string from the text file and prevent null returns.
+     * @return 
+     * @throws java.io.IOException
      */
     public String getSafeString() throws IOException {
-        if (!ready()) return(new String(""));
-        if (!VWrite) { line++;return(br.readLine()); }
-        return(new String(""));
+        if (!ready()) return("");
+        if (!canWriteTo) { line++;return(br.readLine()); }
+        return("");
     }
     
     /**
-     * returns, whether file is ready for reading
+     * Indicate if a file is ready for reading
+     * @return 
+     * @throws java.io.IOException 
      */
     public boolean ready() throws IOException {
         return(br.ready());
     }
     
     /**
-     * returns the current line number
+     * Returns the current line number.
+     * @return 
      */
     public int getLine() {
         return(line);
     }
     
     /**
-     * returns the name of the TextDatei
+     * Returns the name of the TextDatei.
+     * @return 
      */
     public String getName() {
-        return(VName);
+        return(fileName);
     }
     
     /**
      * Returns true, if a file is writable
+     * @return 
      */
     public boolean getWrite() {
-        return(VWrite);
+        return(canWriteTo);
     }
     
     /**
-     * Close the TextDatei
+     * Close the TextFile
+     * 
+     * @throws java.io.IOException
      */
+    @Override
     public void close() throws IOException {
         if (out!=null) {
             out.flush();
@@ -233,17 +219,20 @@ public class TextFile implements AutoCloseable {
     }
     
     /**
-     * Copies the content of URL s1 into File s2.
-     * Returns true/false, depending on the success
+     * Copies the content of URL s1 into File s2.Returns true/false, depending on the success
+     * 
+     * @param urlString - the URL to read out
+     * @param fileName - the name of the target file
+     * @return 
      */
-    public static boolean ReadOutURLToFile(String s1, String s2) {
-        boolean Success=true;
+    public static boolean readOutURLToFile(String urlString, String fileName) {
+        boolean success=true;
         InputStream in=null;
         OutputStream out=null;
         try {
-            URL url=new URL(s1);
+            URL url=new URL(urlString);
             in=url.openStream();
-            out=new FileOutputStream(s2);
+            out=new FileOutputStream(fileName);
             
             byte[] buffer=new byte[4096];
             int bytes_read;
@@ -251,23 +240,25 @@ public class TextFile implements AutoCloseable {
                 out.write(buffer,0,bytes_read);
             }
         } catch (Exception e) {
-            Success=false;
+            success=false;
         } finally {
             try {
                 in.close();
                 out.close();
             } catch(Exception e) {}
         }
-        return(Success);
+        return(success);
     }
     
     /**
      * Returns the content of a URL as a string
+     * @param urlString
+     * @return 
      */
-    public static String ReadOutURL(String s1) {
-        StringBuffer rtn=new StringBuffer(4000);
+    public static String readOutURL(String urlString) {
+        StringBuffer out=new StringBuffer(4000);
         try {
-            URL url=new URL(s1);
+            URL url=new URL(urlString);
             URLConnection urlconn=url.openConnection();
             urlconn.setReadTimeout(10000);
             urlconn.setConnectTimeout(10000);
@@ -276,35 +267,53 @@ public class TextFile implements AutoCloseable {
             byte[] buffer=new byte[4096];
             int bytes_read;
             while ((bytes_read=in.read(buffer))!=-1) {
-                rtn.append(new String(buffer,0,bytes_read));
+                out.append(new String(buffer,0,bytes_read));
             }
             in.close();
-        } catch (Exception e) { rtn=new StringBuffer("##??"+e.toString()); }
-        return(rtn.toString());
+        } catch (Exception e) { out=new StringBuffer("##??"+e.toString()); }
+        return(out.toString());
     }
     
     /**
      * Returns the content of a file as a String
+     * @param fileName
+     * @return 
      */
-    public static String ReadOutFile(String s1) {
-        StringBuffer rtn=new StringBuffer(4000);
+    public static String readOutFile(String fileName) {
+        StringBuffer out=new StringBuffer(4000);
         try {
-            InputStream in=new FileInputStream(s1);
+            InputStream in=new FileInputStream(fileName);
             
             byte[] buffer=new byte[4096];
             int bytes_read;
             while ((bytes_read=in.read(buffer))!=-1) {
-                rtn.append(new String(buffer,0,bytes_read));
+                out.append(new String(buffer,0,bytes_read));
             }
             in.close();
-        } catch (Exception e) { rtn=new StringBuffer("##??"+e.toString()); }
-        return(rtn.toString());
+        } catch (Exception e) { out=new StringBuffer("##??"+e.toString()); }
+        return(out.toString());
     }
 
     /**
      * Returns the content of a file as a String
+     * @param string
+     * @param fileName
+     * @return 
      */
-    public static StringBuffer ReadOutZipFile(String filename) {
+    public static String writeStringToFile(String string, String fileName) {
+        String out="OK";
+        try {
+            Files.write( Paths.get(fileName), string.getBytes());
+        } catch (Exception e) { out="##??"+e.toString(); }
+        return(out);
+    }
+    
+    /**
+     * Returns the content of a file as a String
+     * @param filename
+     * @return 
+     */
+    public static StringBuffer readOutZipFile(String filename) {
         StringBuffer buffer=new StringBuffer();
         String tmp;
         try {
@@ -324,10 +333,80 @@ public class TextFile implements AutoCloseable {
         return (buffer);
     }
     
+    /**
+     * Gzips a file
+     * 
+     * @param fileName
+     * @throws IOException 
+     */
+    public static void GZip(String fileName) throws IOException {
+        FileInputStream fis  = new FileInputStream(new File(fileName));
+        GZIPOutputStream fos = new GZIPOutputStream(new FileOutputStream(new File(fileName+".gz")));
+        byte[] buf = new byte[1024];
+        int i;
+        while((i=fis.read(buf))!=-1) {
+            fos.write(buf, 0, i);
+        }
+        fis.close();
+        fos.close();
+        (new File(fileName)).delete();
+    }
+    /**
+    * GUnzips a file
+     * 
+     * @param fileName
+     * @throws IOException 
+     */
+    public static void GUnZip(String fileName) throws IOException {
+        GZIPInputStream  fis = new GZIPInputStream(new FileInputStream(new File(fileName)));
+        fileName=fileName.substring(0,fileName.length()-3);
+        FileOutputStream fos = new FileOutputStream(new File(fileName));
+        byte[] buf = new byte[1024];
+        int i;
+        while((i=fis.read(buf))!=-1) {
+            fos.write(buf, 0, i);
+        }
+        fis.close();
+        fos.close();
+        (new File(fileName+".gz")).delete();
+    }
     
-
-
-
+    /**
+     * Open a zip file
+     * @param fileName
+     * @return 
+     * @throws java.io.IOException
+     */
+    public static ZipOutputStream openZip(String fileName) throws IOException {
+        ZipOutputStream to=new ZipOutputStream(new FileOutputStream(fileName,(new File(fileName)).exists()));
+        return(to);
+    }
+    
+    /**
+     * Add a Zip entry to zip file
+     * @param zipOutputStream
+     * @param fileName
+     * @throws java.io.IOException
+     */
+    public static void addToZip(ZipOutputStream zipOutputStream,String fileName) throws IOException {
+        FileInputStream from=new FileInputStream(fileName);
+        zipOutputStream.putNextEntry(new ZipEntry(fileName));
+        byte[] buffer=new byte[4096];
+        int bytes_read;
+        while((bytes_read=from.read(buffer))!=-1)
+            zipOutputStream.write(buffer,0,bytes_read);
+        from.close();
+        zipOutputStream.closeEntry();
+    }
+    
+    /**
+     * Close Zip-File
+     * @param zipOutputStream
+     * @throws java.io.IOException
+     */
+    public static void closeZip(ZipOutputStream zipOutputStream) throws IOException {
+        zipOutputStream.close();
+    }
 
     
 }

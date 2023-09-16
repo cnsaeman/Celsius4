@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.components.search;
 
 import celsius.components.SWListItems;
@@ -35,13 +30,17 @@ public class SWSearch extends SWListItems {
     /**
      *  Constructor, read in information
      *  Mother, documenttablemodel, search string, class
+     * @param celsiuseTable
+     * @param searchString
+     * @param m
+     * @param pid
      */
-    public SWSearch(CelsiusTable it, String sstring, int m, int pid) {
-        super(it,pid);
+    public SWSearch(CelsiusTable celsiuseTable, String searchString, int m, int pid) {
+        super(celsiuseTable,pid);
         //System.out.println(">> Started search with pid "+pid);
         mode=m;
-        fullSearchString=sstring;
-        search=sstring.toLowerCase().split(" ");
+        fullSearchString=searchString;
+        search=searchString.toLowerCase().split(" ");
         sqlTags = library.itemTableSQLTags;
         sqlTable = "items";
         sqlOrderBy = "ORDER BY " + library.config.get("item-autosortcolumn");
@@ -80,7 +79,6 @@ public class SWSearch extends SWListItems {
     
     private void searchIndex() {
         done = 0;
-        int last_id=-1;
         int count=batchSize;
         int lastID=0;
         //System.out.println("--");
@@ -125,9 +123,7 @@ public class SWSearch extends SWListItems {
 
     private void searchDeep() {
         done = 0;
-        int last_id=-1;
         int count=batchSize;
-        int lastID=0;
         
         while (!isCancelled() && count==batchSize) {
             String sql="SELECT rowid from search WHERE text MATCH ? LIMIT "+String.valueOf(batchSize)+" OFFSET "+String.valueOf(done)+";";
@@ -139,7 +135,7 @@ public class SWSearch extends SWListItems {
                 statement.setString(1,fullSearchString);
                 RSC.out("PS2");
                 ResultSet rs = statement.executeQuery();
-                StringBuffer ids=new StringBuffer();
+                StringBuilder ids=new StringBuilder();
                 while (rs.next() && !isCancelled()) {
                     ids.append(',');
                     ids.append(rs.getString(1));

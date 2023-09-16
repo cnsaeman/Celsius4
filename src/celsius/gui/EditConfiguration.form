@@ -78,7 +78,7 @@
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="jTFproxyport" max="32767" attributes="1"/>
+                                          <Component id="jTFproxyport" pref="90" max="32767" attributes="1"/>
                                           <Component id="jBtnTest4" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>

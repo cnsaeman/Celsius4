@@ -38,8 +38,8 @@ public class FileTools {
         File folder = new File(name);
         if (folder.isDirectory()) {
             String[] entries = folder.list();
-            for (int i = 0; i < entries.length; i++) {
-                boolean del = removeFolder(name + "/" + entries[i]);
+            for (String entrie : entries) {
+                boolean del = removeFolder(name + "/" + entrie);
                 if (!del) {
                     return false;
                 }

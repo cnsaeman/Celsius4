@@ -12,7 +12,6 @@ import celsius.gui.MainFrame;
 import celsius.components.library.Library;
 import celsius.data.TableRow;
 import atlantis.tools.FileTools;
-import atlantis.tools.JSONParser;
 import celsius3.Library3;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
@@ -126,53 +125,45 @@ public class CelsiusMain {
 
 
     public static void main(String args[]) throws Exception {
-        RSC=new Resources();
-        double gSF;
+        double guiScaleFactor;
         if ((args.length>0) && (args[0].startsWith("scale="))) {
-            gSF=Double.valueOf(Parser.cutFrom(args[0],"scale="));
+            guiScaleFactor=Double.parseDouble(Parser.cutFrom(args[0],"scale="));
         } else {
-            gSF=1;
+            guiScaleFactor=1;
         }
-        gSF=1.3;        
+        guiScaleFactor=1.3;        
+        RSC=new Resources(guiScaleFactor);
         System.out.println("Celsius "+RSC.VersionNumber);
-        RSC.guiScaleFactor=gSF;
         RSC.initResources();
         RSC.logLevel=99;
         
         if (3>4) {
             doWork();
         } else {
-            RSC.setLookAndFeel();
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    StartUp = new SplashScreen(RSC.VersionNumber, true, RSC);
-                    StartUp.setStatus("Initializing Resources...");
-
-                    java.awt.EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            StartUp.setStatus("Creating Main Frame...");
-                        }
-                    });
-                    MF = new MainFrame();
-                    MF.StartUp = StartUp;
-                    MF.RSC = RSC;
-
-                    RSC.setMainFrame(MF);
-                    StartUp.setStatus("Loading Plugins...");
-                    RSC.loadPlugins();
-                    StartUp.setStatus("Laying out GUI...");
-                    MF.gui1();
-                    RSC.guiInformationPanel = MF.guiInfoPanel;
-                    StartUp.setStatus("Setting Shortcuts...");
-                    RSC.loadShortCuts();
-                    MF.setShortCuts();
-                    StartUp.setStatus("Loading Libraries...");
-                    RSC.loadLibraries();
-                    StartUp.setStatus("Final gui...");
-                    MF.gui2();
-                }
+            java.awt.EventQueue.invokeLater(() -> {
+                StartUp = new SplashScreen(RSC.VersionNumber, true, RSC);
+                StartUp.setStatus("Initializing Resources...");
+                
+                java.awt.EventQueue.invokeLater(() -> {
+                    StartUp.setStatus("Creating Main Frame...");
+                });
+                MF = new MainFrame();
+                MF.StartUp = StartUp;
+                MF.RSC = RSC;
+                
+                RSC.setMainFrame(MF);
+                StartUp.setStatus("Loading Plugins...");
+                RSC.loadPlugins();
+                StartUp.setStatus("Laying out GUI...");
+                MF.gui1();
+                RSC.guiInformationPanel = MF.guiInfoPanel;
+                StartUp.setStatus("Setting Shortcuts...");
+                RSC.loadShortCuts();
+                MF.setShortCuts();
+                StartUp.setStatus("Loading Libraries...");
+                RSC.loadLibraries();
+                StartUp.setStatus("Final gui...");
+                MF.gui2();
             });
         }
      

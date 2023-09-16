@@ -850,7 +850,7 @@
             <Component class="javax.swing.JButton" name="jTBAdd">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="RSC.getScaledIcon(&quot;Add Icon&quot;)" type="code"/>
+                  <Connection code="RSC.icons.getScaledIcon(&quot;Add Icon&quot;)" type="code"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value="Add items to current library"/>
                 <Property name="enabled" type="boolean" value="false"/>

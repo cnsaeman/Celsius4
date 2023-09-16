@@ -40,7 +40,7 @@
     <Component class="javax.swing.JButton" name="jBtnClear">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="RSC.getScaledIcon(&quot;closebtn&quot;)" type="code"/>
+          <Connection code="RSC.icons.getScaledIcon(&quot;closebtn&quot;)" type="code"/>
         </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[60, 60]"/>

@@ -7,21 +7,19 @@ package atlantis.gui;
 public class MultiLineMessage extends javax.swing.JDialog {
     
     public String text;
-    private StandardResources RSC;
     
     /** Creates new form DialogMultiLineEditor */
-    public MultiLineMessage(StandardResources RSC, String title, String text) {
-        super(RSC.getMF(), true);
-        this.RSC=RSC;
-        setIconImage(RSC.getAppIcon());
+    public MultiLineMessage(GuiTools guiTools, String title, String text) {
+        super(guiTools.MF, true);
+        setIconImage(guiTools.appIcon);
         this.setTitle(title);
         initComponents();
         text=text;
         jText.setText(text);
         jText.setWrapStyleWord(true);
         jText.setCaretPosition(0);
-        this.setSize(RSC.guiScale(400), RSC.guiScale(300));
-        RSC.centerDialog(this);
+        this.setSize(guiTools.guiScale(400), guiTools.guiScale(300));
+        guiTools.centerDialog(this);
     }
 
     public void setLineWrapping(boolean b) {

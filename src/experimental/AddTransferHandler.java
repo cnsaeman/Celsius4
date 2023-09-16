@@ -1,15 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package experimental;
 
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.MainFrame;
 import celsius.components.library.Library;
 import celsius.data.Item;
-import celsius.gui.GUIToolBox;
 import atlantis.tools.ExecutionShell;
 import atlantis.tools.Parser;
 import atlantis.tools.TextFile;
@@ -197,7 +191,7 @@ public class AddTransferHandler extends TransferHandler {
     private void deleteItem(Item doc, boolean confirmed) {
         if (doc.getS("location").length()>0) {
             if (!confirmed) {
-                int j = MF.RSC.askQuestionOC("Really delete the file " + doc.get("location") + "?", "Warning");
+                int j = MF.RSC.guiTools.askQuestionOC("Really delete the file " + doc.get("location") + "?", "Warning");
                 if (j != JOptionPane.NO_OPTION) {
                     doc.deleteFilesOfAttachments();
                     MF.RSC.out("ADD>Deleting :: " + doc.get("filename"));

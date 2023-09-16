@@ -162,7 +162,7 @@ public class Plugins extends HashMap<String,Plugin> {
             }
         }
         MF.guiInfoPanel.jCBBibPlugins.setModel(DCBM);
-        MF.dialogExportBibliography.setListModel(DLM);
+        if (MF.dialogExportBibliography!=null) MF.dialogExportBibliography.setListModel(DLM);
     }
     
 }

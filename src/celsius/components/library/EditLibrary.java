@@ -17,7 +17,6 @@ import atlantis.gui.KeyValueTableModel;
 import celsius.Resources;
 import atlantis.tools.Parser;
 import celsius.components.plugins.Plugins;
-import celsius.gui.GUIToolBox;
 import celsius.gui.MainFrame;
 import atlantis.gui.MultiLineEditor;
 import celsius.gui.TabLabel;
@@ -51,10 +50,10 @@ public class EditLibrary extends javax.swing.JDialog {
         plugins = RSC.plugins;
         library=RSC.getCurrentlySelectedLibrary();
         initComponents();
-        jTAStyleSheet=new AtlantisTextArea(RSC.guiScale(12));
+        jTAStyleSheet=new AtlantisTextArea(RSC.guiTools.guiScale(12));
         jTAStyleSheet.setColumns(20);
         jScrollPane2.setViewportView(jTAStyleSheet);
-        jTATemplate=new AtlantisTextArea(RSC.guiScale(12));
+        jTATemplate=new AtlantisTextArea(RSC.guiTools.guiScale(12));
         jTATemplate.setColumns(20);
         jScrollPane3.setViewportView(jTATemplate);
         
@@ -85,10 +84,10 @@ public class EditLibrary extends javax.swing.JDialog {
         }
         jLPlugins.setModel(plugins.getPluginsDLM());
         
-        setPreferredSize(new Dimension(RSC.guiScale(700),RSC.guiScale(700)));
+        setPreferredSize(new Dimension(RSC.guiTools.guiScale(700),RSC.guiTools.guiScale(700)));
         pack();
 
-        GUIToolBox.centerDialog(this,MF);
+        RSC.guiTools.centerDialog(this);
         jTPEditMode.setSelectedIndex(initiallySelected);
     }
     
@@ -387,7 +386,7 @@ public class EditLibrary extends javax.swing.JDialog {
         String key = ((String) jTMain.getModel().getValueAt(jTMain.getSelectedRow(), 0));
         // standard text editor
         String value = library.config.get(key.toLowerCase());
-        MultiLineEditor MLE = new MultiLineEditor(RSC, "Edit value", value);
+        MultiLineEditor MLE = new MultiLineEditor(RSC.guiTools, "Edit value", value);
         MLE.setVisible(true);
         if (!MLE.cancelled) {
             value = MLE.text;

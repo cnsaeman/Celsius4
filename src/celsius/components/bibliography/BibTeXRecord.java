@@ -216,9 +216,8 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
         return(!this.containsKey(s));
     }
 
-    public boolean isEmpty(String s) {
-        if (!this.containsKey(s)) return(true);
-        return(getS(s).equals(""));
+    public boolean isEmpty(String key) {
+        return((get(key)==null) || (get(key).isEmpty()));
     }
 
     public String getS(String s) {
@@ -228,13 +227,28 @@ public class BibTeXRecord extends LinkedHashMap<String,String> {
     }
 
     public String getIdentifier() {
-        String identifier=new String("");
-        if (get("journal")!=null) {
-            identifier=get("journal");
-            if (get("volume")!=null) identifier+=" "+get("volume");
-            if (get("year")!=null) identifier+=" ("+get("year")+")";
-            if (get("pages")!=null) identifier+=" "+get("pages");
+        String identifier="";
+        String arxref=get("arxiv-ref");
+        String arxname=get("arxiv-name");
+        if ((arxref!=null) && (arxname!=null)) {
+            if (arxref.contains(arxname)) {
+                identifier=arxref;
+            } else {
+                identifier=arxref+" ["+arxname+"]";
+            }
         }
+        if (type.toLowerCase().equals("book")) {
+            if ((!isEmpty("year")) && (!isEmpty("publisher"))) {
+                identifier+=" "+get("publisher");
+            }
+        } else if (get("journal")!=null) {
+            identifier+=" "+get("journal");
+            if (!isEmpty("volume")) identifier+=" "+get("volume");
+            if (!isEmpty("year")) identifier+=" ("+get("year")+")";
+            if (!isEmpty("pages")) identifier+=" "+get("pages");
+        }
+        
+        if (!isEmpty("year")) identifier=get("year")+" "+identifier;
         identifier=identifier.trim();
         return(identifier);
     }

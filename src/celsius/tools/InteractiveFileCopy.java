@@ -77,7 +77,7 @@ public class InteractiveFileCopy {
         public void done() {
             progressMonitor.close();
             if (error!=null) {
-                RSC.showWarning("Error while copying file: "+error.toString(), "Warning:");
+                RSC.guiTools.showWarning("Warning:","Error while copying file: "+error.toString());
             }
         }
     }

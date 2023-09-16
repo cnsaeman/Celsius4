@@ -19,7 +19,7 @@ public class RangeEditor extends JPanel {
         this.setLayout(new GridLayout(0,1,0,0));
         JLabel jl=new JLabel(s);
         jl.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        jl.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(11)));
+        jl.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(11)));
         pnl.add(jl);
         BtnGrp=new ButtonGroup();
         Btn1=new JRadioButton("<");

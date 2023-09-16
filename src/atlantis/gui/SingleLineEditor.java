@@ -12,22 +12,20 @@ public class SingleLineEditor extends javax.swing.JDialog {
     public String pre;
     public boolean content;
     public boolean cancelled;
-    private final StandardResources RSC;
     
     /** Creates new form DialogMultiLineEditor */
-    public SingleLineEditor(StandardResources RSC, String title, String txt, boolean c) {
-        super(RSC.getMF(), true);
-        this.RSC=RSC;
-        setIconImage(RSC.getAppIcon());
+    public SingleLineEditor(GuiTools guiTools, String title, String text, boolean content) {
+        super(guiTools.MF, true);
+        setIconImage(guiTools.appIcon);
         this.setTitle(title);
         initComponents();
-        text=txt;
-        pre=txt;
-        content=c;
+        this.text=text;
+        pre=text;
+        this.content=content;
         jText.setText(text);
-        if (!content) jText.setForeground(RSC.getLightGray());
+        if (!content) jText.setForeground(AtlantisColors.LIGHTGRAY2);
         jText.setCaretPosition(0);
-        RSC.centerDialog(this);
+        guiTools.centerDialog(this);
     }
     
     /** This method is called from within the constructor to

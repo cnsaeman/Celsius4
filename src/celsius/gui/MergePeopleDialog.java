@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.gui;
 
 import celsius.Resources;
@@ -20,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author cnsaeman
  */
-public class MergePeople extends javax.swing.JDialog implements ListSelectionListener {
+public class MergePeopleDialog extends javax.swing.JDialog implements ListSelectionListener {
 
     private final Resources RSC;
     private final Library library;
@@ -32,7 +27,7 @@ public class MergePeople extends javax.swing.JDialog implements ListSelectionLis
      * @param rsc
      * @param ids
      */
-    public MergePeople(Resources rsc, String ids) {
+    public MergePeopleDialog(Resources rsc, String ids) {
         super(rsc.MF, true);
         RSC=rsc;
         library=RSC.getCurrentlySelectedLibrary();
@@ -74,8 +69,8 @@ public class MergePeople extends javax.swing.JDialog implements ListSelectionLis
         jTable.getSelectionModel().addListSelectionListener(this);
         jTable.getColumnModel().getSelectionModel().addListSelectionListener(this);
         jPanel2.setBorder(RSC.stdBorder());
-        this.setSize(RSC.guiScale(800), RSC.guiScale(400));
-        GUIToolBox.centerDialog(this, RSC.MF);
+        this.setSize(RSC.guiTools.guiScale(800), RSC.guiTools.guiScale(400));
+        RSC.guiTools.centerDialog(this);
     }
 
     /**

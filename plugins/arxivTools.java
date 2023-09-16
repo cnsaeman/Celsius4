@@ -240,7 +240,7 @@ public class arxivTools {
         // 2.1: get SPIRES-key
         Msg.add("Reading Key from SPIRES:");
         Msg.add(slac);
-        String gotit=TextFile.ReadOutURL(slac);
+        String gotit=TextFile.readOutURL(slac);
         if (!gotit.startsWith("##??")) {
             Msg.add("got it:"+GetSpiresKey(gotit));
             return(GetSpiresKey(gotit));
@@ -272,7 +272,7 @@ public class arxivTools {
         // get Bibtex reference
         Msg.add("Reading reference from SPIRES (BibTeX)");
         String URL=spiresbase+"/find/hep/www?key="+key+"&FORMAT=WWWBRIEFBIBTEX";
-        String gotit2=TextFile.ReadOutURL(URL);
+        String gotit2=TextFile.readOutURL(URL);
         if (!gotit2.startsWith("##??")) {
             Msg.add("got it:"+extractBibTeX(gotit2));
             return(extractBibTeX(gotit2));

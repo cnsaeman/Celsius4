@@ -28,7 +28,6 @@ import celsius.data.Item;
 import celsius.data.Item;
 import celsius.components.library.Library;
 import celsius.data.Person;
-import celsius.gui.GUIToolBox;
 import celsius.tools.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -172,14 +171,14 @@ public final class Library3 implements Iterable<Item3> {
         RSC=rsc;
         try {
             String relbase=Parser.cutUntil(fn,(new File(fn)).getName());
-            if (relbase.endsWith(ToolBox.filesep)) relbase=relbase.substring(0,relbase.length()-1);
+            if (relbase.endsWith(ToolBox.FILE_SEPARATOR)) relbase=relbase.substring(0,relbase.length()-1);
             MainFile=new XMLHandler(fn);
             
             name=MainFile.get("name");
             celsiusbasedir=Parser.cutUntilLast((new File(".")).getAbsolutePath(),".");
             basedir=MainFile.get("directory");
-            if (!celsiusbasedir.endsWith(ToolBox.filesep)) celsiusbasedir+=ToolBox.filesep;
-            if (!basedir.endsWith(ToolBox.filesep)) basedir+=ToolBox.filesep;
+            if (!celsiusbasedir.endsWith(ToolBox.FILE_SEPARATOR)) celsiusbasedir+=ToolBox.FILE_SEPARATOR;
+            if (!basedir.endsWith(ToolBox.FILE_SEPARATOR)) basedir+=ToolBox.FILE_SEPARATOR;
             if ((name.length()==0) || (basedir.length()==0)) {
                 (new SafeMessage("The library file seems to be corrupt. Cancelling...","Warning:",0)).showMsg();
                 name="??##Library3 file corrupt.";
@@ -188,7 +187,7 @@ public final class Library3 implements Iterable<Item3> {
             if (!(new File(basedir)).exists())
             basedir=relbase+"/"+basedir;
             if ((new File(basedir + "/lock")).exists()) {
-                int i=RSC.askQuestionAB("The library "+name+" is locked. If no other instance of Celsius is accessing it," +
+                int i=RSC.guiTools.askQuestionAB("The library "+name+" is locked. If no other instance of Celsius is accessing it," +
                         "\nyou can select \"Ignore Lock\" and open it anyway. This can happen " +
                         "\nwhen Celsius has not been shut down properly.", "Library3 locked", "Cancel", "Ignore Lock");
                 if (i==0) {
@@ -215,7 +214,7 @@ public final class Library3 implements Iterable<Item3> {
                 RSC.out(Index.lastError);
             }
             if (Index.lastError.length()>0) {
-                RSC.showWarning(Index.lastError, "Error in library index");
+                // Display error
                 RSC.out(Index.lastError);
             }
 
@@ -459,10 +458,10 @@ public final class Library3 implements Iterable<Item3> {
         String sig=Parser.cutUntil(s,"::");
         s=Parser.cutFrom(s,"::");
         String s2=s;
-        if (s2.startsWith(ToolBox.filesep)) s2=s2.substring(1);
+        if (s2.startsWith(ToolBox.FILE_SEPARATOR)) s2=s2.substring(1);
         if (sig.equals("AI")) {
             if (s2.charAt(0)=='.') s2=s2.substring(1);
-            return(basedir+"information"+ToolBox.filesep+id+"."+s2);
+            return(basedir+"information"+ToolBox.FILE_SEPARATOR+id+"."+s2);
         }
         if (sig.equals("LD")) return(basedir+s2);
         if (sig.equals("BD")) return(celsiusbasedir+s2);
@@ -572,13 +571,13 @@ public final class Library3 implements Iterable<Item3> {
             Library3 Lib=new Library3(fn,RSC);
             int done=0;
             
-            String folder=Parser.cutUntilLast(fn,ToolBox.filesep)+ToolBox.filesep+Lib.MainFile.get("directory");
-            String dbfname=folder+ToolBox.filesep+"CelsiusLibrary.sql";
-            String dbsname=folder+ToolBox.filesep+"CelsiusSearchIndex.sql";
+            String folder=Parser.cutUntilLast(fn,ToolBox.FILE_SEPARATOR)+ToolBox.FILE_SEPARATOR+Lib.MainFile.get("directory");
+            String dbfname=folder+ToolBox.FILE_SEPARATOR+"CelsiusLibrary.sql";
+            String dbsname=folder+ToolBox.FILE_SEPARATOR+"CelsiusSearchIndex.sql";
             FileTools.deleteIfExists(dbfname);
             FileTools.deleteIfExists(dbsname);
-            FileTools.makeDir(folder+ToolBox.filesep+"item-thumbnails");
-            FileTools.makeDir(folder+ToolBox.filesep+"person-thumbnails");
+            FileTools.makeDir(folder+ToolBox.FILE_SEPARATOR+"item-thumbnails");
+            FileTools.makeDir(folder+ToolBox.FILE_SEPARATOR+"person-thumbnails");
             /*if ((new File(dbfname)).exists()) {
                 toolbox.Warning(RSC.getMF(), "Library3 seems to be in SQLite format.", "Can't convert:");
                 return;
@@ -698,7 +697,7 @@ public final class Library3 implements Iterable<Item3> {
             configDictionary.put("person-search-fields", "first_name|last_name");
             configDictionary.put("plugins-import", "Basic Import");
             configDictionary.put("plugins-people", "");
-            configDictionary.put("css-style", TextFile.ReadOutFile(Lib.completeDir(Lib.MainFile.get("style"),"")));
+            configDictionary.put("css-style", TextFile.readOutFile(Lib.completeDir(Lib.MainFile.get("style"),"")));
             if (configDictionary.get("item-folder").startsWith("LD::documents")) configDictionary.put("item-folder","LD::items");
             configDictionary.put("item-naming-convention", Parser.replace(configDictionary.get("item-naming-convention"), "#filetype#", "#$$filetype#"));
             // Write HashMap To File, sorted by keys.

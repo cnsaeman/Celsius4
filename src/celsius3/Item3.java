@@ -146,10 +146,10 @@ public final class Item3 {
         String sig=Parser.cutUntil(s,"::");
         s=Parser.cutFrom(s,"::");
         String s2=s;
-        if (s2.startsWith(ToolBox.filesep)) s2=s2.substring(1);
+        if (s2.startsWith(ToolBox.FILE_SEPARATOR)) s2=s2.substring(1);
         if (sig.equals("AI")) {
             if (s2.charAt(0)=='.') s2=s2.substring(1);
-            return(Lib.basedir+"information"+ToolBox.filesep+get("id")+"."+s2);
+            return(Lib.basedir+"information"+ToolBox.FILE_SEPARATOR+get("id")+"."+s2);
         }
         if (sig.equals("LD")) return(Lib.basedir+s2);
         if (sig.equals("BD")) return(Lib.celsiusbasedir+s2);
@@ -334,7 +334,7 @@ public final class Item3 {
             for(String tag : tags) {
                 s2 = get(tag);
                 if ((s2!=null) && !(s2.indexOf("\n")>-1))
-                    tmp += tag.replaceAll("\\p{C}", "?") + ": " + s2.replaceAll("\\p{C}", "?") + ToolBox.linesep;
+                    tmp += tag.replaceAll("\\p{C}", "?") + ": " + s2.replaceAll("\\p{C}", "?") + ToolBox.LINE_SEPERATOR;
             }
         }
         if (i==2) {
@@ -342,7 +342,7 @@ public final class Item3 {
             for (String tag : CD.XMLTags) {
                 s2 = CD.get(tag);
                 if ((s2!=null) && !(s2.indexOf("\n")>-1))
-                    tmp += tag.replaceAll(charFilter, "?") + ": " + s2.replaceAll(charFilter, "?") + ToolBox.linesep;
+                    tmp += tag.replaceAll(charFilter, "?") + ": " + s2.replaceAll(charFilter, "?") + ToolBox.LINE_SEPERATOR;
             }
         }
         return(tmp);
@@ -483,7 +483,7 @@ public final class Item3 {
         int p=Lib.getPosition(id);
         if (p>-1) {
             if (Integer.valueOf(Lib.Index.get(p,"id"))!=id) {
-                Lib.RSC.showWarning("Error, ID mismatch between Index and MainFile!", "IDs in Index and main file mixed up!");
+                //Display Error
             } else {
                 Lib.Index.deleteElement(p);
                 Lib.setChanged(true);

@@ -14,7 +14,6 @@ package celsius.components.categories;
 
 import celsius.Resources;
 import celsius.components.categories.StructureNode;
-import celsius.gui.GUIToolBox;
 import celsius.tools.ToolBox;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -31,7 +30,7 @@ public class ChooseItemCategory extends javax.swing.JDialog {
     public ChooseItemCategory(Resources RSC) {
         super(RSC.MF, true);
         this.RSC=RSC;
-        setIconImage(RSC.getAppIcon());
+        setIconImage(RSC.guiTools.appIcon);
         initComponents();
         jTreeCategories.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTreeCategories.setShowsRootHandles(true);
@@ -43,7 +42,7 @@ public class ChooseItemCategory extends javax.swing.JDialog {
         DefaultTreeModel CatTreeModel=new DefaultTreeModel(RSC.getCurrentlySelectedLibrary().structureTreeRoot);
         jTreeCategories.setModel(CatTreeModel);
         selected=false;
-        GUIToolBox.centerDialog(this,RSC.MF);
+        RSC.guiTools.centerDialog(this);
     }
     
     /** This method is called from within the constructor to

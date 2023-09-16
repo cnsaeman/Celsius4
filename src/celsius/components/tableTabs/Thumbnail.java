@@ -33,8 +33,8 @@ public class Thumbnail extends javax.swing.JPanel {
     public Thumbnail(TableRow tr, CelsiusTable ct) {
         celsiusTable=ct;
         initComponents();
-        spx=ct.MF.RSC.guiScale(140);
-        spy=ct.MF.RSC.guiScale(160);
+        spx=ct.MF.RSC.guiTools.guiScale(140);
+        spy=ct.MF.RSC.guiTools.guiScale(160);
         setPreferredSize(new Dimension(spx-3,spy-3));
         setMaximumSize(new Dimension(spx-3,spy-3));
         jLIcon.setPreferredSize(new Dimension(spx-3,spy-20-3));

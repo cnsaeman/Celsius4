@@ -5,7 +5,7 @@
 
 package celsius.gui;
 
-import celsius.images.Icons;
+import atlantis.gui.Icons;
 import celsius.Resources;
 import java.awt.Component;
 import java.util.HashMap;
@@ -24,14 +24,14 @@ public class CBRenderer extends JLabel
     private final Icons icons;
     private final HashMap<String,String> dictionary;
 
-    public CBRenderer(Icons i,HashMap<String,String> dict, Resources rsc) {
-        icons=i;
-        dictionary=dict;
+    public CBRenderer(Icons icons,HashMap<String,String> dictionary, Resources RSC) {
+        this.icons=icons;
+        this.dictionary=dictionary;
         setOpaque(true);
         setHorizontalAlignment(LEFT);
         setVerticalAlignment(CENTER);
         this.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
-        this.setFont(new java.awt.Font("Arial", 0, rsc.guiScale(12)));
+        this.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(12)));
     }
 
     public Component getListCellRendererComponent(

@@ -15,7 +15,6 @@ import atlantis.gui.MultiLineMessage;
 import celsius.tools.ToolBox;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
@@ -100,7 +99,7 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
                     ResultSet rs=library.executeResEX("SELECT "+tags+" FROM items;");
                     while (rs.next()) {
                         Item item=new Item(library,rs);
-                        item.currentLoadLevel=2;
+                        item.currentLoadLevel=1;
                         done++;
                         applyToTableRow(item, out);
                         if (progressMonitor != null) {
@@ -135,7 +134,7 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
                     } catch (Exception ex) {
                         RSC.out("Error while finalizing plugin: " + ex.toString());
                         RSC.outEx(ex);
-                        RSC.showWarning("Error while finalizing plugin:\n" + ex.toString(), "Exception:");
+                        RSC.guiTools.showWarning("Exception:","Error while finalizing plugin:\n" + ex.toString());
                     }
                 }
                 if (swFinalizer != null) {
@@ -280,14 +279,14 @@ public class SWApplyPlugin extends SwingWorker<Void,Void> {
                 if (communication.containsKey("showOutput")) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            MultiLineMessage MLM=new MultiLineMessage(RSC, "Plugins report",communication.get("showOutput"));
+                            MultiLineMessage MLM=new MultiLineMessage(RSC.guiTools, "Plugins report",communication.get("showOutput"));
                             MLM.setVisible(true);
                         }
                     });
                 }
             } catch (Exception ex) {
                 RSC.out("jIP>Error while finalizing BibPlugin: " + plugin.metaData.get("title") + ". Exception: " + ex.toString());
-                RSC.showWarning("Error while finalizing Bibplugins\nMessage:\n" + ex.toString(), "Exception:");
+                RSC.guiTools.showWarning("Exception:","Error while finalizing Bibplugins\nMessage:\n" + ex.toString());
                 RSC.outEx(ex);
             }
         } catch (Exception ecx) { RSC.out(TI+"Error writing file: "+ecx.toString()); }

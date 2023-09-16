@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.tools;
 
 import atlantis.tools.Parser;
@@ -82,7 +77,7 @@ public class CelsiusTemplate {
                 item.put("$created", RSC.timestampToString(item.getS("createdTS")));
             }
             if (item.isEmpty("$last_modified")) {
-                item.put("$last_modified", RSC.SDF.format(new Date(Long.valueOf(item.getS("last_modifiedTS")) * 1000)));
+                item.put("$last_modified", RSC.SDF.format(new Date(Long.parseLong(item.getS("last_modifiedTS")) * 1000)));
             }
         } catch (Exception ex) { }
         
@@ -107,12 +102,12 @@ public class CelsiusTemplate {
             String field=key;
             String insert = item.getS(field);
             if (field.equals("last_modifiedTS")) {
-                insert = timeStampToDateTimeString(Long.valueOf(insert));
+                insert = timeStampToDateTimeString(Long.parseLong(insert));
             } else if (field.equals("list_links")) {
                 insert=item.getLinkListString();
             } else if (key.contains("&")) {
                 int modifier = 0;
-                modifier=Integer.valueOf(Parser.cutFrom(key, "&"));
+                modifier=Integer.parseInt(Parser.cutFrom(key, "&"));
                 field=Parser.cutUntil(key,"&");
                 if (library.isPeopleField(field)) {
                     if (modifier > 0) {
@@ -153,7 +148,7 @@ public class CelsiusTemplate {
                 i=out.indexOf("#"+key+"#");
             }
         }
-        return(out.toString());
+        return(out);
     }
 
     public String fillIn(TableRow tableRow,Boolean fast) {
@@ -198,7 +193,7 @@ public class CelsiusTemplate {
                 }
             } else if (key.contains("&")) {
                 int modifier = 0;
-                modifier=Integer.valueOf(Parser.cutFrom(key, "&"));
+                modifier=Integer.parseInt(Parser.cutFrom(key, "&"));
                 field=Parser.cutUntil(key,"&");
                 if (modifier > 0) {
                     switch (modifier) {
@@ -216,7 +211,7 @@ public class CelsiusTemplate {
                 i=out.indexOf("#"+key+"#");
             }
         }
-        return(out.toString());
+        return(out);
     }
     
     public String timeStampToDateTimeString(long ts) {
@@ -257,54 +252,7 @@ public class CelsiusTemplate {
                 i=out.indexOf("#"+key+"#");
             }
         }
-        return(out.toString());
+        return(out);
     }
- 
-    
-    /**
-     * Fills in an HTML template according to the properties given
-     * @param s the template
-     * @param properties the properties
-     * @return the filled-out HTML string
-     */
-    private String replaceInTemplate(String s, HashMap<String,String> properties) {
-        String template=s;
-        String line,tag,value;
-        String out="";
-
-        while (template.length() > 0) {
-            line = Parser.cutUntil(template, "\n");
-            template = Parser.cutFrom(template, "\n");
-            if (line.startsWith("#if#")) {
-                while (line.startsWith("#if#")) {
-                    line=Parser.cutFrom(line,"#if#");
-                    tag=Parser.cutUntil(line,"#");
-                    if (tag.charAt(0)=='!') {
-                        tag=tag.substring(1);
-                        if ((!properties.containsKey(tag)) || (properties.get(tag).length()==0))
-                            line=Parser.cutFrom(line,"#");
-                        else line="";
-                    } else {
-                        if ((properties.containsKey(tag)) && (properties.get(tag).length()>0))
-                            line=Parser.cutFrom(line,"#");
-                        else line="";
-                    }
-                }
-            } else {
-                out+="\n";
-            }
-            if (line.trim().length() > 0) {
-                for (String key : properties.keySet()) {
-                    value = properties.get(key);
-                    line=line.replace("#" + key + "#", value);
-                    line=line.replace("#|" + key + "#", "<ul><li>"+Parser.replace(value,"|", "</li><li>")+"</li></ul>");
-                    line=line.replace("#$" + key + "#", value);
-                }
-                out+=line;
-            }
-        }
-        return(out.trim());
-    }
-
-    
+     
 }

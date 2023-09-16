@@ -13,19 +13,12 @@ package celsius.components.search;
 
 import celsius.components.library.Library;
 import celsius.Resources;
-import celsius.*;
-import celsius.components.search.ThreadSearchDetail;
 import atlantis.tools.Parser;
 import celsius.gui.CBRenderer;
 import celsius.components.tableTabs.CelsiusTable;
 import celsius.gui.ClearEdit;
-import celsius.gui.GUIToolBox;
 import celsius.gui.RangeEditor;
-import celsius.tools.ToolBox;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.*;
@@ -52,13 +45,13 @@ public class DeepSearch extends javax.swing.JDialog {
         RSC=rsc;
         initComponents();
         setTitle("Detailed search");
-        setIconImage(RSC.getImage("search"));
+        setIconImage(RSC.guiTools.appIcon);
         checkBoxes=new HashMap<String,JCheckBox>();
         comboBoxes=new HashMap<String,JComboBox>();
         rangeEditors=new HashMap<String,RangeEditor>();
         jCE1=new ClearEdit(RSC,"Enter search string");
         jPanel1.add(jCE1, java.awt.BorderLayout.NORTH);
-        GUIToolBox.centerDialog(this,RSC.MF);
+        RSC.guiTools.centerDialog(this);
     }
     public JPanel createPanel() {
         JPanel Pnl=new JPanel();
@@ -68,7 +61,7 @@ public class DeepSearch extends javax.swing.JDialog {
 
     public JLabel createLabel(String s) {
         JLabel jl=new JLabel(Parser.lowerEndOfWords(s)+":");
-        jl.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(11)));
+        jl.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(11)));
         jl.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         return(jl);
     }
@@ -76,7 +69,7 @@ public class DeepSearch extends javax.swing.JDialog {
     public JComboBox createComboBox() {
         JComboBox CB=new JComboBox();
         CB.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        CB.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(11)));
+        CB.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(11)));
         return(CB);
     }
 
@@ -179,7 +172,7 @@ public class DeepSearch extends javax.swing.JDialog {
             }
             if (searchtags[i].equals("plaintext")) {
                 JCheckBox cb = new JCheckBox("Extracted plain text");
-                cb.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(11))); // NOI18N
+                cb.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(11))); // NOI18N
                 cb.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
                 cb.setMargin(new java.awt.Insets(0, 0, 0, 0));
                 jPCheck.add(cb);
@@ -188,7 +181,7 @@ public class DeepSearch extends javax.swing.JDialog {
             }
             if (!done) {
                 JCheckBox cb = new JCheckBox();
-                cb.setFont(new java.awt.Font("Arial", 0, RSC.guiScale(11))); // NOI18N
+                cb.setFont(new java.awt.Font("Arial", 0, RSC.guiTools.guiScale(11))); // NOI18N
                 cb.setText(Parser.lowerEndOfWords2(searchtags[i]));
                 cb.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
                 cb.setMargin(new java.awt.Insets(0, 0, 0, 0));

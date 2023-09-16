@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package celsius.data;
 
 import celsius.components.library.Library;
@@ -11,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -35,10 +29,10 @@ public class PeopleListModel implements ListModel {
         containsData=false;
     }
     
-    public PeopleListModel(Library lib, String q1, String q2) throws SQLException {
-        library=lib;
-        query1=q1;
-        query2=q2;
+    public PeopleListModel(Library library, String query1, String query2) throws SQLException {
+        this.library=library;
+        this.query1=query1;
+        this.query2=query2;
         loadData();
     }
     

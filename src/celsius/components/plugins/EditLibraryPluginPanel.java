@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package celsius.components.plugins;
 
 import celsius.Resources;
@@ -42,7 +38,7 @@ public class EditLibraryPluginPanel extends javax.swing.JPanel {
             }
         }
         jList.setModel(DLM);
-        this.setPreferredSize(new Dimension(RSC.guiScale(261),RSC.guiScale(142)));
+        this.setPreferredSize(new Dimension(RSC.guiTools.guiScale(261),RSC.guiTools.guiScale(142)));
     }
 
     public String getStringList() {
